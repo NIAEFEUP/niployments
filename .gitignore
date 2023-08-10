@@ -1,1 +1,3 @@
 .vagrant/**
+# we ignore more changes to dev-cluster to avoid acidental changes to the dev cluster config
+dev-cluster.yaml 
