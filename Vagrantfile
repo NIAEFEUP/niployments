@@ -1,8 +1,12 @@
-CLUSTER_VM_RAM = 2048
-NUM_OF_NODES = 1
-ROUTER_RAM = 512
-BRIDGE_INTERFACE = nil
-HOST_ONLY = true
+require 'yaml'
+
+config = YAML.load(File.read("dev-cluster.yaml"))
+
+cluster_vm_ram = config["cluster"]["perVmRam"]
+num_of_nodes = config["cluster"]["nodeCount"]
+router_ram = config["cluster"]["router"]["ram"]
+bridge_interface = config["cluster"]["networking"] == nil ? nil : config["cluster"]["networking"]["bridgeInterface"]
+host_only = config["cluster"]["networking"] == nil ? false : (config["cluster"]["networking"]["hostOnly"] || false)
 $ip = 2 # start with 2 because virtualbox adapter makes 10.10.0.1 reserved for the host 
 
 def configure_ram(vm, ram)
@@ -28,10 +32,10 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder '.', '/vagrant', disabled: true
     config.vm.define "router" do |router|
         router.vm.box = "generic/debian11"
-        if HOST_ONLY == false then
-            if BRIDGE_INTERFACE != nil then
+        if host_only == false then
+            if bridge_interface != nil then
                     router.vm.network "public_network",
-                    :dev => BRIDGE_INTERFACE
+                    :dev => bridge_interface
             else
                 router.vm.network "public_network"
             end
@@ -48,7 +52,7 @@ Vagrant.configure("2") do |config|
             # expose the router to your network
         end
 
-        configure_ram(router, ROUTER_RAM)
+        configure_ram(router, router_ram)
         configure_private_network(router, true)
 
         router.vm.provision "shell", reboot: true, inline: <<-ROUTERSCRIPT
@@ -79,7 +83,7 @@ Vagrant.configure("2") do |config|
         ROUTERSCRIPT
         
     end
-    for i in 1..NUM_OF_NODES do 
+    for i in 1..num_of_nodes do 
         config.vm.define "cluster#{i}" do |clustervm|
             clustervm.vm.box = "generic/ubuntu2204" 
             script = <<-SCRIPT
@@ -108,7 +112,7 @@ Vagrant.configure("2") do |config|
             ' > /etc/netplan/50-privatenetwork.yaml
             netplan apply
             SCRIPT
-            configure_ram(clustervm, CLUSTER_VM_RAM)
+            configure_ram(clustervm, cluster_vm_ram)
             configure_private_network(clustervm, false)
             clustervm.vm.provision "shell", inline: script
                                             
