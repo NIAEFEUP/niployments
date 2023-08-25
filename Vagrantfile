@@ -1,6 +1,6 @@
 require 'yaml'
 
-config = YAML.load_file('dev-cluster.yaml')
+config = File.exists?('local-dev-cluster.yaml') ? YAML.load_file('local-dev-cluster.yaml') : YAML.load_file('dev-cluster.yaml')
 cluster_vm_ram = config["cluster"]["node"]["ram"]
 num_of_nodes = config["cluster"]["nodeCount"]
 router_ram = config["router"]["ram"]
