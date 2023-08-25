@@ -1,12 +1,11 @@
 require 'yaml'
 
-config = YAML.load(File.read("dev-cluster.yaml"))
-
-cluster_vm_ram = config["cluster"]["perVmRam"]
+config = YAML.load_file('dev-cluster.yaml')
+cluster_vm_ram = config["cluster"]["node"]["ram"]
 num_of_nodes = config["cluster"]["nodeCount"]
-router_ram = config["cluster"]["router"]["ram"]
-bridge_interface = config["cluster"]["networking"] == nil ? nil : config["cluster"]["networking"]["bridgeInterface"]
-host_only = config["cluster"]["networking"] == nil ? false : (config["cluster"]["networking"]["hostOnly"] || false)
+router_ram = config["router"]["ram"]
+bridge_interface = config["networking"] == nil ? nil : config["networking"]["bridgeInterface"]
+host_only = config["networking"] == nil ? false : (config["networking"]["hostOnly"] || false)
 $ip = 2 # start with 2 because virtualbox adapter makes 10.10.0.1 reserved for the host 
 
 def configure_ram(vm, ram)
