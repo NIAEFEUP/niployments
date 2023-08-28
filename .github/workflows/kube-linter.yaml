@@ -2,6 +2,7 @@ name: Check Kubernetes YAMLs with kube-linter
 
 on:
   pull_request:
+  push:
 
 jobs:
   scan:
