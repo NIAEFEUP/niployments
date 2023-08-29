@@ -2,12 +2,28 @@
 
 - name: Configure bgp on controlplane
   hosts: controlplane
+  vars:
+    controlplane_ip: 10.11.11.1/24
 
   tasks:
     - name: Install bird2 as dependency
       become: true
       ansible.builtin.apt:
         name: bird2
+    # FIXME (luisd): this might be problematic on node OSes that are not Ubuntu
+    # we should fix this when we decide on a OS
+    - name: Add controlplane loopback address configuration
+      become: true
+      ansible.builtin.template:
+        src: templates/51-controlnode.yaml.j2
+        dest: /etc/netplan/51-controlnode.yaml
+        mode: "644"
+      register: controlplane_network_config
+    - name: Apply new network configuration
+      become: true
+      ansible.builtin.command:
+        cmd: "netplan apply"
+      changed_when: controlplane_network_config.changed
     - name: Configure bird2
       become: true
       ansible.builtin.template:

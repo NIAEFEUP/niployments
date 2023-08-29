@@ -4,6 +4,13 @@
   hosts: routers
 
   tasks:
+    # enables L4 hashing
+    - name: Enable fib_multipath_hash_policy
+      become: true
+      ansible.posix.sysctl:
+        sysctl_set: true
+        name: net.ipv4.fib_multipath_hash_policy
+        value: 1
     - name: Install bird2 as dependency
       become: true
       ansible.builtin.apt:
