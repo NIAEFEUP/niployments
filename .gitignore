@@ -1,3 +1,4 @@
 .vagrant/**
 local-dev-cluster.yaml
 ansible-inventory-dev.ini
+.vscode/**

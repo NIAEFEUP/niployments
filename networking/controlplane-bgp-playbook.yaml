@@ -1,0 +1,21 @@
+---
+
+- name: Configure bgp on controlplane
+  hosts: controlplane
+
+  tasks:
+    - name: Install bird2 as dependency
+      become: true
+      ansible.builtin.apt:
+        name: bird2
+    - name: Configure bird2
+      become: true
+      ansible.builtin.template:
+        src: templates/node-bird.conf.j2
+        dest: /etc/bird/bird.conf
+        mode: "644"
+    - name: Restart bird2
+      become: true
+      ansible.builtin.systemd:
+        name: bird
+        state: restarted

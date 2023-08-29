@@ -1,0 +1,33 @@
+define myas = 65512;
+
+protocol kernel {
+    scan time 20;
+    ipv4{
+        export none;
+    };
+}
+
+protocol device {
+    scan time 10;
+}
+
+
+protocol static static_bgp {
+    ipv4{
+        import all;
+    };
+    route 10.11.11.1/32 reject;
+}
+
+{% for nodename in groups["routers"]%}
+protocol bgp {{nodename}}_bgp {
+    local as myas;
+    neighbor {{ hostvars[nodename]["ansible_"~
+    hostvars[nodename]["ansible_facts"]["target_interface"]]['ipv4']['address']
+    }} as myas;
+    ipv4 {
+        import none;
+        export where proto = "static_bgp";
+    };
+}
+{%endfor%}

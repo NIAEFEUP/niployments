@@ -73,7 +73,7 @@ if [ $i -lt 4 ]
 then
 INVENTORY+="\n[workers]\n"
 fi
-INVENTORY+="\n[nodes:children]\ncontrolplane\nworkers
-"
+INVENTORY+="\n[nodes:children]\ncontrolplane\nworkers\n
+[all:vars]\ndev_cluster=true"
 
 echo -e $INVENTORY > "ansible-inventory-dev.ini"
