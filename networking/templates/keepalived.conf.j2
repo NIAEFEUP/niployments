@@ -1,0 +1,15 @@
+vrrp_instance VI_1 {
+        state {{ "MASTER" if hostvars[inventory_hostname]["master"] == "true" else "BACKUP"}}
+        interface {{ hostvars[inventory_hostname]["target_interface"] }}
+        virtual_router_id 51
+        priority 254
+        advert_int 1
+        authentication {
+              auth_type PASS
+              auth_pass {{ hostvars[inventory_hostname]["vrrp_secret"] }}
+        }
+        virtual_ipaddress {
+              10.11.11.1/24
+              10.11.11.2/24
+        }
+}

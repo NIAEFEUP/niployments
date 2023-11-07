@@ -50,14 +50,25 @@ PARSED_HOSTS="$(vagrant ssh-config | awk '
         }
     }
 ')"
-
-router=$(echo "$PARSED_HOSTS" | grep "router")
-
 IFS=$'\n' #make ifs new line to array correctly
+routers=(`echo "$PARSED_HOSTS" | grep "router"`)
 nodes=(`echo "$PARSED_HOSTS" | grep "cluster"`)
 IFS=$' '
 
-INVENTORY="[routers]\n$router\n[controlplane]\n"
+INVENTORY="[routers]\n"
+i=0
+for router in "${routers[@]}"
+do
+    if [ $i -eq 0 ]
+    then
+        INVENTORY+="$router master=true\n"
+    else
+        INVENTORY+="$router master=false\n"
+    fi
+    ((i++))
+done
+
+INVENTORY+="\n[controlplane]\n"
 
 i=0
 for node in "${nodes[@]}"

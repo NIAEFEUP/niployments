@@ -1,5 +1,5 @@
 define myas = 65512;
-router id {{ ansible_facts[ansible_facts["target_interface"]]['ipv4']['address'] }};
+router id 10.11.11.1;
 
 protocol device {
     scan time 10;
@@ -20,7 +20,7 @@ protocol static {
 
 {% for nodename in groups["controlplane"]%}
 protocol bgp {{ nodename }}_bgp{
-  local {{ ansible_facts[ansible_facts["target_interface"]]['ipv4']['address'] }} as myas;
+  local 10.11.11.1 as myas;
   neighbor {{ hostvars[nodename]["ansible_"~
     hostvars[nodename]["ansible_facts"]["target_interface"]]['ipv4']['address']
   }} as myas;

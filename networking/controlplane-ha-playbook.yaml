@@ -1,0 +1,18 @@
+- name: Configure HA control plane API server
+  hosts: routers
+  tasks:
+    - name: Install HAProxy
+      become: true
+      ansible.builtin.apt:
+        name: haproxy
+    - name: Configure HAProxy
+      become: true
+      ansible.builtin.template:
+        src: templates/router-haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+        mode: "644"
+    - name: Restart HAProxy
+      become: true
+      ansible.builtin.systemd:
+        service: haproxy
+        state: restarted

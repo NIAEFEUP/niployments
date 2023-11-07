@@ -3,5 +3,7 @@
   ansible.builtin.import_playbook: networking/get-interface-playbook.yaml
 - name: Networking - Router BGP
   ansible.builtin.import_playbook: networking/router-bgp-playbook.yaml
-- name: Networking - Controlplane BGP
-  ansible.builtin.import_playbook: networking/controlplane-bgp-playbook.yaml
+- name: Networking - VRRP
+  ansible.builtin.import_playbook: networking/router-vrrp-playbook.yaml
+- name: Networking - Router Controlplane HA
+  ansible.builtin.import_playbook: networking/controlplane-ha-playbook.yaml
