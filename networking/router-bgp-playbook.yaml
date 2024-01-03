@@ -21,7 +21,14 @@
         src: templates/router-bird.conf.j2
         dest: /etc/bird/bird.conf
         mode: "644"
+    - name: Enable bird2
+      when: hostvars[inventory_hostname]['master'] == 'true'
+      become: true
+      ansible.builtin.systemd:
+        name: bird
+        enabled: true
     - name: Restart bird2
+      when: hostvars[inventory_hostname]['master'] == 'true'
       become: true
       ansible.builtin.systemd:
         name: bird

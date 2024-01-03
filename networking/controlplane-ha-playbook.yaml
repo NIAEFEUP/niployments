@@ -11,8 +11,17 @@
         src: templates/router-haproxy.cfg.j2
         dest: /etc/haproxy/haproxy.cfg
         mode: "644"
+    - name: Enable HAProxy
+      become: true
+      when: hostvars[inventory_hostname]['master'] == 'true'
+      ansible.builtin.systemd:
+        service: haproxy
+        enabled: true
     - name: Restart HAProxy
       become: true
+      when: hostvars[inventory_hostname]['master'] == 'true'
       ansible.builtin.systemd:
         service: haproxy
         state: restarted
+      retries: 3
+      delay: 5

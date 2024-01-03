@@ -18,15 +18,16 @@ protocol static {
   ipv4;
 }
 
-{% for nodename in groups["controlplane"]%}
+{% for nodename in groups["nodes"]%}
 protocol bgp {{ nodename }}_bgp{
-  local 10.11.11.1 as myas;
+  local 10.10.0.254 as myas;
   neighbor {{ hostvars[nodename]["ansible_"~
     hostvars[nodename]["ansible_facts"]["target_interface"]]['ipv4']['address']
   }} as myas;
   direct;
   ipv4 {
     import all;
+    export all;
   };
 }
 

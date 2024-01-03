@@ -11,6 +11,12 @@
       become: true
       ansible.builtin.apt:
         name: keepalived
+    - name: Copy notify script
+      become: true
+      ansible.builtin.copy:
+        src: templates/vrrp-notify-script.sh
+        dest: /etc/keepalived/vrrp-notify-script.sh
+        mode: "777"
     - name: Configure Keepalived
       become: true
       ansible.builtin.template:

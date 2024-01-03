@@ -31,7 +31,7 @@ defaults
 # apiserver frontend which proxys to the control plane nodes
 #---------------------------------------------------------------------
 frontend apiserver
-    bind 10.11.11.2:6443
+    bind 10.11.11.1:6443
     mode tcp
     option tcplog
     default_backend apiserver
