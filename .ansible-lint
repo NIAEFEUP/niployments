@@ -8,5 +8,8 @@ exclude_paths:
  - .github/
  - .vscode/
  - .git
+
+sarif_file: ansible.sarif
+
 kinds:
  - playbook: '**/*-playbook.{yaml,yml}'

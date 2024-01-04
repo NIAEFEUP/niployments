@@ -14,3 +14,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run ansible-lint
         uses: ansible/ansible-lint@main # or version tag instead of 'main'
+      - name: Upload sarif
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+         sarif_file: ansible.sarif
+         category: ansible-lint
