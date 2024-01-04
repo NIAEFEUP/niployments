@@ -1,0 +1,12 @@
+---
+exclude_paths:
+# NOTE(luisd): AFAIK ansible-lint doesn't have a include files only and neither deos have
+#  a glob implementation, so we exclude all yaml files manually from the root directory :/
+ - dev-cluster.yaml
+ - local-dev-cluster.yaml
+ - .kube-linter.yaml
+ - .github/
+ - .vscode/
+ - .git
+kinds:
+ - playbook: '**/*-playbook.{yaml,yml}'
