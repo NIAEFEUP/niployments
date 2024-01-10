@@ -13,6 +13,9 @@ case $STATE in
                   systemctl stop haproxy
                   exit 0
                   ;;
+        # NOTE(luisd): While FAULT states are not implemented yet, we still 
+        #  handle the case. It could be implemented in the future eg.: if 
+        #  the internet on the router fails.
         "FAULT")  systemctl stop bird
                   systemctl stop haproxy
                   exit 0
