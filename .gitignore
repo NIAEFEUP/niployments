@@ -1,3 +1,5 @@
 .vagrant/**
 local-dev-cluster.yaml
 **.sarif
+node/rocky-iso/**
+node/*.iso
