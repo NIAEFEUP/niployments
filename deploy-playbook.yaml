@@ -1,0 +1,11 @@
+---
+- name: Accept ssh keys for the first time
+  ansible.builtin.import_playbook: networking/accept-ssh-keys-playbook.yaml
+- name: Pre-setup - get correct interfaces
+  ansible.builtin.import_playbook: networking/get-interface-playbook.yaml
+- name: Networking - Router BGP
+  ansible.builtin.import_playbook: networking/router-bgp-playbook.yaml
+- name: Networking - VRRP
+  ansible.builtin.import_playbook: networking/router-vrrp-playbook.yaml
+- name: Networking - Router Controlplane HA
+  ansible.builtin.import_playbook: networking/controlplane-ha-playbook.yaml

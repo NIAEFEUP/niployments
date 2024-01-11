@@ -1,0 +1,30 @@
+- name: Router and Controlplane VRRP
+  hosts: routers
+  strategy: linear
+  tasks:
+    - name: Generate random secret for VRRP auth # noqa: run-once[task]
+      ansible.builtin.set_fact:
+        vrrp_secret: "{{ lookup('password', '/dev/null length=64 chars=ascii_letters') }}"
+      delegate_to: localhost
+      run_once: true
+    - name: Install Keepalived
+      become: true
+      ansible.builtin.apt:
+        name: keepalived
+    - name: Copy notify script
+      become: true
+      ansible.builtin.copy:
+        src: templates/vrrp-notify-script.sh
+        dest: /etc/keepalived/vrrp-notify-script.sh
+        mode: "777"
+    - name: Configure Keepalived
+      become: true
+      ansible.builtin.template:
+        src: templates/keepalived.conf.j2
+        dest: /etc/keepalived/keepalived.conf
+        mode: "644"
+    - name: Restart Keepalived
+      become: true
+      ansible.builtin.systemd:
+        name: keepalived
+        state: restarted
