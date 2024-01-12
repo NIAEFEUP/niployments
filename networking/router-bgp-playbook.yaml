@@ -1,0 +1,35 @@
+---
+
+- name: Configure bgp on routers
+  hosts: routers
+
+  tasks:
+    # enables L4 hashing
+    - name: Enable fib_multipath_hash_policy
+      become: true
+      ansible.posix.sysctl:
+        sysctl_set: true
+        name: net.ipv4.fib_multipath_hash_policy
+        value: 1
+    - name: Install bird2 as dependency
+      become: true
+      ansible.builtin.apt:
+        name: bird2
+    - name: Configure bird2
+      become: true
+      ansible.builtin.template:
+        src: templates/router-bird.conf.j2
+        dest: /etc/bird/bird.conf
+        mode: "644"
+    - name: Enable bird2
+      when: hostvars[inventory_hostname]['master'] == 'true'
+      become: true
+      ansible.builtin.systemd:
+        name: bird
+        enabled: true
+    - name: Restart bird2
+      when: hostvars[inventory_hostname]['master'] == 'true'
+      become: true
+      ansible.builtin.systemd:
+        name: bird
+        state: restarted

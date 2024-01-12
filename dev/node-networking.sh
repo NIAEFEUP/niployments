@@ -17,7 +17,7 @@ echo "
                 addresses: [10.10.0.$1/24]
                 routes:
                 -   to: default
-                    via: 10.10.0.2 
+                    via: 10.10.0.254 
                     metric: 0
                 nameservers:
                     addresses: [1.1.1.1, 1.0.0.1]
