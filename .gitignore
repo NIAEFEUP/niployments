@@ -5,3 +5,4 @@ ansible-inventory-dev.ini
 **.sarif
 node/rocky-iso/**
 node/*.iso
+testbed/output-generated/**

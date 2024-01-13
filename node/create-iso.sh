@@ -7,9 +7,8 @@ cd rocky-iso
 bsdtar xf ../rocky.iso
 cd ..
 cp ks.cfg rocky-iso/isolinux/
-cp ks.cfg rocky-iso
 cp grub.cfg rocky-iso/EFI/BOOT/grub.cfg
-cp ninux-splash.png rocky-iso/splash.png
+cp ninux-splash.png rocky-iso/isolinux/splash.png
 cp isolinux.cfg rocky-iso/isolinux/
 cd rocky-iso
 
@@ -30,3 +29,6 @@ mkisofs \
    -eltorito-boot images/efiboot.img \
    -V "Rocky-NInux-9" \
    .
+
+cd ..
+rm -rf rocky-iso

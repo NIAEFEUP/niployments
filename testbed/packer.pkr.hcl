@@ -4,25 +4,26 @@ packer {
       source  = "github.com/hashicorp/vagrant"
       version = "~> 1"
     }
+    virtualbox = {
+      version = "~> 1"
+      source  = "github.com/hashicorp/virtualbox"
+    }
   }
 }
 
 
 source "virtualbox-iso" "generated" {
   guest_os_type = "Linux_64"
-  iso_url       = "https://channels.nixos.org/nixos-23.05/latest-nixos-minimal-x86_64-linux.iso"
-  iso_checksum  = "c92fdd85e18466e4e557d59bed8edfa55f9f139c0b16cf060d59dc198e056e52"
-  ssh_username  = "niaefeup"
-  ssh_password  = "niaefeup"
+  iso_url       = "../node/ninux.iso"
+  iso_checksum="none" #disable checksum because image is generated
+  ssh_username  = "ni"
+  ssh_private_key_file = "../node/bootstrap_key"
+  cpus = 2
+  memory = 2048
   boot_wait     = "60s"
-  boot_command = [
-    "sudo su<enter><wait>",
-    "stop sshd<enter>",
-    "mkfs.btrfs -L nixos /dev/sda<enter><wait5>",
-    "mount -o discard,compress=lzo LABEL=nixos /mnt<enter><wait>",
-    "nixos-generate-config --root /mnt<enter><wait>",
-    "nixos-install && reboot<enter>"
-  ]
+  boot_command = []
+  #maximum of one hour until ssh times out (which means packer timeouts after 1 hour)
+  ssh_timeout = "1h" 
 }
 
 
