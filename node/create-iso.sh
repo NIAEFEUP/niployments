@@ -7,6 +7,7 @@ cd rocky-iso
 bsdtar xf ../rocky.iso
 cd ..
 cp ks.cfg rocky-iso/isolinux/
+cp ks.cfg rocky-iso/ks-efi.cfg
 cp grub.cfg rocky-iso/EFI/BOOT/grub.cfg
 cp ninux-splash.png rocky-iso/isolinux/splash.png
 cp isolinux.cfg rocky-iso/isolinux/
@@ -17,18 +18,12 @@ mkisofs \
     -b isolinux.bin \
     -c boot.cat \
     -no-emul-boot -boot-load-size 4 -boot-info-table \
+    -eltorito-alt-boot \
+    -eltorito-platform efi \
+    -eltorito-boot images/efiboot.img \
+    -no-emul-boot \
     -V "Rocky-NInux-9" -R -J -v -T isolinux/. .
 
-mkisofs \
-   -o ../ninux-efi.iso \
-   -R -J -v -d -N \
-   -x ../ninux-efi.iso \
-   -hide-rr-moved \
-   -no-emul-boot \
-   -eltorito-platform efi \
-   -eltorito-boot images/efiboot.img \
-   -V "Rocky-NInux-9" \
-   .
 
 cd ..
 rm -rf rocky-iso
