@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpine
+  labels:
+    name: "alpine"
+  annotations:
+    # force policy will ensure that deployment is updated
+    # even when tag is unchanged (latest remains)
+    keel.sh/policy: major
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: alpine
+  template:
+    metadata:
+      name: alpine
+      labels:
+        app: alpine
+    spec:
+      containers:
+        - image: 172.18.255.200:443/library/alpine:3.16.3
+          imagePullPolicy: Always # this is required to force pull image
+          name: alpine
+          command: [ "/bin/sh", "-c", "--" ]
+          args: [ "while true; do sleep 3600; done;" ]
