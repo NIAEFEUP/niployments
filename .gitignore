@@ -6,3 +6,4 @@ ansible-inventory-dev.ini
 node/rocky-iso/**
 node/*.iso
 testbed/output-generated/**
+*.box
