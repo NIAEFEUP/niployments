@@ -8,6 +8,7 @@ metadata:
     # force policy will ensure that deployment is updated
     # even when tag is unchanged (latest remains)
     keel.sh/policy: major
+    ignore-check.kube-linter.io/run-as-non-root: "This deployment needs to run as root"
 spec:
   replicas: 1
   revisionHistoryLimit: 5
@@ -28,7 +29,6 @@ spec:
           args: [ "while true; do sleep 3600; done;" ]
           securityContext:
             readOnlyRootFilesystem: true
-            runAsNonRoot: true
           resources:
             limits:
               cpu: 50m

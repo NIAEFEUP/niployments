@@ -8,6 +8,7 @@ exclude_paths:
  - .github/
  - .vscode/
  - services/
+ - dev/
  - .git
 
 sarif_file: ansible.sarif

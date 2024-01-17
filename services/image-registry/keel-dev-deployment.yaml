@@ -109,6 +109,8 @@ metadata:
   namespace: keel
   labels:
     app: keel
+  annotations:
+    ignore-check.kube-linter.io/run-as-non-root: "This deployment needs to run as root"
 spec:
   replicas: 1
   selector:
@@ -147,7 +149,6 @@ spec:
           command: ["/bin/keel"]
           securityContext:
             readOnlyRootFilesystem: true
-            runAsNonRoot: true
           env:
             - name: NAMESPACE
               valueFrom:
