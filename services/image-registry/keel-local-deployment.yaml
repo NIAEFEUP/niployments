@@ -142,9 +142,12 @@ spec:
         # {{ end }}
         - name: keel
           # Note that we use appVersion to get images tag.
-          image: keelhq/keel:latest
+          image: keelhq/keel:0.19.1
           imagePullPolicy: Always
           command: ["/bin/keel"]
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
           env:
             - name: NAMESPACE
               valueFrom:

@@ -26,3 +26,13 @@ spec:
           name: alpine
           command: [ "/bin/sh", "-c", "--" ]
           args: [ "while true; do sleep 3600; done;" ]
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          resources:
+            limits:
+              cpu: 50m
+              memory: 128Mi
+            requests:
+              cpu: 25m
+              memory: 64Mi

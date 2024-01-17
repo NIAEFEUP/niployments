@@ -86,7 +86,7 @@ kubectl apply -f example-deployment.yaml
 ```
 
 ## Add a webhook in Harbor
-In the project with your image add a webhook for artifact push events. Use the Fully Qualified Domain Name (FQDN) of the keel service and the correct endpoint for Harbor events. FQDNs follow the following pattern in Kubernetes `<service-name>.<namespace>.svc.<cluster-domain>`; usually, the cluster domain is `cluster.local`. It should look something like this:
+In the project with your image, add a webhook for artifact push events. Use the Fully Qualified Domain Name (FQDN) of the keel service and the correct endpoint for Harbor events. FQDNs follow the following pattern in Kubernetes `<service-name>.<namespace>.svc.<cluster-domain>`; usually, the cluster domain is `cluster.local`. It should look something like this:
 
 > http://keel.keel.svc.cluster.local:9300/v1/webhooks/harbor
 
