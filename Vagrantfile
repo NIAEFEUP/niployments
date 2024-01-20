@@ -69,7 +69,7 @@ end
 
 def configure_cluster_node(i, config)
     config.vm.define "cluster#{i}" do |clustervm|
-        clustervm.vm.box = "generic/ubuntu2204"
+        clustervm.vm.box = "NIAEFEUP/rocky-NInux"
         lip = $ip.clone
         clustervm.vm.provision "shell" do |s|
             s.path = "dev/node-networking.sh"
@@ -82,6 +82,8 @@ def configure_cluster_node(i, config)
         end
         configure_ram(clustervm, $cluster_vm_ram)
         configure_private_network(clustervm, false)
+        clustervm.ssh.username = "ni"
+        clustervm.ssh.private_key_path = "node/bootstrap_key"
                                     
     end
 end
