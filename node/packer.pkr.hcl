@@ -24,10 +24,10 @@ variable "new_version" {
 
 source "virtualbox-iso" "generated" {
   guest_os_type = "Linux_64"
-  iso_url       = "../node/ninux.iso"
+  iso_url       = "ninux.iso"
   iso_checksum="none" #disable checksum because image is generated
   ssh_username  = "ni"
-  ssh_private_key_file = "../node/bootstrap_key"
+  ssh_private_key_file = "bootstrap_key"
   cpus = 2
   memory = 2048
   boot_wait     = "60s"
@@ -38,10 +38,10 @@ source "virtualbox-iso" "generated" {
 
 source "qemu" "generated-qemu" {
   accelerator = "kvm"
-  iso_url       = "../node/ninux.iso"
+  iso_url       = "ninux.iso"
   iso_checksum="none" #disable checksum because image is generated
   ssh_username  = "ni"
-  ssh_private_key_file = "../node/bootstrap_key"
+  ssh_private_key_file = "bootstrap_key"
   cpus = 2
   memory = 2048
   boot_wait     = "60s"
