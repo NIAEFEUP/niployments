@@ -2,9 +2,9 @@
 
 set -euo pipefail # if something goes wrong exit immediately
 
-if ! command -v mkisofs &> /dev/null
+if ! command -v xorriso &> /dev/null
 then
-    echo "In order to run this script you need to have 'mkisofs' installed on your machine."
+    echo "In order to run this script you need to have 'xorriso' installed on your machine."
     exit 1
 fi
 
@@ -22,16 +22,18 @@ mkdir -p rocky-iso
     cp isolinux.cfg rocky-iso/isolinux/
     cd rocky-iso
 
-    mkisofs \
-        -o ../ninux.iso \
-        -b isolinux.bin \
+    xorriso -as mkisofs \
+        -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin \
+     	-o ../ninux.iso \
+        -b isolinux/isolinux.bin \
         -c boot.cat \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         -eltorito-alt-boot \
         -eltorito-platform efi \
-        -eltorito-boot images/efiboot.img \
+        -e images/efiboot.img \
         -no-emul-boot \
-        -V "Rocky-NInux-9" -R -J -v -T isolinux/. .
+	    -isohybrid-gpt-basdat \
+        -V "Rocky-NInux-9" -R -J -v .
 )
 
 rm -rf rocky-iso
