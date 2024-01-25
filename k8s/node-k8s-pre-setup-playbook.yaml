@@ -1,0 +1,25 @@
+- name: Node k8s pre-setup
+  hosts: nodes
+  tasks:
+    - name: NetworkManager exclude CNI interfaces
+      become: true
+      ansible.builtin.copy:
+        src: templates/rke.conf
+        dest: /etc/NetworkManager/conf.d/rke.conf
+        mode: "644"
+    - name: Restart NetworkManager
+      become: true
+      ansible.builtin.systemd:
+        name: NetworkManager
+        state: restarted
+    - name: Stop and disable firewalld
+      become: true
+      ansible.builtin.systemd:
+        name: firewalld
+        state: stopped
+        enabled: false
+    - name: Install RKE2 # noqa: command-instead-of-module
+      become: true
+      ansible.builtin.shell:
+        cmd: set -o pipefail && curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE="{{ "server" if "controlplane" in group_names else "agent" }}" sh -
+        creates: /usr/bin/rke2

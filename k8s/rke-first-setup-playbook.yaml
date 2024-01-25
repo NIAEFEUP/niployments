@@ -1,0 +1,65 @@
+﻿- name: Setup RKE on the first control-plane node
+  hosts: controlplane[0]
+  tasks:
+    - name: Create the rke2 config directory
+      become: true
+      ansible.builtin.file:
+        path: /etc/rancher/rke2
+        state: directory
+        mode: "755"
+        recurse: true
+    - name: Copy first server node yaml to the correct destination
+      become: true
+      ansible.builtin.copy:
+        src: templates/config-rke-first.yaml
+        dest: /etc/rancher/rke2/config.yaml
+        mode: "644"
+    - name: Start and Enable RKE2
+      become: true
+      ansible.builtin.systemd:
+        name: rke2-server
+        state: started
+        enabled: true
+    - name: Wait for RKE2 to start
+      become: true
+      ansible.builtin.wait_for:
+        port: 6443
+        delay: 5
+        timeout: 300
+    - name: Extract RKE2 token
+      become: true
+      ansible.builtin.command: cat /var/lib/rancher/rke2/server/node-token
+      changed_when: rke2_token.rc != 0 # if token was successfully extracted
+      register: rke2_token
+    - name: Set RKE2 token fact
+      ansible.builtin.set_fact:
+        cluster_token: "{{ rke2_token.stdout }}"
+
+- name: Setup RKE on the remaining control-plane nodes
+  hosts: controlplane[1:]
+  tasks:
+    - name: Create the rke2 config directory
+      become: true
+      ansible.builtin.file:
+        path: /etc/rancher/rke2
+        state: directory
+        mode: "755"
+        recurse: true
+    - name: Copy server node yaml to the correct destination
+      become: true
+      ansible.builtin.template:
+        src: templates/config-rke-additional.j2
+        dest: /etc/rancher/rke2/config.yaml
+        mode: "644"
+    - name: Start and Enable RKE2
+      become: true
+      ansible.builtin.systemd:
+        name: rke2-server
+        state: started
+        enabled: true
+    - name: Wait for RKE2 to start
+      become: true
+      ansible.builtin.wait_for:
+        port: 6443
+        delay: 5
+        timeout: 300
