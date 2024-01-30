@@ -71,6 +71,19 @@ def configure_cluster_node(i, config)
     config.vm.define "cluster#{i}" do |clustervm|
         clustervm.vm.box = "NIAEFEUP/rocky-NInux"
         lip = $ip.clone
+
+        # We enable nested virtualization for vm build tests in vagrant
+        clustervm.vm.provider "virtualbox" do |vb|
+            vb.customize ['modifyvm', :id, '--nested-hw-virt', 'on']
+        end
+
+        clustervm.vm.provider :libvirt do |libvirt|
+            # Enable KVM nested virtualization
+            libvirt.nested = true
+            libvirt.cpu_mode = "host-model"
+        end
+          
+
         clustervm.vm.provision "shell" do |s|
             s.path = "dev/node-networking.sh"
             s.args = [lip]
