@@ -1,0 +1,83 @@
+﻿
+
+- name: "Install debootstrap"
+  become: true
+  ansible.builtin.dnf:
+    name: debootstrap
+    state: present
+
+- name: "Install virtualization utils"
+  become: true
+  ansible.builtin.dnf:
+    name:
+      - qemu-kvm
+      - libvirt
+      - virt-install
+    state: present
+- name: "Enable libvirt service"
+  become: true
+  ansible.builtin.systemd:
+    name: libvirtd
+    state: "started"
+    enabled: true
+
+- name: "Run debootstrap to prepare disk image"
+  become: true
+  ansible.builtin.command:
+    argv:
+      - /usr/sbin/debootstrap
+      - --arch=amd64
+      - --include=bzip2,curl,locales,ntpdate,openssh-server,python3,sudo,vim
+      - bookworm
+      - /srv/vm/images/bookworm
+    creates: /srv/vm/images/bookworm
+
+- name: "Create router disk folder"
+  become: true
+  ansible.builtin.file:
+    recurse: true
+    state: directory
+    path: "/srv/vm/disks/router"
+    mode: "600"
+- name: "Create router QCOW2 file"
+  become: true
+  ansible.builtin.command:
+    cmd: /usr/bin/qemu-img create -f qcow2 /srv/vm/disks/router/router-disk.img 5G
+    creates: /srv/vm/disks/router/router-disk.img
+
+- name: "Enable nbd module"
+  become: true
+  ansible.builtin.modprobe:
+    name: nbd
+    state: present
+
+- name: "Mount router image"
+  become: true
+  ansible.builtin.command: /usr/bin/qemu-nbd --connect=/dev/nbd0 /srv/vm/disks/router/router-disk.img
+  register: image_create_dev
+  failed_when: image_create_dev.rc != 0
+
+- name: "Create partition for router image"
+  become: true
+  ansible.builtin.parted:
+    device: /dev/nbd0
+    number: 1
+    flags:
+      - lvm
+    state: present
+- name: "Make partition use a ext4 filesystem"
+  become: true
+  ansible.builtin.filesystem:
+    dev: /dev/nbd0p1
+    fstype: ext4
+    state: present
+- name: "Mount partition"
+  become: true
+  ansible.builtin.mount:
+    src: /dev/nbd0p1
+    path: /mnt/router
+    fstype: ext4
+    state: ephemeral
+- name: "Copy debootstrap files to partition"
+  become: true
+  ansible.builtin.shell: cp -R /srv/vm/images/bookworm/** /mnt/router
