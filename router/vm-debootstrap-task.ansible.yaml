@@ -80,4 +80,4 @@
     state: ephemeral
 - name: "Copy debootstrap files to partition"
   become: true
-  ansible.builtin.shell: cp -R /srv/vm/images/bookworm/** /mnt/router
+  ansible.builtin.shell: cp -pR /srv/vm/images/bookworm/** /mnt/router
