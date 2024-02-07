@@ -10,5 +10,5 @@ nodes:
 
 containerdConfigPatches:
   - |-
-    [plugins."io.containerd.grpc.v1.cri".registry.configs."172.18.255.200:443".tls]
+    [plugins."io.containerd.grpc.v1.cri".registry.configs."172.28.255.200".tls]
       insecure_skip_verify = true

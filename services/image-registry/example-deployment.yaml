@@ -22,7 +22,7 @@ spec:
         app: alpine
     spec:
       containers:
-        - image: 172.18.255.200:443/library/alpine:3.16.3
+        - image: 172.28.255.200/library/alpine:3.16.3
           imagePullPolicy: Always # this is required to force pull image
           name: alpine
           command: [ "/bin/sh", "-c", "--" ]
