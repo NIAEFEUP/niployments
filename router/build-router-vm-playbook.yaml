@@ -1,24 +1,18 @@
 ﻿- name: Build router VM in hosts that have the appropriate NICs
   hosts: controlplane[0]
   tasks:
-    - name: "Build router image block"
-      block:
-        - name: Build VM disk image
-          ansible.builtin.include_tasks:
-            file: "vm-debootstrap-task.ansible.yaml"
-      always:
-        - name: "Unmount router partition"
-          become: true
-          ansible.posix.mount:
-            src: /dev/nbd0p1
-            path: /mnt/router
-            state: unmounted
-        - name: "Unmount router image"
-          become: true
-          ansible.builtin.command: /usr/bin/qemu-nbd --disconnect /dev/nbd0
-          changed_when: true
-        - name: "Disable nbd module"
-          become: true
-          community.general.modprobe:
-            name: nbd
-            state: absent
+    - name: Build VM disk image
+      ansible.builtin.include_tasks:
+        file: "vm-image-task.ansible.yaml"
+    - name: Create VM for router
+      become: true
+      community.libvirt.virt:
+        autostart: true
+        name: routerVM
+        command: define
+        xml: "{{ lookup('template', 'templates/libvirt-xml.j2') }}"
+    - name: Start VM
+      become: true
+      community.libvirt.virt:
+        name: routerVM
+        state: running

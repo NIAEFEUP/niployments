@@ -1,0 +1,91 @@
+﻿- name: "Install virtualization utils"
+  become: true
+  ansible.builtin.dnf:
+    name:
+      - qemu-kvm
+      - libvirt
+      - virt-install
+      - guestfs-tools
+    state: present
+- name: "Enable libvirt service"
+  become: true
+  ansible.builtin.systemd:
+    name: libvirtd
+    state: "started"
+    enabled: true
+- name: "Create VM disks folder"
+  become: true
+  ansible.builtin.file:
+    recurse: true
+    state: directory
+    path: "/srv/vm/disks"
+    mode: "770"
+    group: qemu
+- name: "Create router disk folder"
+  become: true
+  ansible.builtin.file:
+    recurse: true
+    state: directory
+    path: "/srv/vm/disks/router"
+    mode: "770"
+    group: qemu
+- name: "Download router QCOW2 file"
+  become: true
+  ansible.builtin.get_url:
+    url: https://cloud.debian.org/images/cloud/bookworm/20240211-1654/debian-12-generic-amd64-20240211-1654.qcow2
+    dest: /srv/vm/disks/router/router.qcow2
+    checksum: sha512:b679398972ba45a60574d9202c4f97ea647dd3577e857407138b73b71a3c3c039804e40aac2f877f3969676b6c8a1ebdb4f2d67a4efa6301c21e349e37d43ef5
+    mode: "770"
+- name: "Resize router QCOW2 file"
+  become: true
+  ansible.builtin.command:
+    cmd: qemu-img resize /srv/vm/disks/router/router.qcow2 5G
+
+- name: "Resize router QCOW2 partition"
+  block:
+    - name: "Change old file router name"
+      become: true
+      ansible.builtin.command:
+        cmd: cp /srv/vm/disks/router/router.qcow2 /srv/vm/disks/router/router.qcow2.old
+        creates: /srv/vm/disks/router/router.qcow2.old
+    - name: "Resize filesystem partition for router"
+      become: true
+      ansible.builtin.command:
+        cmd: virt-resize --expand /dev/sda1 /srv/vm/disks/router/router.qcow2.old /srv/vm/disks/router/router.qcow2
+    - name: "Delete old router qcow file"
+      become: true
+      ansible.builtin.file:
+        path: /srv/vm/disks/router/router.qcow2.old
+        state: absent
+- name: "Enable nbd module"
+  become: true
+  community.general.modprobe:
+    name: nbd
+    state: present
+
+- name: "Mount router image"
+  become: true
+  ansible.builtin.command: /usr/bin/qemu-nbd --connect=/dev/nbd0 /srv/vm/disks/router/router.qcow2
+  register: image_create_dev
+  failed_when: image_create_dev.rc != 0
+
+- name: "Mount router partition"
+  become: true
+  ansible.posix.mount:
+    src: /dev/nbd0p3
+    path: /mnt/router
+    fstype: ext4
+    state: ephemeral
+
+- name: "Umount router partition"
+  become: true
+  ansible.posix.mount:
+    src: /dev/nbd0p3
+    path: /mnt/router
+    state: absent
+
+- name: "Umount router image"
+  become: true
+  ansible.builtin.command: /usr/bin/qemu-nbd --disconnect /dev/nbd0
+  register: image_create_dev
+  failed_when: image_create_dev.rc != 0
