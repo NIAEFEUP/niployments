@@ -57,35 +57,53 @@
       ansible.builtin.file:
         path: /srv/vm/disks/router/router.qcow2.old
         state: absent
-- name: "Enable nbd module"
-  become: true
-  community.general.modprobe:
-    name: nbd
-    state: present
 
-- name: "Mount router image"
+- name: Create user on vm
   become: true
-  ansible.builtin.command: /usr/bin/qemu-nbd --connect=/dev/nbd0 /srv/vm/disks/router/router.qcow2
-  register: image_create_dev
-  failed_when: image_create_dev.rc != 0
+  ansible.builtin.command:
+    cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'useradd -m -s /bin/bash -g sudo ni'
 
-- name: "Mount router partition"
+- name: Create password on user
   become: true
-  ansible.posix.mount:
-    src: /dev/nbd0p3
-    path: /mnt/router
-    fstype: ext4
-    state: ephemeral
+  ansible.builtin.command:
+    cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'echo "ni:n1bl04t:)" | chpasswd'
 
-- name: "Umount router partition"
+- name: "Create mount directory"
   become: true
-  ansible.posix.mount:
-    src: /dev/nbd0p3
-    path: /mnt/router
-    state: absent
+  ansible.builtin.file:
+    state: directory
+    path: "/mnt/router"
 
-- name: "Umount router image"
+- block:
+    - name: "Mount router image"
+      become: true
+      ansible.builtin.command: guestmount -a /srv/vm/disks/router/router.qcow2 -m /dev/sda3 /mnt/router
+      register: image_create_dev
+      failed_when: image_create_dev.rc != 0
+    - name: Create .ssh folder on vm
+      become: true
+      ansible.builtin.file:
+        path: /mnt/router/home/{{ ansible_ssh_user }}/.ssh
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: "{{ ansible_ssh_user }}"
+        mode: "755"
+    - name: Copy authorized_keys to vm
+      become: true
+      ansible.builtin.copy:
+        src: /home/ni/.ssh/authorized_keys
+        dest: /mnt/router/home/ni/.ssh/authorized_keys
+        remote_src: true
+        mode: "644"
+
+  always:
+    - name: "Umount router partition"
+      become: true
+      ansible.builtin.command:
+        cmd: guestunmount /mnt/router
+      failed_when: false
+
+- name: Fix grub on VM
   become: true
-  ansible.builtin.command: /usr/bin/qemu-nbd --disconnect /dev/nbd0
-  register: image_create_dev
-  failed_when: image_create_dev.rc != 0
+  ansible.builtin.command:
+    cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'grub-install /dev/sda'
