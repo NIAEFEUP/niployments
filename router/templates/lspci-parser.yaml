@@ -1,0 +1,9 @@
+---
+- example: "00:1f.3 0c05: 8086:8c22 (rev 04)"
+  getval: '(?P<bus>[0-9a-fA-F][0-9a-fA-F]):(?P<device>[0-9a-fA-F][0-9a-fA-F])\.(?P<function>[0-7])\s*([0-9]*)\s*:\s* (?P<pci_vendor_device>[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]).*'
+  result:
+    "{{ bus + ':' + device + '.' + function }}":
+        bus: "{{ bus }}"
+        device: '{{ device }}'
+        function: "{{ function }}"
+        pci_vendor_device: "{{ pci_vendor_device }}"
