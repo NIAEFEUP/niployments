@@ -1,26 +1,6 @@
 #!/bin/sh
-
-echo '
-network:
-    ethernets:
-        eth0: 
-            dhcp4: true
-            dhcp4-overrides:
-                use-dns: false
-                use-routes: false 
-' > /etc/netplan/01-netcfg.yaml
-echo "
-    network:
-        ethernets:
-            eth1:
-                dhcp4: false
-                addresses: [10.10.0.$1/24]
-                routes:
-                -   to: default
-                    via: 10.10.0.254 
-                    metric: 0
-                nameservers:
-                    addresses: [1.1.1.1, 1.0.0.1]
-        version: 2
-" > /etc/netplan/50-privatenetwork.yaml
-netplan apply
+sudo ip r del 0.0.0.0
+sudo nmcli device modify ens5 ipv4.never-default yes
+sudo nmcli con add type ethernet con-name main-network ifname ens6 ip4 10.10.0.$1/24 \
+    gw4 10.10.0.254
+sudo nmcli con up main-network ifname ens6
