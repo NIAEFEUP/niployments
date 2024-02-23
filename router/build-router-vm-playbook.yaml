@@ -3,7 +3,7 @@
   tasks:
     - name: Get PCI devices to find appropriate NICs
       ansible.utils.cli_parse:
-        command: lspci -n
+        command: lspci -Dn
         parser:
           name: ansible.netcommon.native
           template_path: router/templates/lspci-parser.yaml
@@ -23,6 +23,34 @@
             - name: Build VM disk image
               ansible.builtin.include_tasks:
                 file: "vm-image-task.ansible.yaml"
+            - name: Enable vfio modules
+              become: true
+              community.general.modprobe:
+                state: present
+                persistent: present
+                name: "{{ item }}"
+              with_items:
+                - "vfio"
+                - "vfio_pci"
+                - "vfio_iommu_type1"
+            - name: Set device ids to load the vfio driver instead
+              become: true
+              ansible.builtin.template:
+                src: templates/vfio.conf.j2
+                dest: /etc/modprobe.d/vfio.conf
+                mode: "644"
+              notify:
+                - Update initramfs
+              register: vfio_modprobe
+            - name: Get current kernel version for reboot
+              ansible.builtin.command:
+                cmd: uname -r
+              register: kernel_version
+              changed_when: false
+            - name: Reboot using kexec to apply the driver changes
+              become: true
+              ansible.builtin.reboot:
+                reboot_command: "kexec /boot/vmlinuz-{{ kernel_version.stdout }} --initrd=/boot/initramfs-{{ kernel_version.stdout }}.img --reuse-cmdline"
             - name: Create VM for router
               become: true
               community.libvirt.virt:
@@ -35,3 +63,9 @@
               community.libvirt.virt:
                 name: routerVM
                 state: running
+  handlers:
+    - name: Update initramfs
+      become: true
+      ansible.builtin.command:
+        cmd: dracut -f -v
+      changed_when: true

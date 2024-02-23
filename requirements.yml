@@ -1,3 +1,5 @@
 collections:
   - ansible.posix
   - community.libvirt
+  - ansible.utils
+  - community.general
