@@ -7,6 +7,8 @@ exclude_paths:
  - .kube-linter.yaml
  - .github/
  - .vscode/
+ - services/
+ - dev/
  - .git
 
 sarif_file: ansible.sarif
