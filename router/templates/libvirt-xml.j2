@@ -163,12 +163,19 @@
 {# FIXME(luisd): load accepted pci_vendor_devices from a variable #}
 {% for device in (pci_devices |  dict2items | map(attribute="value") | selectattr("pci_vendor_device", "in",["8086:1528"])) %}
   <hostdev mode='subsystem' type='pci' managed='yes'>
+    <driver name='vfio'/>
     <source>
         <address  domain='{{"0x" + "0" * (4 - device.domain | string | length) + device.domain  | string }}'
                   bus='{{"0x" +  "0" * (2 - device.bus| string | length) + device.bus | string }}'
                   slot='{{"0x" + "0" * (2 - device.device | string | length) + device.device  | string }}'
-                  function='{{"0x" +  "0" * (2 - device.function | string | length) + device.function | string }}'/>
+                  function='{{"0x" +  "0" * (2 - device.function | string | length) + device.function | string }}'
+                  />
     </source>
+    <address type='pci' domain='{{"0x" + "0" * (4 - device.domain | string | length) + device.domain  | string }}'
+              bus='{{"0x" +  "0" * (2 - device.bus| string | length) + device.bus | string }}'
+              slot='{{"0x" + "0" * (2 - device.device | string | length) + device.device  | string }}'
+              function='{{"0x" +  "0" * (2 - device.function | string | length) + device.function | string }}'
+              />
   </hostdev>
 {% endfor %}
   </devices>
