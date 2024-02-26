@@ -95,6 +95,12 @@
         dest: /mnt/router/home/ni/.ssh/authorized_keys
         remote_src: true
         mode: "644"
+    - name: Copy interface network config to vm
+      become: true
+      ansible.builtin.template:
+        src: templates/00-external.network.j2
+        dest: /mnt/router/etc/systemd/network/00-external.network
+        mode: "644"
 
   always:
     - name: "Umount router partition"
