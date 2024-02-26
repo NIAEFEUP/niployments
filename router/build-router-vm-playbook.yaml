@@ -1,6 +1,9 @@
 ﻿- name: Build router VM in hosts that have the appropriate NICs
   hosts: controlplane[0]
   tasks:
+    - name: Import router vars
+      ansible.builtin.include_vars:
+        file: "router-vars.json"
     - name: Get PCI devices to find appropriate NICs
       ansible.utils.cli_parse:
         command: lspci -Dn
@@ -10,7 +13,7 @@
         set_fact: pci_devices
     - name: Only include nodes that have suitable devices
       # FIXME (luisd): use vars instead of hardcoding vendor and device id
-      when: '"8086:1528" in (pci_devices | dict2items | map(attribute="value") | map(attribute="pci_vendor_device"))'
+      when: (pci_devices | dict2items | map(attribute="value") | map(attribute="pci_vendor_device") | intersect(valid_nic_ids) | length) != 0
       block:
         - name: Check if router VM exists
           become: true
