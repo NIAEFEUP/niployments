@@ -1,5 +1,27 @@
 {
     "valid_nic_ids": [
         "8086:1528"
+    ],
+    "guest_nic_identifier": {
+        "domain": 0,
+        "bus": 0,
+        "device": 1,
+        "function": 0
+    },
+    "external_eth_config": [
+        {
+            "interface": "enp1s0f0",
+            "ip": "10.227.246.64",
+            "prefix": "24",
+            "default_gateway": "10.227.246.254",
+            "hw_addr": "c4:34:6b:5e:c6:45",
+            "nameservers": [
+                "193.137.55.10",
+                "193.137.55.20"
+            ]
+        },
+        {
+            
+        }
     ]
 }
