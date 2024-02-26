@@ -40,17 +40,7 @@
                 dest: /etc/modprobe.d/vfio.conf
                 mode: "644"
               notify:
-                - Update initramfs
-              register: vfio_modprobe
-            - name: Get current kernel version for reboot
-              ansible.builtin.command:
-                cmd: uname -r
-              register: kernel_version
-              changed_when: false
-            - name: Reboot using kexec to apply the driver changes
-              become: true
-              ansible.builtin.reboot:
-                reboot_command: "kexec /boot/vmlinuz-{{ kernel_version.stdout }} --initrd=/boot/initramfs-{{ kernel_version.stdout }}.img --reuse-cmdline"
+                - Update intramfs and restart kernel
             - name: Create VM for router
               become: true
               community.libvirt.virt:
@@ -64,8 +54,19 @@
                 name: routerVM
                 state: running
   handlers:
-    - name: Update initramfs
-      become: true
-      ansible.builtin.command:
-        cmd: dracut -f -v
-      changed_when: true
+    - name: Update intramfs and restart kernel
+      block:
+        - name: Update initramfs
+          become: true
+          ansible.builtin.command:
+            cmd: dracut -f -v
+          changed_when: true
+        - name: Get current kernel version for reboot
+          ansible.builtin.command:
+            cmd: uname -r
+          register: kernel_version
+          changed_when: false
+        - name: Reboot using kexec to apply the driver changes
+          become: true
+          ansible.builtin.reboot:
+            reboot_command: "kexec /boot/vmlinuz-{{ kernel_version.stdout }} --initrd=/boot/initramfs-{{ kernel_version.stdout }}.img --reuse-cmdline"
