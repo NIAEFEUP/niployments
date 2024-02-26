@@ -4,6 +4,11 @@
     - name: Import router vars
       ansible.builtin.include_vars:
         file: "router-vars.json"
+    - name: Assign one public IP per router
+      ansible.builtin.set_fact:
+        assigned_network: "{{ external_eth_config[play_hosts.index(inventory_hostname)] }}"
+      delegate_to: "{{ item }}"
+      with_items: "{{ groups['controlplane'] }}"
     - name: Get PCI devices to find appropriate NICs
       ansible.utils.cli_parse:
         command: lspci -Dn
