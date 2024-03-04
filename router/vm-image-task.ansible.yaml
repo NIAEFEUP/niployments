@@ -74,6 +74,15 @@
     state: directory
     path: "/mnt/router"
 
+- name: Update package repos
+  become: true
+  ansible.builtin.command:
+    cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'apt-get update'
+- name: Install Avahi on VM
+  become: true
+  ansible.builtin.command:
+    cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'apt-get install -y avahi-daemon avahi-utils'
+
 - block:
     - name: "Mount router image"
       become: true
@@ -95,13 +104,24 @@
         dest: /mnt/router/home/ni/.ssh/authorized_keys
         remote_src: true
         mode: "644"
+    - name: Copy avahi dhcp fallback to vm
+      become: true
+      ansible.builtin.copy:
+        src: templates/00-ipv4ll.network
+        dest: /mnt/router/etc/systemd/network/00-ipv4ll.network
+        mode: "644"
     - name: Copy interface network config to vm
       become: true
       ansible.builtin.template:
-        src: templates/00-external.network.j2
-        dest: /mnt/router/etc/systemd/network/00-external.network
+        src: templates/01-external.network.j2
+        dest: /mnt/router/etc/systemd/network/01-external.network
         mode: "644"
-
+    - name: Enable avahi discoverability
+      become: true
+      ansible.builtin.lineinfile:
+        path: /mnt/router/etc/avahi/avahi-daemon.conf
+        regexp: '^publish-workstation='
+        line: publish-workstation=yes
   always:
     - name: "Umount router partition"
       become: true
