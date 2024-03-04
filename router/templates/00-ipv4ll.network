@@ -1,0 +1,5 @@
+[Match]
+Name=*
+
+[Network]
+LinkLocalAddressing=ipv4

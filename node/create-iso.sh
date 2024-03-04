@@ -14,4 +14,4 @@ rm -rf ninux.iso
 
 docker build . -t ninux-make-iso
 
-docker run -v .:/vol ninux-make-iso mkksiso /vol/ks.cfg /vol/rocky.iso /vol/ninux.iso
+docker run --privileged=true -v .:/vol ninux-make-iso mkksiso --add /NInux --ks /vol/ks.cfg /vol/rocky.iso /vol/ninux.iso
