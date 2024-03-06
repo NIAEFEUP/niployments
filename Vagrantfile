@@ -30,9 +30,10 @@ end
 
 def configure_router(i, config)
     config.vm.define "router#{i}" do |router|
-        router.vm.box = "generic/debian11"
+        router.vm.box = "generic/debian12"
+        router.vm.provision "shell", reboot: true, inline: "sudo systemctl enable systemd-networkd.service"
         lip = $ip.clone
-        router.vm.provision "shell", reboot: true, path:"dev/router-networking.sh", args: [lip]
+        router.vm.provision "shell", reboot: true, path:"dev/router-networking.sh", args: [lip, $host_only.to_s]
         if $host_only == false then
             if $bridge_interface != nil then
                     router.vm.network "public_network",
@@ -59,7 +60,7 @@ def configure_router(i, config)
         end
 
         configure_ram(router, $router_ram)
-        configure_private_network(router, true)
+        configure_private_network(router, false)
         router.vm.provision "shell" do |s|
             s.inline = "hostnamectl set-hostname $1"
             s.args = ["router"+i.to_s]
