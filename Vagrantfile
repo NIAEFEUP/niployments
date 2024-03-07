@@ -12,9 +12,11 @@ $ip = 2 # start with 2 because virtualbox adapter makes 10.10.0.1 reserved for t
 def configure_ram(vm, ram)
     vm.vm.provider "virtualbox" do |v|
         v.memory = ram
+        v.cpus = 4
     end
     vm.vm.provider :libvirt do |l|
         l.memory = ram
+        l.cpus = 4
     end
 end
 

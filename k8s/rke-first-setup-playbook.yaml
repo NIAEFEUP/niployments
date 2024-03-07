@@ -35,8 +35,8 @@
       ansible.builtin.set_fact:
         cluster_token: "{{ rke2_token.stdout }}"
 
-- name: Setup RKE on the remaining control-plane nodes
-  hosts: controlplane[1:]
+- name: Setup RKE on the remaining nodes
+  hosts: controlplane[1:]:workers
   tasks:
     - name: Create the rke2 config directory
       become: true
@@ -53,8 +53,11 @@
         mode: "644"
     - name: Start and Enable RKE2
       become: true
+      timeout: 300
+      throttle: 1
+      retries: 2
       ansible.builtin.systemd:
-        name: rke2-server
+        name: "{{ 'rke2-server' if inventory_hostname in groups['controlplane'] else 'rke2-agent' }}"
         state: started
         enabled: true
     - name: Wait for RKE2 to start

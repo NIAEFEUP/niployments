@@ -15,6 +15,7 @@
       become: true
       ansible.builtin.apt:
         name: bird2
+        update_cache: true
     - name: Configure bird2
       become: true
       ansible.builtin.template:

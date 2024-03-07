@@ -11,7 +11,7 @@
       become: true
       ansible.builtin.systemd:
         name: NetworkManager
-        state: restarted
+        state: reloaded
     - name: Stop and disable firewalld
       become: true
       ansible.builtin.systemd:
