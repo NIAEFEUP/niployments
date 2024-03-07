@@ -2,21 +2,30 @@ require 'yaml'
 
 config = File.exists?('local-dev-cluster.yaml') ? YAML.load_file('local-dev-cluster.yaml') : YAML.load_file('dev-cluster.yaml')
 $cluster_vm_ram = config["cluster"]["node"]["ram"]
+$cluster_vm_cpus = config["cluster"]["node"]["cpu"] || 2
 num_of_nodes = config["cluster"]["nodeCount"]
 $router_ram = config["router"]["ram"]
+$router_cpus = config["router"]["cpu"] || 1
 router_count = config["router"]["count"] || 1 
 $bridge_interface = config["networking"] == nil ? nil : config["networking"]["bridgeInterface"]
 $host_only = config["networking"] == nil ? false : (config["networking"]["hostOnly"] || false)
 $ip = 2 # start with 2 because virtualbox adapter makes 10.10.0.1 reserved for the host 
 
+def configure_cpus(vm, cpus)
+    vm.vm.provider "virtualbox" do |v|
+        v.cpus = cpus
+    end
+    vm.vm.provider :libvirt do |l|
+        l.cpus = cpus
+    end
+end
+
 def configure_ram(vm, ram)
     vm.vm.provider "virtualbox" do |v|
         v.memory = ram
-        v.cpus = 4
     end
     vm.vm.provider :libvirt do |l|
         l.memory = ram
-        l.cpus = 4
     end
 end
 
@@ -60,6 +69,7 @@ def configure_router(i, config)
             # expose the router to your network
         end
 
+        configure_cpus(router, $router_cpus)
         configure_ram(router, $router_ram)
         configure_private_network(router, true)
         router.vm.provision "shell" do |s|
@@ -82,6 +92,7 @@ def configure_cluster_node(i, config)
             s.inline = "hostnamectl set-hostname $1"
             s.args = ["cluster"+i.to_s]
         end
+        configure_cpus(clustervm, $cluster_vm_cpus)
         configure_ram(clustervm, $cluster_vm_ram)
         configure_private_network(clustervm, false)
         clustervm.ssh.username = "ni"
