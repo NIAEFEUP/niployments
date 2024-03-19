@@ -1,0 +1,107 @@
+- name: Setup Kea config file
+  hosts: nodes
+  vars:
+    # target_interface: 169.254.0.0
+    target_interface: 10.10.0.0
+  tasks:
+    - name: Extract nodes MAC addresses
+      run_once: true
+      ansible.builtin.set_fact :
+        mac_addresses : "{{ansible_play_hosts_all | map('extract',hostvars, 'ansible_%s' % item) | map(attribute='macaddress')}}"
+      when: "(ansible_play_hosts_all | map('extract',hostvars, 'ansible_%s' % item) | map(attribute='ipv4') | map(attribute='network') | first) == target_interface"
+      loop: "{{ ansible_interfaces }}"
+
+    - name: b
+      ansible.builtin.debug:
+        msg: "{{ (ansible_play_hosts_all | map('extract',hostvars, 'ansible_%s' % item) | map(attribute='ipv4')) }}"
+      loop: "{{ ansible_interfaces }}"
+ 
+    - name: Export MAC addresses to the routers
+      ansible.builtin.set_fact:
+        mac_addresses: "{{ mac_addresses }}" 
+      delegate_to: "{{ item }}"
+      delegate_facts: yes
+      with_items: "{{ groups['routers'] }}"
+ 
+- name: Setup internal IP for the routers
+  hosts: routers[0]
+  vars:
+    target_network: 169.254.0.0/16
+  tasks:
+    - name: Get internal interfaces
+      ansible.builtin.set_fact:
+        router_interface: "{{ item }}"
+        cacheable: true # cache it to other playbooks in this run use it
+      loop: "{{ ansible_interfaces }}"
+    
+- name: Run DHCP4 Server with Kea
+  hosts: routers
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Install kea package
+      ansible.builtin.apt:
+        name: kea
+        update_cache: yes
+ 
+    - name: Write config file
+      ansible.builtin.template:
+        src: templates/kea-dhcp4.conf.j2
+        dest: /etc/kea/kea-dhcp4.conf
+        mode: "644"
+ 
+    - name: Create leases file if not exists
+      ansible.builtin.file:
+        path: /var/lib/kea/dhcp4.leases
+        state: touch
+        mode: '0700'
+ 
+    - name: Restart kea dhcp server 
+      ansible.builtin.systemd:
+        service: kea-dhcp4-server
+        state: restarted
+ 
+- name: Restart dhcpcd in order for nodes to gain ip addresses
+  hosts: nodes
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: Restart dhcpcd
+      ansible.builtin.systemd:
+        service: dhcpcd
+        state: restarted
+ 
+
+- name: Update IP addresses for routers in the inventory
+  hosts: routers
+  gather_facts: no
+  tasks:
+    - name: Update routers IP's
+      connection: local
+      ansible.builtin.lineinfile:
+        path: '{{ inventory_dir }}/ansible-inventory-dev.ini'
+        regexp: '^{{ inventory_hostname }}(.*)ansible_ssh_host=([^ ]*) (.*)'
+        line: '{{ inventory_hostname }}\1ansible_ssh_host=10.10.0.{{(inventory_hostname[-1] | int + 1) | string}} \3'
+        backrefs: true
+    - name: Change ip_static variable
+      connection: local
+      ansible.builtin.lineinfile:  
+        path: '{{ inventory_dir }}/ansible-inventory-dev.ini'
+        regexp: '^static_ip=(.*)'
+        line: 'static_ip=true'
+        backrefs: true
+ 
+
+- name: Update IP address for nodes in the inventory
+  hosts: nodes
+  gather_facts: no
+  tasks:
+    - name: Update nodes IP's
+      connection: local
+      ansible.builtin.lineinfile:
+        path: '{{ inventory_dir }}/ansible-inventory-dev.ini'
+        regexp: '^{{ inventory_hostname }}(.*)ansible_ssh_host=([^ ]*) (.*)'
+        line: '{{ inventory_hostname }}\1ansible_ssh_host=10.10.0.{{(inventory_hostname[-1] | int + (groups["routers"] | length) + 1)  | string}} \3'
+        backrefs: true
+    - name: Refresh the inventory
+      ansible.builtin.meta: refresh_inventory

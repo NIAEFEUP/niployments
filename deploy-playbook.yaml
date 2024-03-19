@@ -1,6 +1,8 @@
 ---
 - name: Accept ssh keys for the first time
   ansible.builtin.import_playbook: networking/accept-ssh-keys-playbook.yaml
+- name: Networking - Setup static internal IPs
+  ansible.builtin.import_playbook: networking/dhcp-server-config-playbook.yaml
 - name: Pre-setup - get correct interfaces
   ansible.builtin.import_playbook: networking/get-interface-playbook.yaml
 - name: Networking - Router BGP

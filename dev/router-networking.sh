@@ -33,6 +33,10 @@ DHCP=yes
 LinkLocalAddressing=yes
 IPv4LLRoute=true" > /etc/systemd/network/99-default-ipv4ll.network
 
+echo "
+nameserver 1.1.1.1
+" >> /etc/resolvconf/resolv.conf.d/tail
+
 apt-get install -y avahi-daemon avahi-utils avahi-autoipd
 
 sed -i 's/publish-workstation=no/publish-workstation=yes/g' /etc/avahi/avahi-daemon.conf 

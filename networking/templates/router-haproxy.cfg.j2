@@ -49,4 +49,5 @@ backend apiserver
         server {{nodename}} {{ hostvars[nodename]["ansible_"~
     hostvars[nodename]["ansible_facts"]["target_interface"]]['ipv4']['address']
   }}:6443 check
+
     {% endfor %}

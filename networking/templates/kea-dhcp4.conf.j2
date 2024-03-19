@@ -1,0 +1,26 @@
+{
+    "Dhcp4": {
+        "interfaces-config": {
+            "interfaces": [ "eth2" ],
+            "dhcp-socket-type": "raw"
+        },
+        "valid-lifetime": 4000,
+        "max-valid-lifetime": 7200,
+        "subnet4": [{
+           "pools": [ { "pool": "10.10.0.200-10.10.0.249" } ],
+           "subnet": "10.10.0.0/24",
+           "reservations": 
+           [
+            {%for mac_address in mac_addresses %}
+            {
+                "hw-address": "{{mac_address}}",
+                "ip-address": "10.10.0.{{ (groups["routers"] | length) + loop.index + 1}}"
+            }
+                {% if loop.index != loop.length%}
+                ,
+                {% endif %}
+            {% endfor %}
+           ]
+        }]
+    }
+}
