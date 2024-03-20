@@ -85,6 +85,6 @@ then
 INVENTORY+="\n[workers]\n"
 fi
 INVENTORY+="\n[nodes:children]\ncontrolplane\nworkers\n
-[all:vars]\ndev_cluster=true\nansible_python_interpreter='/usr/bin/env python3'\nstatic_ip=false"
+[all:vars]\ndev_cluster=true\nansible_python_interpreter='/usr/bin/env python3'"
 
 echo -e $INVENTORY > "ansible-inventory-dev.ini"

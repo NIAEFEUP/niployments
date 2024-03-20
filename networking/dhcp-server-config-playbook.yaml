@@ -1,8 +1,11 @@
+# TODO: Delay ansible for the IP addresses of the nodes to be changed
+# TODO: Make this playbook only run once
+
 - name: Setup Kea config file
   hosts: nodes
   vars:
-    # target_interface: 169.254.0.0
-    target_interface: 10.10.0.0
+    target_interface: 169.254.0.0
+    # target_interface: 10.10.0.0
   tasks:
     - name: Extract nodes MAC addresses
       run_once: true
@@ -11,11 +14,6 @@
       when: "(ansible_play_hosts_all | map('extract',hostvars, 'ansible_%s' % item) | map(attribute='ipv4') | map(attribute='network') | first) == target_interface"
       loop: "{{ ansible_interfaces }}"
 
-    - name: b
-      ansible.builtin.debug:
-        msg: "{{ (ansible_play_hosts_all | map('extract',hostvars, 'ansible_%s' % item) | map(attribute='ipv4')) }}"
-      loop: "{{ ansible_interfaces }}"
- 
     - name: Export MAC addresses to the routers
       ansible.builtin.set_fact:
         mac_addresses: "{{ mac_addresses }}" 
@@ -23,17 +21,41 @@
       delegate_facts: yes
       with_items: "{{ groups['routers'] }}"
  
+
 - name: Setup internal IP for the routers
-  hosts: routers[0]
+  hosts: routers
   vars:
-    target_network: 169.254.0.0/16
+    target_network: 169.254.0.0
   tasks:
     - name: Get internal interfaces
       ansible.builtin.set_fact:
         router_interface: "{{ item }}"
         cacheable: true # cache it to other playbooks in this run use it
+      when: (hostvars[inventory_hostname]['ansible_%s' % item] | default({})).get('ipv4', {}).get('network') == target_network
       loop: "{{ ansible_interfaces }}"
-    
+  
+- name: Setup static IP 
+  hosts: routers
+  tasks:
+    - name: Setup internal network config to vm
+      become: true
+      ansible.builtin.template:
+        src: templates/02-internal.network.j2
+        dest: /etc/systemd/network/02-internal.network
+        mode: "644"
+    - name: Restart network service on VM
+      become: true
+      ansible.builtin.service:
+        name: systemd-networkd
+        state: restarted
+    - name: Add nameserver to VM
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/resolvconf/resolv.conf.d/tail
+        line: nameserver 1.1.1.1
+        create: yes
+
+
 - name: Run DHCP4 Server with Kea
   hosts: routers
   become: yes
@@ -66,6 +88,9 @@
   become: yes
   gather_facts: no
   tasks:
+    - name: Wait for dhcp server
+      ansible.builtin.wait_for:
+        timeout: 20
     - name: Restart dhcpcd
       ansible.builtin.systemd:
         service: dhcpcd
@@ -90,6 +115,7 @@
         regexp: '^static_ip=(.*)'
         line: 'static_ip=true'
         backrefs: true
+ 
  
 
 - name: Update IP address for nodes in the inventory

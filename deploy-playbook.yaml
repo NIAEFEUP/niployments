@@ -3,6 +3,14 @@
   ansible.builtin.import_playbook: networking/accept-ssh-keys-playbook.yaml
 - name: Networking - Setup static internal IPs
   ansible.builtin.import_playbook: networking/dhcp-server-config-playbook.yaml
+- name: Wait for connection
+  gather_facts: no
+  hosts: all
+  tasks:
+    - name: Wait 30 seconds for connection
+      ansible.builtin.wait_for_connection:
+        connect_timeout: 3
+        timeout: 30
 - name: Pre-setup - get correct interfaces
   ansible.builtin.import_playbook: networking/get-interface-playbook.yaml
 - name: Networking - Router BGP

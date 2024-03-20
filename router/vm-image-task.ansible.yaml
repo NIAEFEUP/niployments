@@ -116,18 +116,6 @@
         src: templates/01-external.network.j2
         dest: /mnt/router/etc/systemd/network/01-external.network
         mode: "644"
-    - name: Setup internal network config to vm
-      become: true
-      ansible.builtin.template:
-        src: templates/02-internal.network.j2
-        dest: /mnt/router/etc/systemd/network/02-internal.network
-        mode: "644"
-    - name: Add nameserver to VM
-      become: true
-      ansible.builtin.lineinfile:
-        src: /mnt/router/etc/resolvconf/resolv.conf.d/tail
-        line: nameserver 1.1.1.1
-        create: yes
     - name: Enable avahi discoverability
       become: true
       ansible.builtin.lineinfile:

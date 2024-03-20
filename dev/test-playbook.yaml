@@ -1,0 +1,8 @@
+- name: test-playbook
+  hosts: all
+  tasks:
+    - name: fuck me
+      ansible.builtin.debug:
+        msg: "found ip"
+      when: item is regex('10.10.0.*')
+      loop: "{{ansible_facts['all_ipv4_addresses']}}"
