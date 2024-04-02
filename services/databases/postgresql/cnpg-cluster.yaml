@@ -14,6 +14,7 @@ data:
 kind: Secret
 metadata:
   name: ni-secret
+type: kubernetes.io/basic-auth
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
@@ -29,8 +30,13 @@ spec:
       secret:
         name: tts-secret
 
-  superuserSecret:
-    name: ni-secret
-  
+  managed:
+    roles:
+      - name: ni
+        login: true
+        superuser: true
+        passwordSecret:
+          name: ni-secret
+
   storage:
     size: 10Gi
