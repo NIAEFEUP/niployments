@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: longhorn-ingress
+  namespace: longhorn-system
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+    # prevent the controller from redirecting (308) to HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    # custom max body size for file uploading like backing image uploading
+    nginx.ingress.kubernetes.io/proxy-body-size: 10000m
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: "/longhorn(/|$)(.*)"
+        backend:
+          service:
+            name: longhorn-frontend
+            port:
+              number: 80
