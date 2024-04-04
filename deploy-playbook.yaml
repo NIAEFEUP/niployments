@@ -3,8 +3,6 @@
   ansible.builtin.import_playbook: router/build-router-vm-playbook.yaml
 - name: Create a set new SSH key for clusters and routers
   ansible.builtin.import_playbook: networking/add-ssh-key-to-nodes-playbook.yaml
-- name: Accept ssh keys for the first time
-  ansible.builtin.import_playbook: networking/accept-ssh-keys-playbook.yaml
 - name: Networking - Setup static internal IPs
   ansible.builtin.import_playbook: networking/dhcp-server-config-playbook.yaml
 - name: Wait for connection
