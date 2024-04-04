@@ -161,7 +161,7 @@
       <address type='pci' domain='0x0000' bus='0x06' slot='0x00' function='0x0'/>
     </rng>
 {# FIXME(luisd): load accepted pci_vendor_devices from a variable #}
-{% for device in (pci_devices |  dict2items | map(attribute="value") | selectattr("pci_vendor_device", "in",valid_nic_ids)) %}
+{% for device in (pci_devices | selectattr("pciVendorDevice", "in",valid_nic_ids)) %}
   <hostdev mode='subsystem' type='pci' managed='yes'>
     <driver name='vfio'/>
     <source>
