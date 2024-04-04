@@ -9,16 +9,18 @@
   tasks:
     - name: Extract nodes MAC addresses
       run_once: true
-      ansible.builtin.set_fact :
-        mac_addresses : "{{ansible_play_hosts_all | map('extract',hostvars, 'ansible_%s' % item) | map(attribute='macaddress')}}"
-      when: "(ansible_play_hosts_all | map('extract',hostvars, 'ansible_%s' % item) | map(attribute='ipv4') | map(attribute='network') | first) == target_interface"
+      ansible.builtin.set_fact:
+        mac_addresses: "{{ ansible_play_hosts_all | map('extract',hostvars, 'ansible_%s' % item) | map(attribute='macaddress') }}"
+      when: >
+        ( ansible_play_hosts_all | map('extract',hostvars, 'ansible_%s' % item) | map(attribute='ipv4')
+        | map(attribute='network') | first ) == target_interface
       loop: "{{ ansible_interfaces }}"
 
     - name: Export MAC addresses to the routers
       ansible.builtin.set_fact:
-        mac_addresses: "{{ mac_addresses }}" 
+        mac_addresses: "{{ mac_addresses }}"
       delegate_to: "{{ item }}"
-      delegate_facts: yes
+      delegate_facts: true
       with_items: "{{ groups['routers'] }}"
  
 
@@ -33,8 +35,7 @@
         cacheable: true # cache it to other playbooks in this run use it
       when: (hostvars[inventory_hostname]['ansible_%s' % item] | default({})).get('ipv4', {}).get('network') == target_network
       loop: "{{ ansible_interfaces }}"
-  
-- name: Setup static IP 
+- name: Setup static IP
   hosts: routers
   tasks:
     - name: Setup internal network config to vm
@@ -53,40 +54,38 @@
       ansible.builtin.lineinfile:
         path: /etc/resolvconf/resolv.conf.d/tail
         line: nameserver 1.1.1.1
-        create: yes
+        mode: "644"
+        create: true
 
 
 - name: Run DHCP4 Server with Kea
   hosts: routers
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
   tasks:
     - name: Install kea package
       ansible.builtin.apt:
         name: kea
-        update_cache: yes
- 
+        update_cache: true
     - name: Write config file
       ansible.builtin.template:
         src: templates/kea-dhcp4.conf.j2
         dest: /etc/kea/kea-dhcp4.conf
         mode: "644"
- 
     - name: Create leases file if not exists
       ansible.builtin.file:
         path: /var/lib/kea/dhcp4.leases
         state: touch
         mode: '0700'
- 
-    - name: Restart kea dhcp server 
+    - name: Restart kea dhcp server
       ansible.builtin.systemd:
         service: kea-dhcp4-server
         state: restarted
  
 - name: Restart dhcpcd in order for nodes to gain ip addresses
   hosts: nodes
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   tasks:
     - name: Wait for dhcp server
       ansible.builtin.wait_for:
@@ -99,7 +98,7 @@
 
 - name: Update IP addresses for routers in the inventory
   hosts: routers
-  gather_facts: no
+  gather_facts: fa
   tasks:
     - name: Update routers IP's
       connection: local
@@ -110,14 +109,11 @@
         backrefs: true
     - name: Change ip_static variable
       connection: local
-      ansible.builtin.lineinfile:  
+      ansible.builtin.lineinfile:
         path: '{{ inventory_dir }}/ansible-inventory-dev.ini'
         regexp: '^static_ip=(.*)'
         line: 'static_ip=true'
         backrefs: true
- 
- 
-
 - name: Update IP address for nodes in the inventory
   hosts: nodes
   gather_facts: no

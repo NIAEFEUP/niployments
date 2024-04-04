@@ -8,7 +8,7 @@
 - name: Networking - Setup static internal IPs
   ansible.builtin.import_playbook: networking/dhcp-server-config-playbook.yaml
 - name: Wait for connection
-  gather_facts: no
+  gather_facts: true
   hosts: all
   tasks:
     - name: Wait 30 seconds for connection
