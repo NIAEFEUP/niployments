@@ -30,6 +30,7 @@
     mode: "770"
     group: qemu
 - name: "Download router QCOW2 file"
+  retries: 3
   become: true
   ansible.builtin.get_url:
     url: https://cloud.debian.org/images/cloud/bookworm/20240211-1654/debian-12-generic-amd64-20240211-1654.qcow2
@@ -83,6 +84,11 @@
   ansible.builtin.command:
     cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'apt-get install -y avahi-daemon avahi-utils'
 
+- name: Add host private key files
+  become: true
+  ansible.builtin.command:
+    cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'ssh-keygen -A'
+
 - block:
     - name: "Mount router image"
       become: true
@@ -104,11 +110,16 @@
         dest: /mnt/router/home/ni/.ssh/authorized_keys
         remote_src: true
         mode: "644"
+    - name: Add ni user to sudoers password
+      become: true
+      ansible.builtin.copy:
+        dest: /mnt/router/etc/sudoers.d/dont-prompt-ni_user-for-sudo-password
+        content: 'ni ALL=(ALL) NOPASSWD:ALL'
     - name: Copy avahi dhcp fallback to vm
       become: true
       ansible.builtin.copy:
-        src: templates/00-ipv4ll.network
-        dest: /mnt/router/etc/systemd/network/00-ipv4ll.network
+        src: templates/99-ipv4ll.network
+        dest: /mnt/router/etc/systemd/network/99-ipv4ll.network
         mode: "644"
     - name: Copy interface network config to vm
       become: true

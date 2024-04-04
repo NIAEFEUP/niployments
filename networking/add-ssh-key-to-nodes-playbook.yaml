@@ -1,0 +1,77 @@
+- name: Add custom SSH key to nodes
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Create SSH directory # noqa: run-once[task]
+      run_once: true
+      connection: local
+      ansible.builtin.file:
+        path: '{{ playbook_dir | dirname }}/.ssh'
+        state: directory
+        mode: '0700'
+
+    - name: Fetch the public key from the node
+      ansible.builtin.command: cat .ssh/authorized_keys
+      register: key
+      changed_when: false
+
+    - name: Parse the public key
+      ansible.builtin.set_fact:
+        node_public_key: "{{ key.stdout.split(' ')[1] }}"
+
+    - name: Generate SSH key # noqa: run-once[task]
+      connection: local
+      run_once: true
+      community.crypto.openssh_keypair:
+        path: '{{ playbook_dir | dirname }}/.ssh/new_key'
+        comment: "When I wrote this code, only God and I understood what I did. Now only God knows."
+        type: "ed25519"
+      register: local_ssh_key
+
+    - name: Cat the public key to pass it to the node
+      connection: local
+      ansible.builtin.command: 'cat {{ playbook_dir | dirname }}/.ssh/new_key.pub'
+      changed_when: local_ssh_key.changed
+      register: new_ssh_key
+
+    - name: Add the key and modify inventory if cluster
+      when: inventory_hostname | regex_replace('\d', '') == 'cluster'
+      throttle: 1
+      block:
+        - name: Propagate the public key
+          become: true
+          ansible.posix.authorized_key:
+            user: ni
+            state: present
+            key: "{{ new_ssh_key.stdout }}"
+            exclusive: "{{ not dev_cluster }}"
+        - name: Modify the inventory
+          connection: local
+          ansible.builtin.lineinfile:
+            path: '{{ inventory_dir }}/ansible-inventory-dev.ini'
+            regexp: '^{{ inventory_hostname }}(.*)ansible_ssh_private_key_file=(\S*) *(.*)'
+            line: '{{ inventory_hostname }}\1ansible_ssh_private_key_file={{ playbook_dir | dirname }}/.ssh/new_key \3'
+            backrefs: true
+
+    - name: Add the key and mofidy inventory if router
+      when: inventory_hostname | regex_replace('\d', '') == 'router'
+      block:
+        - name: Propagate public key to this node
+          ansible.posix.authorized_key:
+            user: "{{ 'vagrant' if dev_cluster == 'true' else 'ni' }}"
+            state: present
+            key: "{{ new_ssh_key.stdout }}"
+            exclusive: "{{ not dev_cluster }}"
+          changed_when: false
+
+        - name: Modify the inventory
+          connection: local
+          ansible.builtin.lineinfile:
+            path: '{{ inventory_dir }}/ansible-inventory-dev.ini'
+            regexp: '^{{ inventory_hostname }}(.*)ansible_ssh_private_key_file=(\S*) *(.*)'
+            line: '{{ inventory_hostname }}\1ansible_ssh_private_key_file={{ playbook_dir | dirname }}/.ssh/new_key \3'
+            backrefs: true
+
+    - name: Refresh the inventory
+      ansible.builtin.meta: refresh_inventory

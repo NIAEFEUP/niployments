@@ -3,3 +3,4 @@ collections:
   - community.libvirt
   - ansible.utils
   - community.general
+  - community.crypto
