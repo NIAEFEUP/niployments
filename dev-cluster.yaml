@@ -9,7 +9,7 @@ router:
 networking:
 # specific networking options, only uncomment this if you need a specific setting below
 # If you are using LibVirt, you need to specify a interface to bridge from (can't be a wireless interface)
-  #  bridgeInteface: eth0 
+  #  bridgeInterface: eth0 
 # If you are using LibVirt and running through wireless you need to make router eth1 hostonly, which means only you can access it.
 # You can also specify this in order to make the router and hence the cluster not accessible through your local network, but it only works on LibVirt.
   hostOnly: false 

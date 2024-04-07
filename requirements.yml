@@ -1,2 +1,3 @@
 collections:
   - ansible.posix
+  - community.crypto
