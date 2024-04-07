@@ -10,7 +10,6 @@ upgradeCompatibility: '1.15'
 rbac:
   # -- Enable creation of Resource-Based Access Control configuration.
   create: true
-k8sServicePort: ""
 terminationGracePeriodSeconds: 1
 # -- Install the cilium agent resources.
 agent: true
@@ -100,3 +99,6 @@ bgpControlPlane:
   enabled: true
   # -- Enable the BGPv2 APIs.
   v2Enabled: false
+kubeProxyReplacement: true
+k8sServiceHost: 10.11.11.1
+k8sServicePort: 6443
