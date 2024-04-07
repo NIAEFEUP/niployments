@@ -1,0 +1,102 @@
+﻿
+# @schema
+# type: [null, string]
+# @schema
+# -- upgradeCompatibility helps users upgrading to ensure that the configMap for
+# Cilium will not change critical values to ensure continued operation
+# This flag is not required for new installations.
+# For example: '1.7', '1.8', '1.9'
+upgradeCompatibility: '1.15'
+rbac:
+  # -- Enable creation of Resource-Based Access Control configuration.
+  create: true
+k8sServicePort: ""
+terminationGracePeriodSeconds: 1
+# -- Install the cilium agent resources.
+agent: true
+# -- Agent container name.
+name: cilium
+# -- Roll out cilium agent pods automatically when configmap is updated.
+rollOutCiliumPods: true
+nodeSelector:
+  kubernetes.io/os: linux
+# -- Node tolerations for agent scheduling to nodes with taints
+# ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+tolerations:
+  - operator: Exists
+    # - key: "key"
+    #   operator: "Equal|Exists"
+    #   value: "value"
+    #   effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
+# -- The priority class to use for cilium-agent.
+priorityClassName: ""
+# -- DNS policy for Cilium agent pods.
+# Ref: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
+dnsPolicy: ""
+# -- Additional containers added to the cilium DaemonSet.
+extraContainers: []
+# -- Additional agent container arguments.
+extraArgs: []
+# -- Additional agent container environment variables.
+extraEnv: []
+# -- Additional agent hostPath mounts.
+extraHostPathMounts: []
+# - name: host-mnt-data
+#   mountPath: /host/mnt/data
+#   hostPath: /mnt/data
+#   hostPathType: Directory
+#   readOnly: true
+#   mountPropagation: HostToContainer
+
+# -- Additional agent volumes.
+extraVolumes: []
+# -- Additional agent volumeMounts.
+extraVolumeMounts: []
+# -- extraConfig allows you to specify additional configuration parameters to be
+# included in the cilium-config configmap.
+extraConfig: {}
+#  my-config-a: "1234"
+#  my-config-b: |-
+#    test 1
+#    test 2
+#    test 3
+
+# -- Annotations to be added to all top-level cilium-agent objects (resources under templates/cilium-agent)
+annotations: {}
+# -- Security Context for cilium-agent pods.
+podSecurityContext: {}
+# -- Annotations to be added to agent pods
+podAnnotations: {}
+# -- Labels to be added to agent pods
+podLabels: {}
+# -- Agent resource limits & requests
+# ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+resources: {}
+#   limits:
+#     cpu: 4000m
+#     memory: 4Gi
+#   requests:
+#     cpu: 100m
+#     memory: 512Mi
+
+# -- resources & limits for the agent init containers
+initResources: {}
+# -- Cilium agent update strategy
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    # @schema
+    # type: [integer, string]
+    # @schema
+    maxUnavailable: 2
+# Configuration Values for cilium-agent
+# -- Annotate k8s node upon initialization with Cilium's metadata.
+annotateK8sNode: false
+# -- Configure BGP
+# -- This feature set enables virtual BGP routers to be created via
+# CiliumBGPPeeringPolicy CRDs.
+bgpControlPlane:
+  # -- Enables the BGP control plane.
+  enabled: true
+  # -- Enable the BGPv2 APIs.
+  v2Enabled: false

@@ -1,8 +1,6 @@
 ---
 - name: Create a set new SSH key for clusters and routers
   ansible.builtin.import_playbook: networking/add-ssh-key-to-nodes-playbook.yaml
-- name: Accept ssh keys for the first time
-  ansible.builtin.import_playbook: networking/accept-ssh-keys-playbook.yaml
 - name: Pre-setup - get correct interfaces
   ansible.builtin.import_playbook: networking/get-interface-playbook.yaml
 - name: Networking - Router BGP
