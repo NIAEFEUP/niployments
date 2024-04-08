@@ -1,10 +1,10 @@
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  name: longhorn-locality-no-backup
+  name: longhorn-locality-no-backup-retain
 provisioner: driver.longhorn.io
 allowVolumeExpansion: true
-reclaimPolicy: "Delete"
+reclaimPolicy: "Retain"
 volumeBindingMode: Immediate
 parameters:
   numberOfReplicas: "3"
@@ -15,4 +15,4 @@ parameters:
   replicaAutoBalance: "least-effort"
 #  diskSelector: "ssd,fast"
 #  nodeSelector: "storage,fast"
-  recurringJobSelector: '[{"name":"snap-group", "isGroup":true}]'
+  recurringJobSelector: '[{"name":"default", "isGroup":true}]'
