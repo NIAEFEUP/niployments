@@ -30,6 +30,8 @@
         name: "UTC"
 - name: Pre-setup - get correct interfaces
   ansible.builtin.import_playbook: networking/get-interface-playbook.yaml
+- name: Pre-setup - Node re-enable NetworkManager
+  ansible.builtin.import_playbook: node/reenable-networkmanager-playbook.yaml
 - name: Networking - Router initial config
   ansible.builtin.import_playbook: networking/router-setup-playbook.yaml
 - name: Networking - Router BGP
