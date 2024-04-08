@@ -17,6 +17,19 @@
         search_regex: OpenSSH
         delay: 10
         timeout: 120
+- name: Pre-setup - enable NTP syncronization
+  hosts: all
+  tasks:
+    - name: "Enable NTP client"
+      become: true
+      ansible.builtin.command: /usr/bin/timedatectl set-ntp on
+      changed_when: true
+    - name: "Switch to UTC timezone"
+      become: true
+      community.general.timezone:
+        name: "UTC"
+- name: Networking - Router initial config
+  ansible.builtin.import_playbook: networking/router-setup-playbook.yaml
 - name: Pre-setup - get correct interfaces
   ansible.builtin.import_playbook: networking/get-interface-playbook.yaml
 - name: Networking - Router BGP

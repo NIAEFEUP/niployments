@@ -1,0 +1,29 @@
+---
+
+- name: Networking - Router basic setup
+  hosts: routers
+  tasks:
+    - name: Enable Layer 3 forwarding
+      become: true
+      ansible.posix.sysctl:
+        sysctl_set: true
+        name: net.ipv4.ip_forward
+        value: 1
+    - name: Install nftables on router
+      become: true
+      ansible.builtin.apt:
+        name:
+          - nftables
+        state: present
+    - name: Copy nftables config
+      become: true
+      ansible.builtin.template:
+        src: templates/nftables.conf.j2
+        dest: /etc/nftables.conf
+        mode: "755"
+    - name: Restart nftables
+      become: true
+      ansible.builtin.systemd:
+        name: nftables
+        state: restarted
+      changed_when: true
