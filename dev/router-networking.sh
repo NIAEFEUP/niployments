@@ -40,10 +40,3 @@ nameserver 1.1.1.1
 apt-get install -y avahi-daemon avahi-utils avahi-autoipd
 
 sed -i 's/publish-workstation=no/publish-workstation=yes/g' /etc/avahi/avahi-daemon.conf 
-
-
-nft add table nat
-nft add chain nat postrouting { type nat hook postrouting priority 100 \; }
-nft add rule nat postrouting ip saddr 10.10.0.0/24 oif eth1 masquerade
-nft list ruleset > /etc/nftables.conf
-systemctl enable nftables
