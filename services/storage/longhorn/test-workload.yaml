@@ -5,7 +5,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn-locality-retain
+  storageClassName: longhorn-locality
   resources:
     requests:
       storage: 2Gi
@@ -15,6 +15,9 @@ kind: Pod
 metadata:
   name: volume-test
   namespace: default
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "The container requires the root filesystem to be writable" 
+    ignore-check.kube-linter.io/run-as-non-root: "The container must run as root user"
 spec:
   containers:
   - name: volume-test
@@ -25,6 +28,13 @@ spec:
       mountPath: /data
     ports:
     - containerPort: 80
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "0.05"
+      requests:
+        memory: "64Mi"
+        cpu: "0.01"
   volumes:
   - name: volv
     persistentVolumeClaim:
