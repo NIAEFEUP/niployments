@@ -1,6 +1,6 @@
 require 'yaml'
 
-config = File.exists?('local-dev-cluster.yaml') ? YAML.load_file('local-dev-cluster.yaml') : YAML.load_file('dev-cluster.yaml')
+config = File.exist?('local-dev-cluster.yaml') ? YAML.load_file('local-dev-cluster.yaml') : YAML.load_file('dev-cluster.yaml')
 $cluster_vm_ram = config["cluster"]["node"]["ram"]
 num_of_nodes = config["cluster"]["nodeCount"]
 $router_ram = config["router"]["ram"]
@@ -71,6 +71,7 @@ end
 def configure_cluster_node(i, config)
     config.vm.define "cluster#{i}" do |clustervm|
         clustervm.vm.box = "NIAEFEUP/rocky-NInux"
+        clustervm.vm.box_version = "0.4.1"
         lip = $ip.clone
 
         # We enable nested virtualization for vm build tests in vagrant
