@@ -71,7 +71,7 @@ end
 def configure_cluster_node(i, config)
     config.vm.define "cluster#{i}" do |clustervm|
         clustervm.vm.box = "NIAEFEUP/rocky-NInux"
-        clustervm.vm.box_version = "0.4.1"
+        clustervm.vm.box_version = "0.5.1"
         lip = $ip.clone
 
         # We enable nested virtualization for vm build tests in vagrant

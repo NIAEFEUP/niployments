@@ -34,10 +34,6 @@
   vars:
     target_network: 169.254.0.0
   tasks:
-    - name: Skip for empty macaddresess list
-      when: mac_addresses is undefined or not mac_addresses
-      ansible.builtin.meta: end_play
-
     - name: Get internal interfaces
       ansible.builtin.set_fact:
         router_interface: "{{ item }}"
@@ -50,7 +46,7 @@
         cacheable: true # cache it to other playbooks in this run use it
       # FIXME (luisd): remove hardcoded ip on refactor
       when: >
-        not router_interface and
+        router_interface is undefined and
         (hostvars[inventory_hostname]['ansible_%s' % item] | default({})).get('ipv4', {}).get('network') == "10.10.0.0"
       loop: "{{ ansible_interfaces }}"
 
@@ -103,6 +99,14 @@
       ansible.builtin.apt:
         name: kea
         update_cache: true
+      register: kea_install
+
+    - name: Delete default config if kea was installed # noqa: no-handler
+      when: kea_install.changed
+      become: true
+      ansible.builtin.file:
+        path: /etc/kea/kea-dhcp4.conf
+        state: absent
 
     - name: Get old config file
       ansible.builtin.command:
@@ -114,7 +118,7 @@
     - name: Write old mac addresses
       ansible.builtin.set_fact:
         mac_addresses: >
-          {{ (old_config.stdout | from_json | json_query('Dhcp4.subnet4[0].reservations[*]."hw-address"')) + (mac_addresses | default([])) }}
+          {{ (old_config.stdout | from_json | json_query('Dhcp4.subnet4[0].reservations[*]."hw-address"') | default([])) + (mac_addresses | default([])) }}
       when: old_config.rc == 0
 
     - name: Write config file
