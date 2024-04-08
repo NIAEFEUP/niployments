@@ -9,6 +9,12 @@
         "subnet4": [{
            "pools": [ { "pool": "10.10.0.200-10.10.0.249" } ],
            "subnet": "10.10.0.0/24",
+           "option-data": [
+            {
+                "name": "routers",
+                "data": "10.11.11.1"
+            }
+           ],
            "reservations": 
            [
             {%for mac_address in mac_addresses %}

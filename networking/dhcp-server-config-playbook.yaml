@@ -18,7 +18,7 @@
       loop: "{{ ansible_play_hosts_all | map('extract', hostvars) | json_query('[].ansible_interfaces') | flatten | unique }}"
 
     - name: Skip for empty macaddresess list
-      when: not mac_addresses
+      when: mac_addresses is undefined or not mac_addresses
       ansible.builtin.meta: end_play
 
     - name: Export MAC addresses to the routers
@@ -34,7 +34,7 @@
     target_network: 169.254.0.0
   tasks:
     - name: Skip for empty macaddresess list
-      when: not mac_addresses
+      when: mac_addresses is undefined or not mac_addresses
       ansible.builtin.meta: end_play
 
     - name: Get internal interfaces
@@ -43,11 +43,21 @@
         cacheable: true # cache it to other playbooks in this run use it
       when: (hostvars[inventory_hostname]['ansible_%s' % item] | default({})).get('ipv4', {}).get('network') == target_network
       loop: "{{ ansible_interfaces }}"
+    - name: Get internal interface if router dhcp has been defined
+      ansible.builtin.set_fact:
+        router_interface: "{{ item }}"
+        cacheable: true # cache it to other playbooks in this run use it
+      # FIXME (luisd): remove hardcoded ip on refactor
+      when: >
+        not router_interface and
+        (hostvars[inventory_hostname]['ansible_%s' % item] | default({})).get('ipv4', {}).get('network') == "10.10.0.0"
+      loop: "{{ ansible_interfaces }}"
+
 - name: Setup static IP
   hosts: routers
   tasks:
     - name: Skip for empty macaddresess list
-      when: not mac_addresses
+      when: mac_addresses is undefined or not mac_addresses
       ansible.builtin.meta: end_play
 
     - name: Setup internal network config to vm
@@ -83,55 +93,52 @@
 
 - name: Run DHCP4 Server with Kea
   hosts: routers
-  become: true
   tasks:
-    - name: Skip for empty macaddresess list
-      when: not mac_addresses
-      ansible.builtin.meta: end_play
-
     - name: Install kea package
+      become: true
       ansible.builtin.apt:
         name: kea
         update_cache: true
+
+    - name: Get old config file
+      ansible.builtin.command:
+        cmd: cat /etc/kea/kea-dhcp4.conf
+      failed_when: false # never fail because it will be handle in the next task
+      changed_when: true
+      register: old_config
+
+    - name: Write old mac addresses
+      ansible.builtin.set_fact:
+        mac_addresses: >
+          {{ (old_config.stdout | from_json | json_query('Dhcp4.subnet4[0].reservations[*]."hw-address"')) + (mac_addresses | default([])) }}
+      when: old_config.rc == 0
+
     - name: Write config file
+      become: true
       ansible.builtin.template:
         src: templates/kea-dhcp4.conf.j2
         dest: /etc/kea/kea-dhcp4.conf
         mode: "644"
     - name: Create leases file if not exists
+      become: true
       ansible.builtin.file:
         path: /var/lib/kea/dhcp4.leases
         state: touch
         mode: '0700'
-    - name: Restart kea dhcp server
-      ansible.builtin.systemd:
-        service: kea-dhcp4-server
-        state: restarted
- 
-- name: Restart dhcpcd in order for nodes to gain ip addresses
-  hosts: nodes
-  become: true
-  tasks:
-    - name: Skip for empty macaddresess list
-      when: not mac_addresses
-      ansible.builtin.meta: end_play
-    - name: Wait for dhcp server
-      ansible.builtin.wait_for:
-        timeout: 20
-    - name: Restart dhcpcd
-      ansible.builtin.systemd:
-        service: dhcpcd
-        state: restarted
-
-- name: Update IP address for nodes in the inventory
-  hosts: nodes
-  tasks:
     - name: Update nodes IP's
       connection: local
       ansible.builtin.lineinfile:
         path: '{{ inventory_dir }}/ansible-inventory-dev.ini'
-        regexp: '^{{ inventory_hostname }}(.*)ansible_ssh_host=([^ ]*) (.*)'
-        line: '{{ inventory_hostname }}\1ansible_ssh_host=10.10.0.{{ (inventory_hostname[-1] | int + (groups["routers"] | length) + 1)  | string }} \3'
+        regexp: '^{{ item }}(.*)ansible_ssh_host=([^ ]*) (.*)'
+        line: >
+          {{ item }}\1ansible_ssh_host=10.10.0.{{ (groups["nodes"].index(item) + 1 + (groups["routers"] | length) + 1)  | string }} \3
         backrefs: true
+      loop: "{{ groups['nodes'] }}"
+
+    - name: Restart kea dhcp server
+      become: true
+      ansible.builtin.systemd:
+        service: kea-dhcp4-server
+        state: restarted
     - name: Refresh the inventory
       ansible.builtin.meta: refresh_inventory

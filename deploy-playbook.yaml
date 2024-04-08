@@ -6,13 +6,17 @@
 - name: Networking - Setup static internal IPs
   ansible.builtin.import_playbook: networking/dhcp-server-config-playbook.yaml
 - name: Wait for connection
-  gather_facts: true
   hosts: all
+  connection: local
+  gather_facts: false
   tasks:
-    - name: Wait 30 seconds for connection
-      ansible.builtin.wait_for_connection:
-        connect_timeout: 3
-        timeout: 30
+    - name: Wait for nodes to change dhcp address
+      ansible.builtin.wait_for:
+        port: 22
+        host: '{{ (ansible_ssh_host | default(ansible_host)) | default(inventory_hostname) }}'
+        search_regex: OpenSSH
+        delay: 10
+        timeout: 120
 - name: Pre-setup - get correct interfaces
   ansible.builtin.import_playbook: networking/get-interface-playbook.yaml
 - name: Networking - Router BGP
