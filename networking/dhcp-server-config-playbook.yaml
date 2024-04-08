@@ -11,7 +11,8 @@
     - name: Extract nodes MAC addresses
       run_once: true # noqa: run-once[task]
       ansible.builtin.set_fact:
-        mac_addresses: "{{ ( mac_addresses | default([]))  + (ansible_play_hosts_all | map('extract', hostvars) | json_query('[].ansible_%s.macaddress' % item )) }}"
+        mac_addresses: >
+          {{ (mac_addresses | default([])) + (ansible_play_hosts_all | map('extract', hostvars) | json_query('[].ansible_%s.macaddress' % item)) }}
       when: >
         ansible_play_hosts_all | map('extract', hostvars) | json_query('[].ansible_%s.ipv4' % item)
         | selectattr('network', 'defined') | selectattr('network', '==', target_interface)
@@ -68,8 +69,11 @@
         mode: "644"
     - name: Restart network service on VM
       become: true
-      ansible.builtin.command:
-        cmd: systemctl --no-block restart systemd-networkd
+      ansible.builtin.systemd:
+        no_block: true
+        name: systemd-networkd
+        state: restarted
+      changed_when: true
       ignore_unreachable: true
       async: 10
       poll: 0
@@ -131,7 +135,7 @@
         path: '{{ inventory_dir }}/ansible-inventory-dev.ini'
         regexp: '^{{ item }}(.*)ansible_ssh_host=([^ ]*) (.*)'
         line: >
-          {{ item }}\1ansible_ssh_host=10.10.0.{{ (groups["nodes"].index(item) + 1 + (groups["routers"] | length) + 1)  | string }} \3
+          {{ item }}\1ansible_ssh_host=10.10.0.{{ (groups["nodes"].index(item) + 1 + (groups["routers"] | length) + 1) | string }} \3
         backrefs: true
       loop: "{{ groups['nodes'] }}"
 
