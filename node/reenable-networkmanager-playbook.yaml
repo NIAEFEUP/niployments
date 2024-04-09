@@ -42,9 +42,10 @@
   become: true
   tasks:
     - name: Delete old leases
-      ansible.builtin.file:
-        state: absent
-        path: /var/lib/kea/kea-leases4.csv
+      become: true
+      ansible.builtin.command:
+        cmd: rm -f /var/lib/kea/kea-leases4.csv*
+      changed_when: true
 
     - name: Restart kea
       ansible.builtin.systemd:

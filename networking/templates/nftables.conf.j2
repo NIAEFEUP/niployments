@@ -6,6 +6,6 @@ flush ruleset
 table ip nat {
 	chain postrouting {
 		type nat hook postrouting priority srcnat; policy accept;
-		ip saddr 10.10.0.0/24 oif "{{ target_interface }}" masquerade
+		ip saddr 10.10.0.0/24 oif "{{ 'enp0s1f0' if dev_cluster == 'false' else 'eth1' }}" masquerade
 	}
 }
