@@ -787,6 +787,7 @@ service:
   # -- Cannot contain type, selector or ports entries.
   spec: # {}
     externalTrafficPolicy: Local
+    loadBalancerClass: io.cilium/bgp-control-plane
     # externalTrafficPolicy: Cluster
     # loadBalancerIP: "1.2.3.4"
     # clusterIP: "2.3.4.5"

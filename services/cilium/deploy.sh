@@ -10,3 +10,5 @@ helm upgrade --install cilium cilium/cilium \
 cilium-cli status --wait
 
 kubectl apply -f $(dirname $0)/bgp-peering-policy.yaml
+
+kubectl apply -f $(dirname $0)/load-balancer-pool.yaml

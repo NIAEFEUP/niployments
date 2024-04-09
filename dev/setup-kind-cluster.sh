@@ -71,6 +71,8 @@ spec:
   loadBalancerIPs: true
 EOF
 
+$HELM_EXECUTABLE repo add traefik https://traefik.github.io/charts
+
 $HELM_EXECUTABLE upgrade --install traefik traefik/traefik \
   --version 25.0.0 \
   --values $(dirname $0)/../services/traefik/values-dev.yaml \
