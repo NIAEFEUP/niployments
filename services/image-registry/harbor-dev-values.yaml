@@ -1,7 +1,7 @@
 expose:
   # Set how to expose the service. Set the type as "ingress", "clusterIP", "nodePort" or "loadBalancer"
   # and fill the information in the corresponding section
-  type: loadBalancer
+  type: clusterIP
   tls:
     # Enable TLS or not.
     # Delete the "ssl-redirect" annotations in "expose.ingress.annotations" when TLS is disabled and "expose.type" is "ingress"
@@ -63,32 +63,6 @@ expose:
       httpPort: 80
       # The service port Harbor listens on when serving HTTPS
       httpsPort: 443
-  nodePort:
-    # The name of NodePort service
-    name: harbor
-    ports:
-      http:
-        # The service port Harbor listens on when serving HTTP
-        port: 80
-        # The node port Harbor listens on when serving HTTP
-        nodePort: 30002
-      https:
-        # The service port Harbor listens on when serving HTTPS
-        port: 443
-        # The node port Harbor listens on when serving HTTPS
-        nodePort: 30003
-  loadBalancer:
-    # The name of LoadBalancer service
-    name: harbor
-    # Set the IP if the LoadBalancer supports assigning IP
-    IP: ""
-    ports:
-      # The service port Harbor listens on when serving HTTP
-      httpPort: 80
-      # The service port Harbor listens on when serving HTTPS
-      httpsPort: 443
-    annotations: {}
-    sourceRanges: []
 
 # The external URL for Harbor core service. It is used to
 # 1) populate the docker/helm commands showed on portal
@@ -103,7 +77,7 @@ expose:
 # the IP address of k8s node
 #
 # If Harbor is deployed behind the proxy, set it as the URL of proxy
-externalURL: https://172.28.255.200
+externalURL: https://harbor.niaefeup.pt
 
 # The internal TLS used for harbor components secure communicating. In order to enable https
 # in each component tls cert files need to provided in advance.

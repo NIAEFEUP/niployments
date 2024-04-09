@@ -10,3 +10,6 @@ helm upgrade --install harbor harbor/harbor \
 
 
 kubectl apply -f $(dirname $0)/keel-dev-deployment.yaml
+
+kubectl apply -f $(dirname $0)/01-harbor-certificates.yaml
+kubectl apply -f $(dirname $0)/02-harbor-ingressroute.yaml
