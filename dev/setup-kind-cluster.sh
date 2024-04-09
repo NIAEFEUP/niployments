@@ -70,3 +70,10 @@ spec:
   externalIPs: true
   loadBalancerIPs: true
 EOF
+
+$HELM_EXECUTABLE upgrade --install traefik traefik/traefik \
+  --version 25.0.0 \
+  --values $(dirname $0)/../services/traefik/values-dev.yaml \
+  --namespace kube-system
+
+$(dirname $0)/../services/cert-manager/deploy-dev.sh
