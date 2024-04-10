@@ -24,8 +24,8 @@
       become: true
       ansible.builtin.shell:
         cmd: >
-          set -o pipefail && curl -sfL https://get.rke2.io
-          | INSTALL_RKE2_VERSION="{{ rke2_version }}"
-            INSTALL_RKE2_TYPE="{{ "server" if "controlplane" in group_names else "agent" }}"
-            sh -
+          set -o pipefail && curl -sfL https://get.rke2.io |
+          INSTALL_RKE2_VERSION="{{ rke2_version }}"
+          INSTALL_RKE2_TYPE="{{ "server" if "controlplane" in group_names else "agent" }}"
+          sh -
         creates: /usr/bin/rke2
