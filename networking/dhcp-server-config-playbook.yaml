@@ -80,16 +80,26 @@
         regexp: '^{{ inventory_hostname }}(.*)ansible_ssh_host=([^ ]*) (.*)'
         line: '{{ inventory_hostname }}\1ansible_ssh_host=10.10.0.{{ (inventory_hostname[-1] | int + 1) | string }} \3'
         backrefs: true
+      register: router_update
     - name: Refresh inventory
       ansible.builtin.meta: refresh_inventory
+    - name: Wait for systemd-networkd
+      when: router_update.changed # noqa: no-handler
+      ansible.builtin.wait_for:
+        port: 22
+        host: '{{ (ansible_ssh_host | default(ansible_host)) | default(inventory_hostname) }}'
+        search_regex: OpenSSH
+        delay: 10
+        timeout: 120
+      delegate_to: localhost
     - name: Add nameserver to VM
+      when: router_update.changed # noqa: no-handler
       become: true
       ansible.builtin.lineinfile:
         path: /etc/resolvconf/resolv.conf.d/tail
         line: nameserver 1.1.1.1
         mode: "644"
         create: true
-
 
 - name: Run DHCP4 Server with Kea
   hosts: routers

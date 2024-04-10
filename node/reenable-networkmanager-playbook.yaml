@@ -1,5 +1,20 @@
 ---
 
+- name: Stop dhcp kea server
+  hosts: routers
+  become: true
+  tasks:
+    - name: Delete old leases
+      become: true
+      ansible.builtin.command:
+        cmd: rm -f /var/lib/kea/kea-leases4.csv
+      changed_when: true
+
+    - name: Stop kea
+      ansible.builtin.systemd:
+        service: kea-dhcp4-server
+        state: stopped
+
 - name: Re-enable NetworkManager on nodes
   hosts: nodes
   become: true
@@ -15,6 +30,7 @@
           ansible.builtin.systemd_service:
             name: dhcpcd
             enabled: false
+            state: stopped
         - name: Enable NetworkManager
           ansible.builtin.systemd_service:
             name: NetworkManager
@@ -37,20 +53,15 @@
           ansible.builtin.set_fact:
             needs_reboot_dhcp: true
 
-- name: Restart dhcp kea server
+- name: Start dhcp kea server
   hosts: routers
   become: true
   tasks:
-    - name: Delete old leases
-      become: true
-      ansible.builtin.command:
-        cmd: rm -f /var/lib/kea/kea-leases4.csv*
-      changed_when: true
-
-    - name: Restart kea
+    - name: Start kea
       ansible.builtin.systemd:
         service: kea-dhcp4-server
-        state: restarted
+        state: started
+
 
 - name: Restart node if necessary
   hosts: nodes
