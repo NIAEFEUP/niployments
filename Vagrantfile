@@ -82,6 +82,7 @@ end
 def configure_cluster_node(i, config)
     config.vm.define "cluster#{i}" do |clustervm|
         clustervm.vm.box = "NIAEFEUP/rocky-NInux"
+        clustervm.vm.box_version = "0.4.1"
         lip = $ip.clone
         clustervm.vm.provision "shell" do |s|
             s.path = "dev/node-networking.sh"
