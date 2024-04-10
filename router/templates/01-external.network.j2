@@ -1,0 +1,12 @@
+[Match]
+Name=enp0s1f0
+
+[Link]
+MACAddress={{assigned_network.hw_addr}}
+
+[Network]
+Address={{assigned_network.ip}}/{{assigned_network.prefix}}
+Gateway={{assigned_network.gateway}}
+{% for dns in assigned_network.nameservers %}
+DNS={{ dns }}
+{% endfor %}

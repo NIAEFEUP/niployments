@@ -1,0 +1,15 @@
+[connection]
+id={{ target_interface }}
+type=ethernet
+interface-name={{ target_interface }}
+
+[ethernet]
+
+[ipv4]
+method=auto
+
+[ipv6]
+addr-gen-mode=eui64
+method=auto
+
+[proxy]

@@ -1,0 +1,12 @@
+- name: Add EPEL repos to all nodes
+  hosts: nodes
+  tasks:
+    - name: Enable CRB
+      become: true
+      ansible.builtin.command: /usr/bin/dnf config-manager --set-enabled crb
+      changed_when: true # AFAIK there's no way to check if this is enabled or not
+    - name: Install EPEL repo
+      become: true
+      ansible.builtin.dnf:
+        name: "epel-release"
+        state: present

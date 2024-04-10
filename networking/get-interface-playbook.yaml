@@ -9,3 +9,8 @@
         cacheable: true # cache it to other playbooks in this run use it
       when: (hostvars[inventory_hostname]['ansible_%s' % item] | default({})).get('ipv4', {}).get('network') == target_network
       loop: "{{ ansible_interfaces }}"
+
+    - name: Fail if there's no dhcp IP
+      when: not target_interface
+      ansible.builtin.fail:
+        msg: "Node {{ inventory_hostname }} failed to get a DHCP lease."
