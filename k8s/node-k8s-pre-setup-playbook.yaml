@@ -1,7 +1,7 @@
 - name: Node k8s pre-setup
   hosts: nodes
   vars:
-    RKE2_VERSION: "v1.29.3+rke2r1"
+    rke2_version: "v1.29.3+rke2r1"
   tasks:
     - name: NetworkManager exclude CNI interfaces
       become: true
@@ -23,5 +23,9 @@
     - name: Install RKE2 # noqa: command-instead-of-module
       become: true
       ansible.builtin.shell:
-        cmd: set -o pipefail && curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION="{{ RKE2_VERSION }}" INSTALL_RKE2_TYPE="{{ "server" if "controlplane" in group_names else "agent" }}" sh -
+        cmd: >
+          set -o pipefail && curl -sfL https://get.rke2.io
+          | INSTALL_RKE2_VERSION="{{ rke2_version }}"
+            INSTALL_RKE2_TYPE="{{ "server" if "controlplane" in group_names else "agent" }}"
+            sh -
         creates: /usr/bin/rke2
