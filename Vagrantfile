@@ -30,9 +30,10 @@ end
 
 def configure_router(i, config)
     config.vm.define "router#{i}" do |router|
-        router.vm.box = "generic/debian11"
+        router.vm.box = "generic/debian12"
+        router.vm.provision "shell", reboot: true, inline: "sudo systemctl enable systemd-networkd.service"
         lip = $ip.clone
-        router.vm.provision "shell", reboot: true, path:"dev/router-networking.sh", args: [lip]
+        router.vm.provision "shell", reboot: true, path:"dev/router-networking.sh", args: [lip, $host_only.to_s]
         if $host_only == false then
             if $bridge_interface != nil then
                     router.vm.network "public_network",
@@ -59,7 +60,7 @@ def configure_router(i, config)
         end
 
         configure_ram(router, $router_ram)
-        configure_private_network(router, true)
+        configure_private_network(router, false)
         router.vm.provision "shell" do |s|
             s.inline = "hostnamectl set-hostname $1"
             s.args = ["router"+i.to_s]
@@ -70,8 +71,21 @@ end
 def configure_cluster_node(i, config)
     config.vm.define "cluster#{i}" do |clustervm|
         clustervm.vm.box = "NIAEFEUP/rocky-NInux"
-        clustervm.vm.box_version = "0.4.1"
+        clustervm.vm.box_version = "0.5.1"
         lip = $ip.clone
+
+        # We enable nested virtualization for vm build tests in vagrant
+        clustervm.vm.provider "virtualbox" do |vb|
+            vb.customize ['modifyvm', :id, '--nested-hw-virt', 'on']
+        end
+
+        clustervm.vm.provider :libvirt do |libvirt|
+            # Enable KVM nested virtualization
+            libvirt.nested = true
+            libvirt.cpu_mode = "host-model"
+        end
+          
+
         clustervm.vm.provision "shell" do |s|
             s.path = "dev/node-networking.sh"
             s.args = [lip]
