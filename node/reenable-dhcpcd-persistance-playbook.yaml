@@ -1,0 +1,27 @@
+---
+
+- name: Reenable dhcpcd persistance
+  hosts: nodes
+  become: true
+  tasks:
+    - name: Get service facts
+      ansible.builtin.service_facts:
+
+    - name: Remove dhcpcd if it's enabled and add NetworkManager
+      when: >
+        'dhcpcd.service' in ansible_facts.services and ansible_facts.services['dhcpcd.service']['status'] == 'enabled'
+      block:
+        - name: Add dhcpcd persistance
+          become: true
+          ansible.builtin.lineinfile:
+            path: /etc/dhcpcd.conf
+            regexp: "^#persistent"
+            line: "persistent"
+          notify:
+            - Restart dhcpcd
+  handlers:
+    - name: Restart dhcpcd
+      become: true
+      ansible.builtin.systemd:
+        name: dhcpcd
+        state: restarted
