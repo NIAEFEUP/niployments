@@ -1,0 +1,162 @@
+﻿- name: "Install virtualization utils"
+  become: true
+  ansible.builtin.dnf:
+    name:
+      - qemu-kvm
+      - libvirt
+      - virt-install
+      - guestfs-tools
+    state: present
+- name: "Enable libvirt service"
+  become: true
+  ansible.builtin.systemd:
+    name: libvirtd
+    state: "started"
+    enabled: true
+- name: "Create VM disks folder"
+  become: true
+  ansible.builtin.file:
+    recurse: true
+    state: directory
+    path: "/srv/vm/disks"
+    mode: "770"
+    group: qemu
+- name: "Create router disk folder"
+  become: true
+  ansible.builtin.file:
+    recurse: true
+    state: directory
+    path: "/srv/vm/disks/router"
+    mode: "770"
+    group: qemu
+- name: "Download router QCOW2 file"
+  retries: 3
+  become: true
+  ansible.builtin.get_url:
+    url: https://cloud.debian.org/images/cloud/bookworm/20240211-1654/debian-12-generic-amd64-20240211-1654.qcow2
+    dest: /srv/vm/disks/router/router.qcow2
+    checksum: sha512:b679398972ba45a60574d9202c4f97ea647dd3577e857407138b73b71a3c3c039804e40aac2f877f3969676b6c8a1ebdb4f2d67a4efa6301c21e349e37d43ef5
+    mode: "770"
+- name: "Resize router QCOW2 file"
+  become: true
+  ansible.builtin.command:
+    cmd: qemu-img resize /srv/vm/disks/router/router.qcow2 5G
+  changed_when: true
+
+- name: "Resize router QCOW2 partition"
+  block:
+    - name: "Change old file router name"
+      become: true
+      ansible.builtin.command:
+        cmd: cp /srv/vm/disks/router/router.qcow2 /srv/vm/disks/router/router.qcow2.old
+        creates: /srv/vm/disks/router/router.qcow2.old
+      changed_when: true
+    - name: "Resize filesystem partition for router"
+      become: true
+      ansible.builtin.command:
+        cmd: virt-resize --expand /dev/sda1 /srv/vm/disks/router/router.qcow2.old /srv/vm/disks/router/router.qcow2
+      changed_when: true
+    - name: "Delete old router qcow file"
+      become: true
+      ansible.builtin.file:
+        path: /srv/vm/disks/router/router.qcow2.old
+        state: absent
+
+- name: Create user on vm
+  become: true
+  ansible.builtin.command:
+    cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'useradd -m -s /bin/bash -g sudo ni'
+  changed_when: true
+
+- name: Create password on user
+  become: true
+  ansible.builtin.command:
+    cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'echo "ni:n1bl04t:)" | chpasswd'
+  changed_when: true
+
+- name: "Create mount directory"
+  become: true
+  ansible.builtin.file:
+    state: directory
+    path: "/mnt/router"
+    mode: "644"
+
+- name: Update package repos
+  become: true
+  ansible.builtin.command:
+    cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'apt-get update'
+  changed_when: true
+
+- name: Install Avahi on VM
+  become: true
+  ansible.builtin.command:
+    cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'apt-get install -y avahi-daemon avahi-utils'
+  changed_when: true
+
+
+- name: Add host private key files
+  become: true
+  ansible.builtin.command:
+    cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'ssh-keygen -A'
+  changed_when: true
+
+- name: "VM file provisioning"
+  block:
+    - name: "Mount router image"
+      become: true
+      ansible.builtin.command: guestmount -a /srv/vm/disks/router/router.qcow2 -m /dev/sda3 /mnt/router
+      changed_when: true
+      register: image_create_dev
+      failed_when: image_create_dev.rc != 0
+    - name: Create .ssh folder on vm
+      become: true
+      ansible.builtin.file:
+        path: /mnt/router/home/{{ ansible_ssh_user }}/.ssh
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: "{{ ansible_ssh_user }}"
+        mode: "755"
+    - name: Copy authorized_keys to vm
+      become: true
+      ansible.builtin.copy:
+        src: /home/ni/.ssh/authorized_keys
+        dest: /mnt/router/home/ni/.ssh/authorized_keys
+        remote_src: true
+        mode: "644"
+    - name: Add ni user to sudoers password
+      become: true
+      ansible.builtin.copy:
+        dest: /mnt/router/etc/sudoers.d/dont-prompt-ni_user-for-sudo-password
+        content: 'ni ALL=(ALL) NOPASSWD:ALL'
+        mode: "644"
+    - name: Copy avahi dhcp fallback to vm
+      become: true
+      ansible.builtin.copy:
+        src: templates/99-ipv4ll.network
+        dest: /mnt/router/etc/systemd/network/99-ipv4ll.network
+        mode: "644"
+    - name: Copy interface network config to vm
+      become: true
+      ansible.builtin.template:
+        src: templates/01-external.network.j2
+        dest: /mnt/router/etc/systemd/network/01-external.network
+        mode: "644"
+    - name: Enable avahi discoverability
+      become: true
+      ansible.builtin.lineinfile:
+        path: /mnt/router/etc/avahi/avahi-daemon.conf
+        regexp: '^publish-workstation='
+        line: publish-workstation=yes
+  always:
+    - name: "Umount router partition"
+      become: true
+      ansible.builtin.command:
+        cmd: guestunmount /mnt/router
+      failed_when: false
+      changed_when: true
+
+- name: Fix grub on VM
+  become: true
+  ansible.builtin.command:
+    cmd: virt-customize -a /srv/vm/disks/router/router.qcow2 --run-command 'grub-install /dev/sda'
+  changed_when: true

@@ -1,14 +1,47 @@
 ---
+- name: Install Router VMs
+  ansible.builtin.import_playbook: router/build-router-vm-playbook.yaml
 - name: Create a set new SSH key for clusters and routers
   ansible.builtin.import_playbook: networking/add-ssh-key-to-nodes-playbook.yaml
+- name: Networking - Setup static internal IPs
+  ansible.builtin.import_playbook: networking/dhcp-server-config-playbook.yaml
+- name: Wait for connection
+  hosts: all
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Wait for nodes to change dhcp address
+      ansible.builtin.wait_for:
+        port: 22
+        host: '{{ (ansible_ssh_host | default(ansible_host)) | default(inventory_hostname) }}'
+        search_regex: OpenSSH
+        delay: 10
+        timeout: 120
+- name: Pre-setup - enable NTP syncronization
+  hosts: all
+  tasks:
+    - name: "Enable NTP client"
+      become: true
+      ansible.builtin.command: /usr/bin/timedatectl set-ntp on
+      changed_when: true
+    - name: "Switch to UTC timezone"
+      become: true
+      community.general.timezone:
+        name: "UTC"
 - name: Pre-setup - get correct interfaces
   ansible.builtin.import_playbook: networking/get-interface-playbook.yaml
+- name: Pre-setup - Node re-enable NetworkManager
+  ansible.builtin.import_playbook: node/reenable-networkmanager-playbook.yaml
+- name: Networking - Router initial config
+  ansible.builtin.import_playbook: networking/router-setup-playbook.yaml
 - name: Networking - Router BGP
   ansible.builtin.import_playbook: networking/router-bgp-playbook.yaml
 - name: Networking - VRRP
   ansible.builtin.import_playbook: networking/router-vrrp-playbook.yaml
 - name: Networking - Router Controlplane HA
   ansible.builtin.import_playbook: networking/controlplane-ha-playbook.yaml
+- name: Nodes - Enable EPEL repositories
+  ansible.builtin.import_playbook: node/add-epel-repos-playbook.yaml
 - name: Node - Pre-setup K8S
   ansible.builtin.import_playbook: k8s/node-k8s-pre-setup-playbook.yaml
 - name: Setup K8s on control-plane

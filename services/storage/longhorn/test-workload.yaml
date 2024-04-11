@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: longhorn-volv-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-locality
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: volume-test
+  namespace: default
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "The container requires the root filesystem to be writable" 
+    ignore-check.kube-linter.io/run-as-non-root: "The container must run as root user"
+spec:
+  containers:
+  - name: volume-test
+    image: nginx:stable-alpine
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - name: volv
+      mountPath: /data
+    ports:
+    - containerPort: 80
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "0.05"
+      requests:
+        memory: "64Mi"
+        cpu: "0.01"
+  volumes:
+  - name: volv
+    persistentVolumeClaim:
+      claimName: longhorn-volv-pvc

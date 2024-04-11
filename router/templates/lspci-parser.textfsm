@@ -1,0 +1,8 @@
+Value domain ([0-9a-fA-F]{4})
+Value bus ([0-9a-fA-F]{2})
+Value device ([0-9a-fA-F]{2})
+Value function ([0-7])
+Value pciVendorDevice ([0-9a-fA-F]{4}:[0-9a-fA-F]{4})
+
+Start
+ ^${domain}:${bus}:${device}\.${function}.*: *${pciVendorDevice} -> Next.Record

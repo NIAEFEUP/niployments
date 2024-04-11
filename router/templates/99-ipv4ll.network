@@ -1,0 +1,7 @@
+[Match]
+Name=*
+Type=ether
+
+[Network]
+LinkLocalAddressing=yes
+IPv4LLRoute=true
