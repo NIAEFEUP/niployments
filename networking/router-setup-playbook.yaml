@@ -3,6 +3,21 @@
 - name: Networking - Router basic setup
   hosts: routers
   tasks:
+    - name: Disable vagrant default route on dev cluster
+      when: dev_cluster == 'true'
+      block:
+        - name: Copy template for vagrant systemd config
+          become: true
+          ansible.builtin.template:
+            src: templates/01-vagrant.network.j2
+            dest: /etc/systemd/network/01-vagrant.network
+            mode: "644"
+        - name: Restart network service on VM
+          become: true
+          ansible.builtin.systemd:
+            name: systemd-networkd
+            state: restarted
+
     - name: Enable Layer 3 forwarding
       become: true
       ansible.posix.sysctl:
