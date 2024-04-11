@@ -1,0 +1,5 @@
+token: {{ hostvars[groups['controlplane'][0]]['cluster_token'] }}
+server: https://10.11.11.1:9345
+selinux: true
+tls-san:
+  - 10.11.11.1

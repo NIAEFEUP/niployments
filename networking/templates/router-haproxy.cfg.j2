@@ -50,4 +50,29 @@ backend apiserver
     hostvars[nodename]["ansible_facts"]["target_interface"]]['ipv4']['address']
   }}:6443 check
     {% endfor %}
+
+
+#---------------------------------------------------------------------
+# RKE2 supervisor server frontend which proxys to the control plane nodes
+#---------------------------------------------------------------------
+frontend supervisorserver
+    bind 10.11.11.1:9345
+    mode tcp
+    option tcplog
+    default_backend supervisorserver
+
+#---------------------------------------------------------------------
+# round robin balancing for RKE2 supervisor
+#---------------------------------------------------------------------
+backend supervisorserver
+    option httpchk GET /cacerts
+    http-check expect status 200
+    mode tcp
+    option ssl-hello-chk
+    balance     roundrobin
+    {% for nodename in groups["controlplane"]%}
+        server {{nodename}} {{ hostvars[nodename]["ansible_"~
+    hostvars[nodename]["ansible_facts"]["target_interface"]]['ipv4']['address']
+  }}:9345 check
+    {% endfor %}
 #---------------------------------------------------------------------
