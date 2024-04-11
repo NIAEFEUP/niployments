@@ -1,0 +1,161 @@
+﻿- name: Build router VM in hosts that have the appropriate NICs
+  hosts: controlplane
+  tasks:
+    - name: Skip play if running in the development cluster
+      when: dev_cluster == "true"
+      ansible.builtin.meta: end_play
+    - name: Skip host if it doesnt have external_interface defined
+      when: external_interface is undefined
+      ansible.builtin.meta: end_host
+    - name: Import router vars
+      ansible.builtin.include_vars:
+        file: "router-vars.json"
+    - name: Check if libvirt is installed
+      ansible.builtin.service_facts:
+    - name: Check if router VM exists
+      become: true
+      community.libvirt.virt:
+        command: list_vms
+      register: routervm_stat
+      when: "'libvirtd.service' in ansible_facts.services"
+    # we only want to remove vfio if there isn't a router anymore in order to make this reproducible
+    - name: Remove vfio pci devices modprobe
+      become: true
+      when: '"libvirtd.service" in ansible_facts.services and "routerVM" not in routervm_stat.list_vms'
+      ansible.builtin.file:
+        path: /etc/modprobe.d/vfio.conf
+        state: absent
+      notify:
+        - Update initramfs and reboot
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+    - name: Get PCI devices to find appropriate NICs
+      ansible.utils.cli_parse:
+        command: lspci -Dn
+        parser:
+          name: ansible.utils.textfsm
+          template_path: router/templates/lspci-parser.textfsm
+        set_fact: pci_devices
+    - name: Remove dhcpcd persistance
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/dhcpcd.conf
+        regexp: "^persistent"
+        line: "#persistent"
+      notify:
+        - Restart dhcpcd
+    - name: Remove external_interface from dhcpcd
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/dhcpcd.conf
+        regexp: "^denyinterfaces.*"
+        line: "denyinterfaces {{ external_interface }}"
+      notify:
+        - Restart dhcpcd
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Only include nodes that have suitable devices
+      when: >
+        (pci_devices | map(attribute="pciVendorDevice") | intersect(valid_nic_ids) | length) != 0
+      block:
+        - name: Assign one public IP per router
+          ansible.builtin.set_fact:
+            assigned_network: "{{ external_eth_config[play_hosts.index(inventory_hostname)] }}"
+          delegate_to: "{{ item }}"
+          with_items: "{{ ansible_play_hosts }}"
+
+        - name: Build new router VM
+          when: '"libvirtd.service" not in ansible_facts.services or "routerVM" not in routervm_stat.list_vms'
+          block:
+            - name: Get PCI ID per interface
+              ansible.builtin.set_fact:
+                device_by_pci_address: "{{ ansible_facts | json_query('@.* | [?pciid].{key: device, value: pciid}') | items2dict }}"
+            - name: Parse PCI ID of external interface
+              ansible.utils.cli_parse:
+                text: "{{ device_by_pci_address[external_interface] }}"
+                parser:
+                  name: ansible.utils.textfsm
+                  template_path: router/templates/pci-id-parser.textfsm
+                set_fact: external_interface_pci_device
+            - name: Filter pci_devices to include the same device as the external interface
+              ansible.builtin.set_fact:
+                pci_devices: "{{ pci_devices | selectattr('bus', 'equalto', external_interface_pci_device[0]['bus'])
+                  | selectattr('device', 'equalto', external_interface_pci_device[0]['device'])
+                  | selectattr('bus', 'equalto', external_interface_pci_device[0]['bus'])
+                   }}"
+            - name: Set external interface up
+              become: true
+              ansible.builtin.command:
+                cmd: "ip link set up {{ external_interface }}"
+              changed_when: true
+            # This might fail a few times until the interface comes up
+            - name: Configure external ip to configure VM temporarily
+              become: true
+              retries: 3
+              delay: 5
+              ansible.builtin.command:
+                cmd: "ip addr add {{ assigned_network.ip + '/' + assigned_network.prefix }} dev {{ external_interface }}"
+              changed_when: true
+            - name: Configure default route
+              become: true
+              ansible.builtin.command:
+                cmd: "ip route add default dev {{ external_interface }} via {{ assigned_network.gateway }}"
+              changed_when: true
+            - name: Configure DNS
+              become: true
+              ansible.builtin.lineinfile:
+                dest: /etc/resolv.conf
+                line: "nameserver {{ assigned_network.nameservers[0] }}"
+            - name: Build VM disk image
+              ansible.builtin.include_tasks:
+                file: "vm-image-task.ansible.yaml"
+            - name: Enable vfio modules
+              become: true
+              community.general.modprobe:
+                state: present
+                persistent: present
+                name: "{{ item }}"
+              with_items:
+                - "vfio"
+                - "vfio_pci"
+                - "vfio_iommu_type1"
+            - name: Set device ids to load the vfio driver instead
+              become: true
+              ansible.builtin.template:
+                src: templates/vfio.conf.j2
+                dest: /etc/modprobe.d/vfio.conf
+                mode: "644"
+              notify:
+                - Update initramfs and reboot
+            - name: Flush handlers
+              ansible.builtin.meta: flush_handlers
+            - name: Create VM for router
+              become: true
+              community.libvirt.virt:
+                autostart: true
+                name: routerVM
+                command: define
+                xml: "{{ lookup('template', 'templates/libvirt-xml.j2') }}"
+            - name: Start VM
+              become: true
+              community.libvirt.virt:
+                name: routerVM
+                state: running
+            - name: Pause until user inputs router inventory settings
+              when: dev_cluster == "false"
+              ansible.builtin.pause:
+                prompt: "Please verify that the routers are properly up and add them to the corresponding inventory file"
+            - name: Refresh inventory
+              ansible.builtin.meta: refresh_inventory
+
+
+  handlers:
+    - name: Update initramfs and reboot
+      ansible.builtin.include_tasks:
+        file: "update-initramfs-tasks.ansible.yaml"
+    - name: Restart dhcpcd
+      become: true
+      ansible.builtin.systemd:
+        name: dhcpcd
+        state: restarted

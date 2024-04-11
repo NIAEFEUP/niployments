@@ -1,0 +1,103 @@
+---
+
+- name: Stop dhcp kea server
+  hosts: routers
+  become: true
+  tasks:
+    - name: Delete old leases
+      become: true
+      ansible.builtin.command:
+        cmd: rm -f /var/lib/kea/kea-leases4.csv
+      changed_when: true
+
+    - name: Stop kea
+      ansible.builtin.systemd:
+        service: kea-dhcp4-server
+        state: stopped
+
+- name: Re-enable NetworkManager on nodes
+  hosts: nodes
+  become: true
+  tasks:
+    - name: Get service facts
+      ansible.builtin.service_facts:
+
+    - name: Remove dhcpcd if it's enabled and add NetworkManager
+      when: >
+        'dhcpcd.service' in ansible_facts.services and ansible_facts.services['dhcpcd.service']['status'] == 'enabled'
+      block:
+        - name: Disable dhcpcd
+          ansible.builtin.systemd_service:
+            name: dhcpcd
+            enabled: false
+            state: stopped
+        - name: Enable NetworkManager
+          ansible.builtin.systemd_service:
+            name: NetworkManager
+            enabled: true
+        - name: Delete system-connections folder
+          ansible.builtin.file:
+            path: /etc/NetworkManager/system-connections
+            state: absent
+        - name: Create system-connections folder
+          ansible.builtin.file:
+            path: /etc/NetworkManager/system-connections
+            state: directory
+            mode: "744"
+        - name: Copy internal network template
+          ansible.builtin.template:
+            src: templates/internal-network.nmconnection.j2
+            dest: /etc/NetworkManager/system-connections/internal-network.nmconnection
+            mode: "600"
+        - name: Disable vagrant default route
+          when: dev_cluster == "true"
+          vars:
+            target_network: 10.10.0.0
+          block:
+            - name: Get vagrant interface
+              ansible.builtin.set_fact:
+                vagrant_interface: "{{ item }}"
+                cacheable: true # cache it to other playbooks in this run use it
+              when: >
+                (hostvars[inventory_hostname]['ansible_%s' % item] | default({})).get('ipv4', {}).get('network') != target_network
+                and (hostvars[inventory_hostname]['ansible_%s' % item] | default({})).get('type', '') == 'ether'
+              loop: "{{ ansible_interfaces }}"
+
+            - name: Fail if there's no vagrant interface
+              when: vagrant_interface is undefined or not vagrant_interface
+              ansible.builtin.fail:
+                msg: "Failed to get the vagrant interface on {{ ansible_hostname }}"
+            - name: Copy vagrant network template
+              ansible.builtin.template:
+                src: templates/vagrant-network.nmconnection.j2
+                dest: /etc/NetworkManager/system-connections/vagrant-network.nmconnection
+                mode: "600"
+        - name: Set flag for reboot
+          ansible.builtin.set_fact:
+            needs_reboot_dhcp: true
+
+- name: Start dhcp kea server
+  hosts: routers
+  become: true
+  tasks:
+    - name: Start kea
+      ansible.builtin.systemd:
+        service: kea-dhcp4-server
+        state: started
+
+
+- name: Restart node if necessary
+  hosts: nodes
+  tasks:
+    - name: Check if restart is necessary
+      when: needs_reboot_dhcp is defined
+      block:
+        - name: Get current kernel version for reboot
+          ansible.builtin.command:
+            cmd: uname -r
+          register: kernel_version
+          changed_when: false
+        - name: Reboot using kexec to apply the networkmanager changes
+          become: true
+          ansible.builtin.reboot:
+            reboot_command: "kexec /boot/vmlinuz-{{ kernel_version.stdout }} --initrd=/boot/initramfs-{{ kernel_version.stdout }}.img --reuse-cmdline"

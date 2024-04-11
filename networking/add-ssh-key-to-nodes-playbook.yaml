@@ -39,7 +39,7 @@
       when: inventory_hostname | regex_replace('\d', '') == 'cluster'
       throttle: 1
       block:
-        - name: Propagate the publicg key
+        - name: Propagate the public key
           become: true
           ansible.posix.authorized_key:
             user: ni
@@ -50,8 +50,8 @@
           connection: local
           ansible.builtin.lineinfile:
             path: '{{ inventory_dir }}/ansible-inventory-dev.ini'
-            regexp: '^{{ inventory_hostname }}(.*)ansible_ssh_private_key_file=(.*)( .*)?'
-            line: '{{ inventory_hostname }}\1ansible_ssh_private_key_file={{ playbook_dir | dirname }}/.ssh/new_key\3'
+            regexp: '^{{ inventory_hostname }}(.*)ansible_ssh_private_key_file=(\S*) *(.*)'
+            line: '{{ inventory_hostname }}\1ansible_ssh_private_key_file={{ playbook_dir | dirname }}/.ssh/new_key \3'
             backrefs: true
 
     - name: Add the key and mofidy inventory if router
@@ -59,7 +59,7 @@
       block:
         - name: Propagate public key to this node
           ansible.posix.authorized_key:
-            user: vagrant
+            user: "{{ 'vagrant' if dev_cluster == 'true' else 'ni' }}"
             state: present
             key: "{{ new_ssh_key.stdout }}"
             exclusive: "{{ not dev_cluster }}"
@@ -69,7 +69,7 @@
           connection: local
           ansible.builtin.lineinfile:
             path: '{{ inventory_dir }}/ansible-inventory-dev.ini'
-            regexp: '^{{ inventory_hostname }}(.*)ansible_ssh_private_key_file=(.*) +(.*)'
+            regexp: '^{{ inventory_hostname }}(.*)ansible_ssh_private_key_file=(\S*) *(.*)'
             line: '{{ inventory_hostname }}\1ansible_ssh_private_key_file={{ playbook_dir | dirname }}/.ssh/new_key \3'
             backrefs: true
 

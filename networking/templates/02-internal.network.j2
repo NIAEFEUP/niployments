@@ -1,0 +1,6 @@
+[Match]
+Name={{router_interface}}
+
+[Network]
+Address=10.10.0.{{ (inventory_hostname[-1] | int + 1) | string }}/24
+DNS=1.1.1.1

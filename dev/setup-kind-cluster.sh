@@ -22,7 +22,7 @@ $KIND_EXECUTABLE delete clusters $KIND_CLUSTER_NAME
 
 # Delete any old networks that might be present on the system.
 # We redirect all output to /dev/null so we do not clutter the terminal output
-docker network rm "$KIND_NETWORK" 1>/dev/null 2>&1 || true
+docker network rm "$KIND_NETWORK_NAME" 1>/dev/null 2>&1 || true
 docker network create "$KIND_NETWORK_NAME" \
   --subnet=172.28.0.0/16 \
   --gateway 172.28.0.1 \
@@ -79,3 +79,5 @@ $HELM_EXECUTABLE upgrade --install traefik traefik/traefik \
   --namespace kube-system
 
 $(dirname $0)/../services/cert-manager/deploy-dev.sh
+
+$KUBECTL_EXECUTABLE apply -f $(dirname "$0")/../services/storage/longhorn/storageClasses/fakeDevClasses
