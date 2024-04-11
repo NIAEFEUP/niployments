@@ -17,6 +17,10 @@
         search_regex: OpenSSH
         delay: 10
         timeout: 120
+- name: Pre-setup - reenable dhcpcd persistance
+  ansible.builtin.import_playbook: node/reenable-dhcpcd-persistance-playbook.yaml
+- name: Pre-setup - change hostname
+  ansible.builtin.import_playbook: node/change-hostname-playbook.yaml
 - name: Pre-setup - enable NTP syncronization
   hosts: all
   tasks:
