@@ -22,7 +22,17 @@ spec:
       scramCredentialsSecretName: my-scram
   additionalMongodConfig:
     storage.wiredTiger.engineConfig.journalCompressor: zlib
-
+  statefulSet:
+    spec:
+      volumeClaimTemplates:
+        - metadata:
+            name: data-volume
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            storageClassName: longhorn-locality-retain
+            resources:
+              requests:
+                storage: 5G
 # the user credentials will be generated from this secret
 # once the credentials are generated, this secret is no longer required
 ---

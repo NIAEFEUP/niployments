@@ -40,3 +40,4 @@ spec:
 
   storage:
     size: 10Gi
+    storageClass: longhorn-strict-local-retain

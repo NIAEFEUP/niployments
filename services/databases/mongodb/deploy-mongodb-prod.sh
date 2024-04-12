@@ -2,12 +2,11 @@
 # IMPORTANT: Deploy the development cluster first!
 # Run from the root of the repository
 
-mongodb_dir='./services/databases/mongodb'
-pods=$(cat $mongodb_dir/mongodb-cluster.yaml | awk '{if ($1 == "members:") print $2}')
+pods=$(cat $(dirname $0)/mongodb-cluster.yaml | awk '{if ($1 == "members:") print $2}')
 
 helm repo add mongodb https://mongodb.github.io/helm-charts
 helm install community-operator mongodb/community-operator --namespace mongodb --create-namespace
-kubectl apply -f $mongodb_dir/mongodb-cluster.yaml --namespace mongodb
+kubectl apply -f $(dirname $0)/mongodb-cluster.yaml --namespace mongodb
 sleep 20  # Wait a little bit for first pod to be created
 
 for i in $(seq 0 $((pods - 1))); do
