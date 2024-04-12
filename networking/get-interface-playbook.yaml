@@ -11,6 +11,6 @@
       loop: "{{ ansible_interfaces }}"
 
     - name: Fail if there's no dhcp IP
-      when: not target_interface
+      when: target_interface is undefined or not target_interface
       ansible.builtin.fail:
         msg: "Node {{ inventory_hostname }} failed to get a DHCP lease."
