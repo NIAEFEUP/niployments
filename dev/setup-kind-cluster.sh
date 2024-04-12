@@ -71,4 +71,13 @@ spec:
   loadBalancerIPs: true
 EOF
 
+$HELM_EXECUTABLE repo add traefik https://traefik.github.io/charts
+
+$HELM_EXECUTABLE upgrade --install traefik traefik/traefik \
+  --version 25.0.0 \
+  --values $(dirname $0)/../services/traefik/values-dev.yaml \
+  --namespace kube-system
+
+$(dirname $0)/../services/cert-manager/deploy-dev.sh
+
 $KUBECTL_EXECUTABLE apply -f $(dirname "$0")/../services/storage/longhorn/storageClasses/fakeDevClasses

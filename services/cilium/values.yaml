@@ -108,3 +108,6 @@ hubble:
     enabled: true
   ui:
     enabled: true
+bgp:
+  announce:
+    loadbalancerIP: true

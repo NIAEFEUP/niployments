@@ -1,0 +1,16 @@
+﻿---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: harbor-tls
+  namespace: image-registry
+spec:
+  secretName: harbor-tls
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: registry.niaefeup.pt
+  dnsNames:
+    - harbor.niaefeup.pt
+    - registry.niaefeup.pt
+    - notary.niaefeup.pt
