@@ -17,3 +17,5 @@ helm upgrade longhorn longhorn/longhorn \
   --create-namespace \
   --values $VALUES_FILE \
   --version 1.6.1
+
+kubectl apply -f "$(dirname $0)/storageClasses"
