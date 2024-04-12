@@ -1,0 +1,43 @@
+apiVersion: v1
+data:
+  password: cGFzcw==  # pass
+  username: dHRz      # tts
+kind: Secret
+metadata:
+  name: tts-secret
+type: kubernetes.io/basic-auth
+---
+apiVersion: v1
+data:
+  password: cGFzcw==  # pass
+  username: bmk=      # ni
+kind: Secret
+metadata:
+  name: ni-secret
+type: kubernetes.io/basic-auth
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cnpg-cluster
+spec:
+  instances: 3
+
+  bootstrap:
+    initdb:
+      database: tts-db
+      owner: tts
+      secret:
+        name: tts-secret
+
+  managed:
+    roles:
+      - name: ni
+        login: true
+        superuser: true
+        passwordSecret:
+          name: ni-secret
+
+  storage:
+    size: 10Gi
+    storageClass: longhorn-strict-local-retain
