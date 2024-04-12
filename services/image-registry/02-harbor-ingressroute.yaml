@@ -1,0 +1,74 @@
+﻿---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: http2https
+  namespace: image-registry
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: harbor-https
+  namespace: image-registry
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`registry.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: harbor-core
+          port: 80
+      middlewares:
+      - name: http2https
+    - match: Host(`harbor.niaefeup.pt`) && PathPrefix(`/api/`, `/c/`, `/chartrepo/`, `/service/`, `/v2/`)
+      kind: Rule
+      services:
+        - name: harbor-core
+          port: 80
+      middlewares:
+      - name: http2https
+    - match: Host(`harbor.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: harbor-portal
+          port: 80
+      middlewares:
+      - name: http2https
+  tls:
+    secretName: harbor-tls
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: harbor-http
+  namespace: image-registry
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`registry.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: noop@internal
+          kind: TraefikService
+      middlewares:
+      - name: http2https
+    - match: Host(`harbor.niaefeup.pt`) && PathPrefix(`/api/`, `/c/`, `/chartrepo/`, `/service/`, `/v2/`)
+      kind: Rule
+      services:
+        - name: noop@internal
+          kind: TraefikService
+      middlewares:
+      - name: http2https
+    - match: Host(`harbor.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: noop@internal
+          kind: TraefikService
+      middlewares:
+      - name: http2https
