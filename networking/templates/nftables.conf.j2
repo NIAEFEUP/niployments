@@ -4,8 +4,14 @@ flush ruleset
 
 
 table ip nat {
+
+	chain prerouting {
+		type nat hook prerouting priority -100;
+		iif "{{ 'enp0s1f0' if dev_cluster == 'false' else 'eth1' }}" tcp dport { 80, 443, 8080, 8443, 666, 8008, 9001, 12345, 25565, 31337, 33434, 42069} dnat to 10.11.11.2
+	}
+
 	chain postrouting {
-		type nat hook postrouting priority srcnat; policy accept;
-		ip saddr 10.10.0.0/24 oif "{{ 'enp0s1f0' if dev_cluster == 'false' else 'eth1' }}" masquerade
+		type nat hook postrouting priority 100;
+		iif {{ target_interface }} oif "{{ 'enp0s1f0' if dev_cluster == 'false' else 'eth1' }}" masquerade
 	}
 }
