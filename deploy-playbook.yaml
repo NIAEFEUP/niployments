@@ -17,6 +17,10 @@
         search_regex: OpenSSH
         delay: 10
         timeout: 120
+- name: Pre-setup - reenable dhcpcd persistance
+  ansible.builtin.import_playbook: node/reenable-dhcpcd-persistance-playbook.yaml
+- name: Pre-setup - change hostname
+  ansible.builtin.import_playbook: node/change-hostname-playbook.yaml
 - name: Pre-setup - enable NTP syncronization
   hosts: all
   tasks:
@@ -42,3 +46,7 @@
   ansible.builtin.import_playbook: networking/controlplane-ha-playbook.yaml
 - name: Nodes - Enable EPEL repositories
   ansible.builtin.import_playbook: node/add-epel-repos-playbook.yaml
+- name: Node - Pre-setup K8S
+  ansible.builtin.import_playbook: k8s/node-k8s-pre-setup-playbook.yaml
+- name: Setup K8s on control-plane
+  ansible.builtin.import_playbook: k8s/rke-first-setup-playbook.yaml

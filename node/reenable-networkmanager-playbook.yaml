@@ -49,6 +49,29 @@
             src: templates/internal-network.nmconnection.j2
             dest: /etc/NetworkManager/system-connections/internal-network.nmconnection
             mode: "600"
+        - name: Disable vagrant default route
+          when: dev_cluster == "true"
+          vars:
+            target_network: 10.10.0.0
+          block:
+            - name: Get vagrant interface
+              ansible.builtin.set_fact:
+                vagrant_interface: "{{ item }}"
+                cacheable: true # cache it to other playbooks in this run use it
+              when: >
+                (hostvars[inventory_hostname]['ansible_%s' % item] | default({})).get('ipv4', {}).get('network') != target_network
+                and (hostvars[inventory_hostname]['ansible_%s' % item] | default({})).get('type', '') == 'ether'
+              loop: "{{ ansible_interfaces }}"
+
+            - name: Fail if there's no vagrant interface
+              when: vagrant_interface is undefined or not vagrant_interface
+              ansible.builtin.fail:
+                msg: "Failed to get the vagrant interface on {{ ansible_hostname }}"
+            - name: Copy vagrant network template
+              ansible.builtin.template:
+                src: templates/vagrant-network.nmconnection.j2
+                dest: /etc/NetworkManager/system-connections/vagrant-network.nmconnection
+                mode: "600"
         - name: Set flag for reboot
           ansible.builtin.set_fact:
             needs_reboot_dhcp: true

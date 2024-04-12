@@ -1,0 +1,16 @@
+[connection]
+id={{ vagrant_interface }}
+type=ethernet
+interface-name={{ vagrant_interface }}
+
+[ethernet]
+
+[ipv4]
+method=auto
+never-default=true
+
+[ipv6]
+addr-gen-mode=eui64
+method=auto
+
+[proxy]
