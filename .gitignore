@@ -8,3 +8,4 @@ node/*.iso
 node/output-generated
 testbed/output-generated/**
 *.box
+*.DS_Store
