@@ -4,6 +4,9 @@
   hosts: routers
   become: true
   tasks:
+    - name: Skip playbook if it's not master
+      when: master is undefined or master == 'false'
+      ansible.builtin.meta: end_host
     - name: Delete old leases
       become: true
       ansible.builtin.command:
@@ -80,6 +83,9 @@
   hosts: routers
   become: true
   tasks:
+    - name: Skip playbook if it's not master
+      when: master is undefined or master == 'false'
+      ansible.builtin.meta: end_host
     - name: Start kea
       ansible.builtin.systemd:
         service: kea-dhcp4-server
