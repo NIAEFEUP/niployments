@@ -60,7 +60,7 @@ defaultSettings:
   # -- Setting that allows scheduling on disks with existing healthy replicas of the same volume. This setting is enabled by default.
   replicaDiskSoftAntiAffinity: ~
   # -- Policy that defines the action Longhorn takes when a volume is stuck with a StatefulSet or Deployment pod on a node that failed.
-  nodeDownPodDeletionPolicy: ~
+  nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
   # -- Policy that defines the action Longhorn takes when a node with the last healthy replica of a volume is drained.
   nodeDrainPolicy: ~
   # -- Setting that allows automatic detaching of manually-attached volumes when a node is cordoned.
