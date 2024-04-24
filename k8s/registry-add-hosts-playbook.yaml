@@ -1,0 +1,16 @@
+---
+
+- name: Add registry to /etc/hosts
+  hosts: all
+  become: true
+  tasks:
+    - name: Add registry to /etc/hosts
+      ansible.builtin.lineinfile:
+        dest: /etc/hosts
+        line: "10.11.11.2 registry.niaefeup.pt"
+        state: present
+    - name: Add harbor to /etc/hosts
+      ansible.builtin.lineinfile:
+        dest: /etc/hosts
+        line: "10.11.11.2 harbor.niaefeup.pt"
+        state: present

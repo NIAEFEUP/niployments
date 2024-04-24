@@ -41,4 +41,5 @@
       ansible.builtin.systemd:
         name: nftables
         state: restarted
+        enabled: true
       changed_when: true
