@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nitsig-website
+  namespace: nitsig
+  annotations:
+    keel.sh/policy: "force"
+    keel.sh/match-tag: "true" 
+spec:
+  selector:
+    matchLabels:
+      app: nitsig-website
+  template:
+    metadata:
+      labels:
+        app: nitsig-website
+    spec:
+      containers:
+      - name: nitsig-website
+        image: registry.niaefeup.pt/niaefeup/nitsig-website:main
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "64m"
+        ports:
+        - containerPort: 80
+        imagePullPolicy: Always
+      imagePullSecrets:
+        - name: harbor-pull-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nitsig-service
+  namespace: nitsig
+spec:
+  selector:
+    app: nitsig-website
+  ports:
+  - port: 80
+    targetPort: 80
+  type: "ClusterIP"
+
