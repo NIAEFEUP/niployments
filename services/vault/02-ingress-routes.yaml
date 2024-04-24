@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: vault-https
+  namespace: vault
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`vault.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: vault-ui
+          port: 80
+  tls:
+    secretName: website-cert

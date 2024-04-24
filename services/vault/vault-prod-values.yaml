@@ -1,0 +1,34 @@
+#https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration
+# global:
+#   tlsDisable: true
+server:
+  dev:
+    enabled: false
+  logLevel: debug
+ui:
+  enabled: true
+  serviceType: "LoadBalancer"
+  externalPort: 8200
+
+ha:
+  enabled: true
+  raft:
+    enabled: true
+    config: |
+      storage "raft" {
+        path    = "./vault/raft_storage"
+      }
+
+      listener "tcp" {
+        address     = "127.0.0.1:8200"
+      }
+
+      api_addr = "http://127.0.0.1:8200"
+      cluster_addr = "https://127.0.0.1:8201"
+
+dataStorage:
+  enabled: true
+  storageClass: "longhorn-locality-retain"
+
+injector:
+  enabled: "false"
