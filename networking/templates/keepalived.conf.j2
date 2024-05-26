@@ -1,3 +1,11 @@
+vrrp_script keepalived_check {
+    script "/etc/keepalived/keepalived_check.sh"
+    interval 1
+    timeout 5
+    rise 3
+    fall 3
+}
+
 vrrp_instance VI_1 {
         state {{ "MASTER" if hostvars[inventory_hostname]["master"] == "true" else "BACKUP"}}
         interface {{ hostvars[inventory_hostname]["target_interface"] }}
@@ -11,6 +19,9 @@ vrrp_instance VI_1 {
         virtual_ipaddress {
             10.11.11.1/24 brd 10.11.11.255
             10.10.0.254/24 brd 10.10.0.255
+        }
+        track_script {
+            keepalived_check
         }
         notify "/etc/keepalived/vrrp-notify-script.sh"
 }
