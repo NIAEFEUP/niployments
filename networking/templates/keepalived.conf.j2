@@ -1,6 +1,6 @@
 vrrp_script keepalived_check {
     script "/etc/keepalived/keepalived_check.sh"
-    interval 1
+    interval 10
     timeout 5
     rise 3
     fall 3
