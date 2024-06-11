@@ -6,7 +6,7 @@ metadata:
 spec:
   resources:
     requests:
-      storage: 2Gi
+      storage: 10Gi
   storageClassName: longhorn-locality-retain
   accessModes:
     - ReadWriteOnce
