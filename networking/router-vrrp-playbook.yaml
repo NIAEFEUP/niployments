@@ -11,6 +11,12 @@
       become: true
       ansible.builtin.apt:
         name: keepalived
+    - name: Configure keepalived script
+      become: true
+      ansible.builtin.template:
+        src: templates/keepalived_check.sh
+        dest: /etc/keepalived/keepalived_check.sh
+        mode: "744"
     - name: Copy notify script
       become: true
       ansible.builtin.copy:

@@ -6,6 +6,7 @@
 router:
   ram: 512
   cpu: 1
+  count: 2 
 networking:
 # specific networking options, only uncomment this if you need a specific setting below
 # If you are using LibVirt, you need to specify a interface to bridge from (can't be a wireless interface)
