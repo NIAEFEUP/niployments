@@ -28,7 +28,7 @@ spec:
       volumes:
         - name: clickhouse-db
           persistentVolumeClaim:
-            claimName: plausible-events-db
+            claimName: plausible-events-db-no-backup
 ---
 apiVersion: v1
 kind: Service
