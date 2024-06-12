@@ -8,7 +8,7 @@ then
     exit 1
 fi
 
-curl http://mirrors.up.pt/rocky/9/isos/x86_64/Rocky-9-latest-x86_64-minimal.iso -C - -o rocky.iso
+curl https://mirrors.up.pt/rocky/9/isos/x86_64/Rocky-9-latest-x86_64-minimal.iso -C - -o rocky.iso
 
 rm -rf ninux.iso
 
