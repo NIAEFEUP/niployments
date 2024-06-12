@@ -8,7 +8,9 @@ spec:
   - localASN: 65512
     exportPodCIDR: true
     neighbors:
-    - peerAddress: "10.10.0.254/32"
+    - peerAddress: "10.10.0.2/32"
+      peerASN: 65512
+    - peerAddress: "10.10.0.3/32"
       peerASN: 65512
     serviceSelector:
       matchExpressions:

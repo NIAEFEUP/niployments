@@ -76,7 +76,7 @@
     - name: Update routers IP's
       connection: local
       ansible.builtin.lineinfile:
-        path: '{{ inventory_dir }}/ansible-inventory-dev.ini'
+        path: '{{ inventory_file }}'
         regexp: '^{{ inventory_hostname }}(.*)ansible_ssh_host=([^ ]*) (.*)'
         line: '{{ inventory_hostname }}\1ansible_ssh_host=10.10.0.{{ (inventory_hostname[-1] | int + 1) | string }} \3'
         backrefs: true
@@ -104,6 +104,9 @@
 - name: Run DHCP4 Server with Kea
   hosts: routers
   tasks:
+    - name: Skip playbook if it's not master
+      when: master is undefined or master == 'false'
+      ansible.builtin.meta: end_host
     - name: Install kea package
       become: true
       ansible.builtin.apt:
@@ -146,7 +149,7 @@
     - name: Update nodes IP's
       connection: local
       ansible.builtin.lineinfile:
-        path: '{{ inventory_dir }}/ansible-inventory-dev.ini'
+        path: '{{ inventory_file }}'
         regexp: '^{{ item }}(.*)ansible_ssh_host=([^ ]*) (.*)'
         line: >
           {{ item }}\1ansible_ssh_host=10.10.0.{{ (groups["nodes"].index(item) + 1 + (groups["routers"] | length) + 1) | string }} \3

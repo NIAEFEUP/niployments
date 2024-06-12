@@ -1,0 +1,30 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: stripprefix-nitsig
+  namespace: nitsig
+spec:
+  stripPrefix:
+    prefixes:
+      - "/nitsig"
+    forceSlash: false
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nitsig-https
+  namespace: nitsig
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`ni.fe.up.pt`) && PathPrefix(`/nitsig`)
+      kind: Rule
+      services:
+        - name: nitsig-service
+          port: 80
+      middlewares:
+      - name: stripprefix-nitsig
+  tls:
+    secretName: website-cert

@@ -2,10 +2,11 @@
 
 KIND_EXECUTABLE=kind
 KUBECTL_EXECUTABLE=kubectl
-CILIUM_EXECUTABLE=cilium-cli
-CILIUM_MAC_OS_EXECUTABLE=cilium 
 
-if [ "$(uname)" == "Darwin" ]; then
+CILIUM_EXECUTABLE=cilium-cli
+command -v $CILIUM_EXECUTABLE >/dev/null 2>&1 
+if [ $? -ne 0 ]; then
+  echo "Did not find cilium-cli, trying cilium..."
   CILIUM_EXECUTABLE=cilium
 fi
 
@@ -15,7 +16,7 @@ HELM_EXECUTABLE=helm
 
 command -v $KIND_EXECUTABLE >/dev/null 2>&1 || { echo >&2 "I require '$KIND_EXECUTABLE' but it's not installed.  Aborting."; exit 1; }
 command -v $KUBECTL_EXECUTABLE >/dev/null 2>&1 || { echo >&2 "I require '$KUBECTL_EXECUTABLE' but it's not installed.  Aborting."; exit 1; }
-command -v $CILIUM_EXECUTABLE >/dev/null 2>&1 || command -v $CILIUM_MAC_OS_EXECUTABLE >/dev/null 2>&1  || { echo >&2 "I require '$CILIUM_EXECUTABLE' or '$CILIUM_MAC_OS_EXECUTABLE' but it's not installed.  Aborting."; exit 1; }
+command -v $CILIUM_EXECUTABLE >/dev/null 2>&1 || { echo >&2 "I require '$CILIUM_EXECUTABLE' but it's not installed.  Aborting."; exit 1; }
 command -v $HELM_EXECUTABLE >/dev/null 2>&1 || { echo >&2 "I require '$HELM_EXECUTABLE' but it's not installed.  Aborting."; exit 1; }
 
 # Create "kind" network, deleting any old ones if they exist

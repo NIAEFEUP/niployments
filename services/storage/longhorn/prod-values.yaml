@@ -1,8 +1,8 @@
 defaultSettings:
   # -- Endpoint used to access the backupstore. (Options: "NFS", "CIFS", "AWS", "GCP", "AZURE")
-  backupTarget: ~
+  backupTarget: ~ # TODO: Add bucket in the following form "s3://<bucket-name>@auto/<path>"
   # -- Name of the Kubernetes secret associated with the backup target.
-  backupTargetCredentialSecret: ~
+  backupTargetCredentialSecret: ~ # TODO: Add secret name like: longhorn-cloudflare-r2-backups
   # -- Setting that allows Longhorn to automatically attach a volume and create snapshots or backups when recurring jobs are run.
   allowRecurringJobWhileVolumeDetached: ~
   # -- Setting that allows Longhorn to automatically create a default disk only on nodes with the label "node.longhorn.io/create-default-disk=true" (if no other disks exist). When this setting is disabled, Longhorn creates a default disk on each node that is added to the cluster.
@@ -60,7 +60,7 @@ defaultSettings:
   # -- Setting that allows scheduling on disks with existing healthy replicas of the same volume. This setting is enabled by default.
   replicaDiskSoftAntiAffinity: ~
   # -- Policy that defines the action Longhorn takes when a volume is stuck with a StatefulSet or Deployment pod on a node that failed.
-  nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
+  nodeDownPodDeletionPolicy: ~
   # -- Policy that defines the action Longhorn takes when a node with the last healthy replica of a volume is drained.
   nodeDrainPolicy: ~
   # -- Setting that allows automatic detaching of manually-attached volumes when a node is cordoned.
@@ -192,7 +192,7 @@ persistence:
 
 ingress:
   # -- Setting that allows Longhorn to generate ingress records for the Longhorn UI service.
-  enabled: true
+  enabled: false
 
   # -- IngressClass resource that contains ingress configuration, including the name of the Ingress controller.
   # ingressClassName can replace the kubernetes.io/ingress.class annotation used in earlier Kubernetes releases.

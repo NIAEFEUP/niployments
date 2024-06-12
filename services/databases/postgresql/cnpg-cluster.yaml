@@ -1,20 +1,3 @@
-apiVersion: v1
-data:
-  password: cGFzcw==  # pass
-  username: dHRz      # tts
-kind: Secret
-metadata:
-  name: tts-secret
-type: kubernetes.io/basic-auth
----
-apiVersion: v1
-data:
-  password: cGFzcw==  # pass
-  username: bmk=      # ni
-kind: Secret
-metadata:
-  name: ni-secret
-type: kubernetes.io/basic-auth
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
@@ -35,8 +18,21 @@ spec:
       - name: ni
         login: true
         superuser: true
+        ensure: present
         passwordSecret:
           name: ni-secret
+      - name: plausible
+        ensure: present
+        createdb: false
+        login: true
+        passwordSecret:
+          name: plausible-secret
+      - name: sinf-website-2023
+        ensure: present
+        createdb: false
+        login: true
+        passwordSecret:
+          name: sinf-website-2023-secret
 
   storage:
     size: 10Gi
