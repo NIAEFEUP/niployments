@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plausible-config
+  namespace: plausible-ni
+data:
+  MAILER_NAME: Plausible NIAEFEUP
+  DISABLE_REGISTRATION: invite_only
+  SMTP_HOST_ADDR: smtp.gmail.com
+  SMTP_HOST_SSL_ENABLED: "true"
+  SMTP_HOST_PORT: "465"
+  BASE_URL: https://plausible.niaefeup.pt
+  CLICKHOUSE_DATABASE_URL: http://plausible-events-db:8123/plausible_events_db

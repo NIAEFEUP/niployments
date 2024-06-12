@@ -6,9 +6,9 @@
     - name: Change hostname
       become: true
       ansible.builtin.hostname:
-        name: "{{ ansible_hostname }}"
+        name: "{{ inventory_hostname }}"
     - name: Change hostname permanently
       become: true
       ansible.builtin.command:
-        cmd: "hostnamectl set-hostname {{ ansible_hostname }}"
+        cmd: "hostnamectl set-hostname {{ inventory_hostname }}"
       changed_when: true

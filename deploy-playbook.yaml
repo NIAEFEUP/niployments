@@ -46,6 +46,10 @@
   ansible.builtin.import_playbook: networking/controlplane-ha-playbook.yaml
 - name: Nodes - Enable EPEL repositories
   ansible.builtin.import_playbook: node/add-epel-repos-playbook.yaml
+- name: Add registry to /etc/hosts
+  ansible.builtin.import_playbook: k8s/registry-add-hosts-playbook.yaml
+- name: Nodes - configure DNS caching
+  ansible.builtin.import_playbook: node/configure-dns-caching-playbook.yaml
 - name: Node - Pre-setup K8S
   ansible.builtin.import_playbook: k8s/node-k8s-pre-setup-playbook.yaml
 - name: Setup K8s on control-plane

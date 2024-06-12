@@ -11,7 +11,8 @@ kubectl apply --server-side -f https://raw.githubusercontent.com/cloudnative-pg/
 kubectl wait --for=condition=available=true -n cnpg-system deployment/cnpg-controller-manager --timeout=120s
 
 kubectl create namespace pg
-kubectl apply -f $cnpg_dir/cnpg-cluster.yaml -n pg
+kubectl apply -f $(dirname $0)/cnpg-secrets.yaml -n pg
+kubectl apply -f $(dirname $0)/cnpg-cluster.yaml -n pg
 sleep 5  # Wait a little bit for first pod to be created
 init_pod_1=$(kubectl get pods -n pg | awk '{if ($1 ~ "^cnpg-cluster-1-initdb-*") print $1}')
 kubectl wait --for=delete -n pg pods/$init_pod_1 --timeout=300s

@@ -1,0 +1,17 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: website-https
+  namespace: plausible-ni
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`plausible.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: plausible
+          port: 80
+  tls:
+    secretName: website-cert

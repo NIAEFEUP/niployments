@@ -5,9 +5,9 @@ metadata:
   name: cloudflare-api-token-secret
   namespace: cert-manager
 type: Opaque
-data:
-  # FIXME (luisd): add API Token for deploy
+stringData:
   api-token: <FILL-IN>
+
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -15,7 +15,7 @@ metadata:
   name: letsencrypt-staging
 spec:
   acme:
-    email: geral@sinf.pt
+    email: ni@aefeup.pt
     privateKeySecretRef:
       name: letsencrypt-staging
     server: https://acme-staging-v02.api.letsencrypt.org/directory
@@ -33,7 +33,7 @@ metadata:
   name: letsencrypt-production
 spec:
   acme:
-    email: geral@sinf.pt
+    email: ni@aefeup.pt
     privateKeySecretRef:
       name: letsencrypt-production
     server: https://acme-v02.api.letsencrypt.org/directory

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plausible-events-db
+  namespace: plausible-ni
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn-locality-retain
+  accessModes:
+    - ReadWriteOnce

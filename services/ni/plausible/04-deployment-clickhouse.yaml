@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickhouse
+  namespace: plausible-ni
+spec:
+  selector:
+    matchLabels:
+      app: clickhouse
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      containers:
+      - name: clickhouse
+        image: clickhouse/clickhouse-server:23.3.7.5-alpine
+        resources:
+          limits:
+            memory: "2048Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8123
+        volumeMounts:
+          - name: clickhouse-db
+            mountPath: /var/lib/clickhouse
+      volumes:
+        - name: clickhouse-db
+          persistentVolumeClaim:
+            claimName: plausible-events-db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plausible-events-db
+  namespace: plausible-ni
+spec:
+  selector:
+    app: clickhouse
+  ports:
+  - port: 8123
+    targetPort: 8123
+

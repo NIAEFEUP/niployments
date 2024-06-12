@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ni-website-app
+  namespace: ni-website
+spec:
+  selector:
+    app: ni-website-app
+  ports:
+  - port: 80
+    targetPort: 3000
+
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ni-website
+  namespace: ni-website
+spec:
+  selector:
+    matchLabels:
+      app: ni-website-app
+  serviceName: ni-website-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ni-website-app
+    spec:
+      containers:
+      - name: website
+        image: registry.niaefeup.pt/niaefeup/website-ni:latest
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+          - name: secret-env
+            mountPath: /usr/src/app/.env
+            subPath: env
+          - name: public-storage
+            mountPath: /usr/src/app/src/public
+      imagePullSecrets:
+        - name: harbor-pull-secret
+      volumes:
+        - name: secret-env
+          secret:
+            secretName: website-secrets
+        - name: public-storage
+          persistentVolumeClaim:
+            claimName: public-pvc

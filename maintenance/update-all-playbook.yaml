@@ -1,0 +1,31 @@
+---
+
+- name: Update all nodes
+  hosts: nodes
+  become: true
+  tasks:
+    - name: Update nodes using DNF # noqa: package-latest
+      ansible.builtin.dnf:
+        name: "*"
+        update_cache: true
+        update_only: true
+        state: latest
+        bugfix: true
+        security: true
+    - name: Reboot nodes
+      throttle: 1
+      ansible.builtin.reboot:
+
+- name: Update all routers
+  hosts: routers
+  become: true
+  tasks:
+    - name: Update nodes using APT
+      ansible.builtin.apt:
+        name: "*"
+        update_cache: true
+        only_upgrade: true
+        state: latest
+    - name: Reboot routers
+      throttle: 1
+      ansible.builtin.reboot:
