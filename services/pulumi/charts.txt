@@ -1,0 +1,7 @@
+traefik/traefik:28.3.0
+jetstack/cert-manager:v1.14.7
+cilium/cilium:1.15.3
+clustersecret/cluster-secret:v0.4.0
+mongodb/community-operator
+harbor/harbor
+longhorn/longhorn:1.6.1
