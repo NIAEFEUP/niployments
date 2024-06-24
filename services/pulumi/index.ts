@@ -1,6 +1,5 @@
-import * as k8s from "@pulumi/kubernetes";
+import "./services/ementas";
 
-const appLabels = { app: "nginx" };
 const deployment = new k8s.apps.v1.Deployment("nginx", {
     spec: {
         selector: { matchLabels: appLabels },
