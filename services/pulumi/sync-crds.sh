@@ -57,7 +57,7 @@ function download_crds_with_curl {
     local url=$2
     local dir=$3
 
-    local crds="$(curl -s "$url")"
+    local crds="$(curl -s "$url" | yq '. | select(.kind == "CustomResourceDefinition")')"
 
     if [ -z "$crds" ]; then
         return
@@ -69,33 +69,49 @@ function download_crds_with_curl {
     echo "$crds_file"
 }
 
+function add_repositories {
+    local charts_file=$1
+
+    echo "[Helm] Adding repositories" 1>&2
+
+    readarray repositories < <(yq -o=j -I=0 '.repositories[]' "$charts_file")
+    for repository in "${repositories[@]}"; do
+        local name="$(echo "$repository" | yq '.name')"
+        local url="$(echo "$repository" | yq '.url')"
+
+        helm repo add "$name" "$url" --force-update
+    done
+
+    helm repo update
+}
+
 function download_crds {
     local charts_file=$1
     local dir=$2
 
     local crds=()
 
-    readarray helm_crds < <(yq -o=j -I=0 '.helm-crds[]' "$charts_file")
+    readarray helm_crds < <(yq -o=j -I=0 '.manifests[] | select(.type == "helm")' "$charts_file")
     for helm_crd in "${helm_crds[@]}"; do
         local chart_id="$(echo "$helm_crd" | yq '.chart')"
-        local chart_version="$(echo "$helm_crd" | yq '.version')"
+        local chart_version="$(echo "$helm_crd" | yq '.version // "*"')"
 
-        echo "[Helm CRDs] Downloading CRDs for $chart_id:$chart_version" 1>&2
+        echo "[Helm CRDs] Downloading CRDs for $chart_id:chart_version" 1>&2
         crds+=("$(download_crds_from_helm "$chart_id" "$chart_version" "$dir")")
     done
 
-    readarray helm_templates < <(yq -o=j -I=0 '.helm-templates[]' "$charts_file")
+    readarray helm_templates < <(yq -o=j -I=0 '.manifests[] | select(.type == "template")' "$charts_file")
     for helm_template in "${helm_templates[@]}"; do
         local chart_id="$(echo "$helm_template" | yq '.chart')"
-        local chart_version="$(echo "$helm_template" | yq '.version')"
-        local name="$(echo "$helm_template" | yq '.name')"
-        local options="$(echo "$helm_template" | yq '.options')"
+        local chart_version="$(echo "$helm_template" | yq '.version // "*"')"
+        local options="$(echo "$helm_template" | yq '.options // ""')"
+        local name="$(echo "$chart_id" | grep -oe '[^/]*$')"
 
         echo "[Helm Templates] Downloading CRDs for $chart_id:$chart_version" 1>&2
         crds+=("$(download_crds_from_helm_template "$chart_id" "$chart_version" "$name" "$options" "$dir")")
     done
 
-    readarray curl_crds < <(yq -o=j -I=0 '.curl-crds[]' "$charts_file")
+    readarray curl_crds < <(yq -o=j -I=0 '.manifests[] | select(.type == "curl")' "$charts_file")
     for curl_crd in "${curl_crds[@]}"; do
         local name="$(echo "$curl_crd" | yq '.name')"
         local url="$(echo "$curl_crd" | yq '.url')"
@@ -109,9 +125,12 @@ function download_crds {
 
 rm -rf crds/
 
-crd_paths="$(download_crds "crds.yaml" "crds/.tmp/")"
+SPEC_FILE="crds.yaml"
+add_repositories "$SPEC_FILE"
+crd_paths="$(download_crds "$SPEC_FILE" "crds/.tmp/")"
+
 crd2pulumi -n ${crd_paths[@]}
 
-rm -rf crds/.tmp/
+# rm -rf crds/.tmp/
 
 echo "CRDs synced successfully"

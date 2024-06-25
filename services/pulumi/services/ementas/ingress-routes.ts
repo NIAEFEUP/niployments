@@ -25,4 +25,4 @@ export const ingressRoute = new crds.traefik.v1alpha1.IngressRoute("ementas-ingr
             secretName: "ementas-cert",
         }
     },
-}, { dependsOn: [certificate ]});
+}, { dependsOn: [certificate] });
