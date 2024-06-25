@@ -1,0 +1,26 @@
+helm-crds:
+  - chart: traefik/traefik
+    version: 28.3.0
+  - chart: cilium/cilium
+    version: 1.15.3
+  - chart: clustersecret/cluster-secret
+    version: v0.4.0
+  - chart: mongodb/community-operator
+    version: "*"
+  - chart: harbor/harbor
+    version: "*"
+  - chart: longhorn/longhorn
+    version: 1.6.1
+
+helm-templates:
+  - chart: jetstack/cert-manager
+    version: v1.14.7
+    name: cert-manager
+    # options passed to the `helm template` command
+    options: |
+      --values=../cert-manager/values.yaml
+      --namespace=cert-manager
+
+curl-crds:
+  - name: cloudnative-pg/cloudnative-pg
+    url: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.22/releases/cnpg-1.22.2.yaml
