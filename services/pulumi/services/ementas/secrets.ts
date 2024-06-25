@@ -10,6 +10,6 @@ export const secrets = new k8s.core.v1.Secret("ementas-secrets", {
         namespace: namespace.metadata.name,
     },
     stringData: {
-        "DATABASE_URL": config.require("ementas:mongodb:uri"),    
+        "DATABASE_URL": config.require("ementas-mongodb-uri"),
     },
 });

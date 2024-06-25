@@ -21,7 +21,7 @@ export const website = new k8s.apps.v1.Deployment("ementas-website", {
         containers: [
           {
             name: "ementas-website",
-            image: "registry.niaefeup.pt/niaefeup/nimentas-sasup:latest",
+            image: "registry.niaefeup.pt/niaefeup/nimentas-sasup:main",
             imagePullPolicy: "Always",
             resources: {
               limits: {
