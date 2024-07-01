@@ -2,12 +2,12 @@
     "name": "niployments",
     "main": "index.ts",
     "devDependencies": {
-        "@types/node": "^18",
-        "typescript": "^5.0.0"
+        "@types/node": "^18.19.39",
+        "typescript": "^5.5.3"
     },
     "dependencies": {
-        "@pulumi/kubernetes": "^4.0.0",
-        "@pulumi/pulumi": "^3.113.0"
+        "@pulumi/kubernetes": "^4.14.0",
+        "@pulumi/pulumi": "^3.121.0"
     },
     "imports": {
         "#crds": "./crds/nodejs/index.ts",

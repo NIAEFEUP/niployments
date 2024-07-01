@@ -1,1 +1,7 @@
-encryptionsalt: v1:3r59/KOirVA=:v1:ZO9Zo9ipCNfrc+ag:/mXkTKxNlbDZpLH93oBGNmXSsp0fAw==
+encryptionsalt: v1:6vimz/8deKQ=:v1:2jXtXVp4buA9Qw0S:Msz9WV6s+ixqlVstCWD6COpFetFONg==
+config:
+  niployments:ementas-mongodb-uri: mongodb://nimentas:pass@mongodb-op-0.mongodb-op-svc.mongodb.svc.cluster.local:27017,mongodb-op-1.mongodb-op-svc.mongodb.svc.cluster.local:27017,mongodb-op-2.mongodb-op-svc.mongodb.svc.cluster.local:27017/nimentas?replicaSet=mongodb-op&ssl=false
+  niployments:mongodb/admin-password:
+    secure: v1:f6NgA0SBJ6F+P7gK:FOskiEA/fOLlODxh97fwz8jB06g=
+  niployments:mongodb/nimentas-password:
+    secure: v1:PB1bxtgnlIy6WG0S:7L4PZjiDpx5/IQlr/FPwoohK4QA=

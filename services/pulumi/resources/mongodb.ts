@@ -33,6 +33,7 @@ type Role =
 type User<Databases extends string> = { name: string } & PulumiInputify<{
   db: Databases;
   password: string;
+  connectionStringSecretNamespace?: string;
   connectionStringSecretMetadata?: {
     namespace?: string;
     name?: string;
@@ -44,7 +45,7 @@ type User<Databases extends string> = { name: string } & PulumiInputify<{
 }>;
 
 type Args<Databases extends string> = {
-  readonly dbs: Databases[];
+  dbs: readonly Databases[];
   namespace?: pulumi.Input<string>;
   mdbc?: {
     metadata?: Omit<k8s.types.input.meta.v1.ObjectMeta, "namespace">;
@@ -61,7 +62,7 @@ export class MongoDBCommunityController<
   private name: string;
   private namespace: pulumi.Input<string> | undefined;
   private commitAction: PromiseWithResolvers<void>;
-  private committed: boolean = false;
+  private committed = false;
 
   private users: pulumi.Input<crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs>[] =
     [];
@@ -113,9 +114,12 @@ export class MongoDBCommunityController<
 
   public commit() {
     if (this.committed) {
-      pulumi.log.warn("MongoDBCommunityController has already been committed. This may cause some users to not be properly added to the replica set.", this);
+      pulumi.log.warn(
+        "MongoDBCommunityController has already been committed. This may cause some users to not be properly added to the replica set.",
+        this
+      );
     }
-    
+
     this.committed = true;
     this.commitAction.resolve();
   }
@@ -123,7 +127,7 @@ export class MongoDBCommunityController<
   public addUser(user: User<Databases>) {
     const resolvedUser = pulumi.output(user);
 
-    const credentialsSecretName = `${this.name}-${user.name}-credentials-secret`;
+    const credentialsSecretName = `${this.name}-${user.name}-credentials`;
     const credentialsSecret = new k8s.core.v1.Secret(
       credentialsSecretName,
       {
@@ -138,18 +142,24 @@ export class MongoDBCommunityController<
       { parent: this }
     );
 
-    const userSpec = resolvedUser.apply((resolvedUser) => ({
-      name: user.name,
-      db: resolvedUser.db,
-      // pulumi doesn't like (string & {}) for autocomplete, so we have to cast it
-      roles: resolvedUser.roles as crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersRolesArgs[],
-      connectionStringSecretName: resolvedUser.connectionStringSecretMetadata?.name,
-      connectionStringSecretNamespace: resolvedUser.connectionStringSecretMetadata?.namespace,
-      passwordSecretRef: {
-        name: credentialsSecret.metadata.name,
-      },
-      scramCredentialsSecretName: `${this.name}-${user.name}-scram-credentials-secret`,
-    }) satisfies crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs);
+    const userSpec = resolvedUser.apply(
+      (resolvedUser) =>
+        ({
+          name: user.name,
+          db: resolvedUser.db,
+          // pulumi doesn't like (string & {}) for autocomplete, so we have to cast it
+          roles:
+            resolvedUser.roles as crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersRolesArgs[],
+          connectionStringSecretName:
+            resolvedUser.connectionStringSecretMetadata?.name,
+          connectionStringSecretNamespace:
+            resolvedUser.connectionStringSecretMetadata?.namespace,
+          passwordSecretRef: {
+            name: credentialsSecret.metadata.name,
+          },
+          scramCredentialsSecretName: `${this.name}-${user.name}`,
+        } satisfies crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs)
+    );
 
     this.users.push(userSpec);
 
@@ -157,55 +167,18 @@ export class MongoDBCommunityController<
   }
 }
 
-const db = new MongoDBCommunityController("mongodb", {
-  dbs: ["admin", "nimentas", "fkjkhgkdjf"],
-  namespace: "mongodb",
-  mdbc: {
-    spec: {
-      type: "ReplicaSet",
-      members: 3,
-      version: "6.0.5",
-      security: {
-        authentication: {
-          modes: ["SCRAM"],
-        },
-      },
-      additionalMongodConfig: {
-        "storage.wiredTiger.engineConfig.journalCompressor": "zlib",
-      },
-      statefulSet: {
-        spec: {
-          volumeClaimTemplates: [
-            {
-              metadata: {
-                name: "data-volume",
-              },
-              spec: {
-                accessModes: ["ReadWriteOnce"],
-                resources: {
-                  requests: {
-                    storage: "5Gi",
-                  },
-                },
-              },
-            },
-          ],
-        },
-      },
-    },
-  },
-});
+export class MongoDBCommunityRbac extends pulumi.ComponentResource {
+  constructor(name: string, args: { namespace: pulumi.Input<string> }, opts?: pulumi.ComponentResourceOptions) {
+    super("niployments:mongodb:MongoDBCommunityRbac", name, {}, opts);
 
-db.addUser({
-  name: "ni",
-  db: "admin",
-  password: "pass",
-  roles: [
-    {
-      db: "admin",
-      name: "root",
-    },
-  ],
-}).commit();
-
-db.commit();
+    new k8s.kustomize.Directory(`${name}-directory`, {
+      directory: "https://github.com/mongodb/mongodb-kubernetes-operator/tree/master/config/rbac",
+      transformations: [
+        (obj: any) => {
+          obj.metadata = obj.metadata ?? {};
+          obj.metadata.namespace = args.namespace;
+        },
+      ],
+    }, { parent: this });
+  }
+}

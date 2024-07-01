@@ -1,7 +1,30 @@
+import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
 import { namespace } from "./namespace";
-import { secrets } from "./secrets";
 import { labels, containerPort } from "./values";
+import { apps } from "../databases/mongodb";
+import { MongoDBCommunityRbac } from "../../resources/mongodb";
+
+const config = new pulumi.Config();
+
+new MongoDBCommunityRbac("ementas-mongodb-rbac", { namespace: namespace.metadata.name });
+
+apps
+  .addUser({
+    name: "ementas",
+    db: "nimentas",
+    password: config.requireSecret("mongodb/nimentas-password"),
+    roles: [
+      {
+        name: "readWrite",
+        db: "nimentas",
+      },
+    ],
+    connectionStringSecretMetadata: {
+      namespace: namespace.metadata.name,
+      name: "ementas-mongodb-secret",
+    },
+  });
 
 export const website = new k8s.apps.v1.Deployment("ementas-website", {
   metadata: {
@@ -39,9 +62,8 @@ export const website = new k8s.apps.v1.Deployment("ementas-website", {
                 name: "DATABASE_URL",
                 valueFrom: {
                   secretKeyRef: {
-                    name: secrets.metadata.name,
+                    name: "ementas-mongodb-secret",
                     key: "connectionString.standard",
-                    optional: false,
                   },
                 },
               }
