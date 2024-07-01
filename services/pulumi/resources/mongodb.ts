@@ -2,7 +2,6 @@ import { PulumiInputify } from "#utils/pulumi.js";
 import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
 import * as crds from "#crds";
-import { resolve } from "path";
 
 type Role =
   // Database user roles
@@ -27,11 +26,11 @@ type Role =
   | "userAdminAnyDatabase"
   | "dbAdminAnyDatabase"
   // Superuser roles
-  | "root";
-// User-defined roles
-//   | (string & {});
+  | "root"
+  // User-defined roles
+  | (string & {});
 
-type User<Databases extends string> = {
+type User<Databases extends string> = { name: string } & PulumiInputify<{
   db: Databases;
   password: string;
   connectionStringSecretMetadata?: {
@@ -42,80 +41,96 @@ type User<Databases extends string> = {
     name: Role;
     db: Databases;
   }[];
-};
+}>;
 
 type Args<Databases extends string> = {
   readonly dbs: Databases[];
-  metadata?: Omit<k8s.types.input.meta.v1.ObjectMeta, "name">;
-  spec?: Omit<
-    crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecArgs,
-    "users"
-  >;
+  namespace?: pulumi.Input<string>;
+  mdbc?: {
+    metadata?: Omit<k8s.types.input.meta.v1.ObjectMeta, "namespace">;
+    spec?: Omit<
+      crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecArgs,
+      "users"
+    >;
+  };
 };
 
-export class MongoDBCommunity<
+export class MongoDBCommunityController<
   const Databases extends string
 > extends pulumi.ComponentResource<{}> {
   private name: string;
-  private namespace: pulumi.Output<string | undefined>;
-  private users: pulumi.Output<crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs>[];
-  private secrets: k8s.core.v1.Secret[];
+  private namespace: pulumi.Input<string> | undefined;
+  private commitAction: PromiseWithResolvers<void>;
+  private committed: boolean = false;
 
-  private resourcePromise: Promise<void>;
-  private resolveResourcePromise: () => void;
+  private users: pulumi.Input<crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs>[] =
+    [];
 
   constructor(
     name: string,
     args: Args<Databases>,
     opts?: pulumi.ComponentResourceOptions
   ) {
-    super("niployments:mongodb:MongoDBCommunity", name, {}, opts);
+    const commitAction = Promise.withResolvers<void>();
+    super(
+      "niployments:mongodb:MongoDBCommunityController",
+      name,
+      { commit: commitAction.promise },
+      opts
+    );
 
     this.name = name;
-    this.users = [];
-    this.secrets = [];
-    
-    this.resolveResourcePromise = () => { throw new Error("resolveResourcePromise not set") };
-    this.resourcePromise = new Promise((resolve) => {
-        this.resolveResourcePromise = resolve;
-    });
-    
-    this.namespace = pulumi.output(args.metadata?.namespace);
+    this.namespace = args?.namespace;
+    this.commitAction = commitAction;
 
     const operatorName = `${this.name}-operator`;
     new crds.mongodbcommunity.v1.MongoDBCommunity(
       operatorName,
       {
         metadata: {
-          ...args.metadata,
-          name: operatorName,
+          ...args.mdbc?.metadata,
+          namespace: args?.namespace,
         },
-        spec: args.spec && {
-          ...args.spec,
-          users: pulumi.output(this.resourcePromise.then(() => this.users)),
+        spec: args.mdbc?.spec && {
+          ...args.mdbc?.spec,
+          users: pulumi.output(
+            this.commitAction.promise.then(() => this.users)
+          ),
         },
       },
       { parent: this }
     );
   }
 
-  protected async initialize(args: pulumi.Inputs): Promise<{}> {
-      await this.resourcePromise;
-      pulumi.log.error("MongoDBCommunity initialized");
-      return {};
+  protected async initialize({
+    commit,
+  }: {
+    commit: Promise<void>;
+  }): Promise<{}> {
+    await commit;
+    return {};
   }
 
-  public addUser(name: string, user: PulumiInputify<User<Databases>>) {
+  public commit() {
+    if (this.committed) {
+      pulumi.log.warn("MongoDBCommunityController has already been committed. This may cause some users to not be properly added to the replica set.", this);
+    }
+    
+    this.committed = true;
+    this.commitAction.resolve();
+  }
+
+  public addUser(user: User<Databases>) {
     const resolvedUser = pulumi.output(user);
 
-    const credentialsSecretName = `${this.name}-${name}-credentials-secret`;
+    const credentialsSecretName = `${this.name}-${user.name}-credentials-secret`;
     const credentialsSecret = new k8s.core.v1.Secret(
       credentialsSecretName,
       {
-        metadata: this.namespace.apply((namespace) => ({
-          namespace,
+        metadata: {
+          namespace: this.namespace,
           name: credentialsSecretName,
-        })),
+        },
         stringData: {
           password: resolvedUser.password,
         },
@@ -123,72 +138,67 @@ export class MongoDBCommunity<
       { parent: this }
     );
 
-    this.secrets.push(credentialsSecret);
+    const userSpec = resolvedUser.apply((resolvedUser) => ({
+      name: user.name,
+      db: resolvedUser.db,
+      // pulumi doesn't like (string & {}) for autocomplete, so we have to cast it
+      roles: resolvedUser.roles as crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersRolesArgs[],
+      connectionStringSecretName: resolvedUser.connectionStringSecretMetadata?.name,
+      connectionStringSecretNamespace: resolvedUser.connectionStringSecretMetadata?.namespace,
+      passwordSecretRef: {
+        name: credentialsSecret.metadata.name,
+      },
+      scramCredentialsSecretName: `${this.name}-${user.name}-scram-credentials-secret`,
+    }) satisfies crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs);
 
-    this.users.push(
-      pulumi.all([resolvedUser, credentialsSecret.metadata]).apply(([user, credentialsSecretMetadata]) => ({
-        connectionStringSecretName: user.connectionStringSecretMetadata?.name,
-        connectionStringSecretNamespace:
-          user.connectionStringSecretMetadata?.namespace,
-        db: user.db,
-        name,
-        passwordSecretRef: {
-          name: credentialsSecretMetadata.name,
-        },
-        roles: user.roles,
-        scramCredentialsSecretName: `${this.name}-${name}-scram-credentials-secret`,
-      }))
-    );
-  }
+    this.users.push(userSpec);
 
-  public finish() {
-    pulumi.log.error("MongoDBCommunity finishing");
-    this.resolveResourcePromise();
+    return this;
   }
 }
 
-
-const db = new MongoDBCommunity("mongodb", {
+const db = new MongoDBCommunityController("mongodb", {
   dbs: ["admin", "nimentas", "fkjkhgkdjf"],
-  metadata: {
-    namespace: "mongodb",
-  },
-  spec: {
-    type: "ReplicaSet",
-    members: 3,
-    version: "6.0.5",
-    security: {
-      authentication: {
-        modes: ["SCRAM"],
+  namespace: "mongodb",
+  mdbc: {
+    spec: {
+      type: "ReplicaSet",
+      members: 3,
+      version: "6.0.5",
+      security: {
+        authentication: {
+          modes: ["SCRAM"],
+        },
       },
-    },
-    additionalMongodConfig: {
-      "storage.wiredTiger.engineConfig.journalCompressor": "zlib",
-    },
-    statefulSet: {
-      spec: {
-        volumeClaimTemplates: [
-          {
-            metadata: {
-              name: "data-volume",
-            },
-            spec: {
-              accessModes: ["ReadWriteOnce"],
-              resources: {
-                requests: {
-                  storage: "5Gi",
+      additionalMongodConfig: {
+        "storage.wiredTiger.engineConfig.journalCompressor": "zlib",
+      },
+      statefulSet: {
+        spec: {
+          volumeClaimTemplates: [
+            {
+              metadata: {
+                name: "data-volume",
+              },
+              spec: {
+                accessModes: ["ReadWriteOnce"],
+                resources: {
+                  requests: {
+                    storage: "5Gi",
+                  },
                 },
               },
             },
-          },
-        ],
+          ],
+        },
       },
     },
   },
 });
 
-db.addUser("ni", {
-  db: "fkjkhgkdjf",
+db.addUser({
+  name: "ni",
+  db: "admin",
   password: "pass",
   roles: [
     {
@@ -196,7 +206,6 @@ db.addUser("ni", {
       name: "root",
     },
   ],
-})
-;
+}).commit();
 
-db.finish();
+db.commit();

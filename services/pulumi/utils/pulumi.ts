@@ -7,8 +7,6 @@ type RecursivePulumiInput<T> =
             ? undefined
             : pulumi.Input<T>;
 
-type X = RecursivePulumiInput<string | undefined>;
-
 export type PulumiInputify<T> = RecursivePulumiInput<pulumi.Unwrap<T>>;
 
 export function applyInDeployment<Input, Output>(value: pulumi.Output<Input>, inDryRun: pulumi.Input<Output>, inDeployment: (value: Input) => pulumi.Input<Output>) {
