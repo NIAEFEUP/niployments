@@ -8,7 +8,7 @@ mongodb_dir='./services/databases/mongodb'
 pods=$(cat $mongodb_dir/mongodb-cluster.yaml | awk '{if ($1 == "members:") print $2}')
 
 helm repo add mongodb https://mongodb.github.io/helm-charts
-helm install community-operator mongodb/community-operator --namespace mongodb --create-namespace
+helm install community-operator mongodb/community-operator --namespace mongodb --create-namespace --set operator.watchNamespace="*"
 kubectl apply -f $mongodb_dir/mongodb-cluster.yaml --namespace mongodb
 sleep 20  # Wait a little bit for first pod to be created
 
