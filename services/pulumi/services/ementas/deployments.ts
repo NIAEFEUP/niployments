@@ -34,12 +34,17 @@ export const website = new k8s.apps.v1.Deployment("ementas-website", {
                 containerPort,
               },
             ],
-            envFrom: [
+            env: [
               {
-                secretRef: {
-                  name: secrets.metadata.name,
+                name: "DATABASE_URL",
+                valueFrom: {
+                  secretKeyRef: {
+                    name: secrets.metadata.name,
+                    key: "connectionString.standard",
+                    optional: false,
+                  },
                 },
-              },
+              }
             ],
           },
         ],

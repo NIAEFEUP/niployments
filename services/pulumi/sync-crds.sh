@@ -96,7 +96,7 @@ function download_crds {
         local chart_id="$(echo "$helm_crd" | yq '.chart')"
         local chart_version="$(echo "$helm_crd" | yq '.version // "*"')"
 
-        echo "[Helm CRDs] Downloading CRDs for $chart_id:chart_version" 1>&2
+        echo "[Helm CRDs] Downloading CRDs for $chart_id:$chart_version" 1>&2
         crds+=("$(download_crds_from_helm "$chart_id" "$chart_version" "$dir")")
     done
 
