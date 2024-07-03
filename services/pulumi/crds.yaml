@@ -10,6 +10,8 @@ repositories:
     url: https://charts.longhorn.io
   - name: traefik
     url: https://traefik.github.io/charts
+  - name: minio-operator
+    url: https://operator.min.io
 
 manifests:
   # cert-manager
@@ -44,3 +46,8 @@ manifests:
   - type: helm
     chart: traefik/traefik
     version: 28.3.0
+
+  # minio
+  - type: template
+    chart: minio-operator/operator
+    version: 5.0.15
