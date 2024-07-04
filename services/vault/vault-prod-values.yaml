@@ -1,34 +1,46 @@
 #https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration
-# global:
-#   tlsDisable: true
 server:
   dev:
     enabled: false
   logLevel: debug
 ui:
   enabled: true
-  serviceType: "LoadBalancer"
-  externalPort: 8200
-
-ha:
-  enabled: true
-  raft:
-    enabled: true
-    config: |
-      storage "raft" {
-        path    = "./vault/raft_storage"
-      }
-
-      listener "tcp" {
-        address     = "127.0.0.1:8200"
-      }
-
-      api_addr = "http://127.0.0.1:8200"
-      cluster_addr = "https://127.0.0.1:8201"
+  serviceType: "ClusterIP"
+  externalPort: 80
 
 dataStorage:
   enabled: true
-  storageClass: "longhorn-locality-retain"
+  size: 2Gi
+  storageClass: longhorn-locality-retain
+  mountPath: "opt/vault/raft"
+  accessMode: ReadWriteOnce
 
+ha:
+  enabled: true
+  config: |
+    disable_mlock = true # avoids out of memory errors by blocking swapping of its virtual pages
+    
+    listener "tcp" {
+      address = "0.0.0.0:8200"
+      tls_cert_file      = "/opt/vault/tls/vault-cert.pem"
+      tls_key_file       = "/opt/vault/tls/vault-key.pem"
+      tls_client_ca_file = "/opt/vault/tls/vault-ca.pem" # certificate of the CA root
+    }
+
+    storage "raft" {
+      path    = "/opt/vault/raft"
+
+      #retry_join {
+      #  leader_tls_servername   = "vault"
+      #  leader_api_addr         = "https://0.0.0.0:8200"
+      #  leader_ca_cert_file     = "/opt/vault/tls/vault-ca.pem"
+      #  leader_client_cert_file = "/opt/vault/tls/vault-cert.pem"
+      #   leader_client_key_file  = "/opt/vault/tls/vault-key.pem"
+      #}
+    }
+  raft:
+    enabled: true
+    replicas: 3
+       
 injector:
   enabled: "false"
