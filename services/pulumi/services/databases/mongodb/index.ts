@@ -32,6 +32,7 @@ export const apps = new MongoDBCommunityController("mongodb-apps", {
               },
               spec: {
                 accessModes: ["ReadWriteOnce"],
+                storageClassName: "longhorn-locality-retain",
                 resources: {
                   requests: {
                     storage: "5Gi",
