@@ -1,7 +1,8 @@
-import { PulumiInputify } from "#utils/pulumi.js";
+import { concat, PulumiInputify } from "../utils/pulumi";
 import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
 import * as crds from "#crds";
+import { replicateTo } from "../utils/replicator";
 
 type Role =
   // Database user roles
@@ -34,10 +35,7 @@ type User<Databases extends string> = { name: string } & PulumiInputify<{
   db: Databases;
   password: string;
   connectionStringSecretNamespace?: string;
-  connectionStringSecretMetadata?: {
-    namespace?: string;
-    name?: string;
-  };
+  connectionStringSecretName?: string;
   roles: {
     name: Role;
     db: Databases;
@@ -67,6 +65,8 @@ export class MongoDBCommunityController<
   private users: pulumi.Input<crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs>[] =
     [];
 
+  private operatorDependsOn: pulumi.Input<pulumi.Resource | undefined>[] = [];
+
   constructor(
     name: string,
     args: Args<Databases>,
@@ -84,6 +84,11 @@ export class MongoDBCommunityController<
     this.namespace = args?.namespace;
     this.commitAction = commitAction;
 
+    const definedOperatorDependsOn = pulumi.output(this.commitAction.promise.then(() => {
+      const definedDeps = pulumi.output(this.operatorDependsOn).apply((deps) => deps.filter(pulumi.Resource.isInstance));
+      return definedDeps;
+  }).catch(() => pulumi.output([])));
+
     const operatorName = `${this.name}-operator`;
     new crds.mongodbcommunity.v1.MongoDBCommunity(
       operatorName,
@@ -99,7 +104,7 @@ export class MongoDBCommunityController<
           ),
         },
       },
-      { parent: this }
+      { parent: this, dependsOn: definedOperatorDependsOn }
     );
   }
 
@@ -151,9 +156,10 @@ export class MongoDBCommunityController<
           roles:
             resolvedUser.roles as crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersRolesArgs[],
           connectionStringSecretName:
-            resolvedUser.connectionStringSecretMetadata?.name,
-          connectionStringSecretNamespace:
-            resolvedUser.connectionStringSecretMetadata?.namespace,
+            resolvedUser.connectionStringSecretName,
+          connectionStringSecretAnnotations: resolvedUser.connectionStringSecretNamespace && concat([
+            replicateTo(resolvedUser.connectionStringSecretNamespace),
+          ]) || undefined,
           passwordSecretRef: {
             name: credentialsSecret.metadata.name,
           },
@@ -164,21 +170,5 @@ export class MongoDBCommunityController<
     this.users.push(userSpec);
 
     return this;
-  }
-}
-
-export class MongoDBCommunityRbac extends pulumi.ComponentResource {
-  constructor(name: string, args: { namespace: pulumi.Input<string> }, opts?: pulumi.ComponentResourceOptions) {
-    super("niployments:mongodb:MongoDBCommunityRbac", name, {}, opts);
-
-    new k8s.kustomize.Directory(`${name}-directory`, {
-      directory: "https://github.com/mongodb/mongodb-kubernetes-operator/tree/master/config/rbac",
-      transformations: [
-        (obj: any) => {
-          obj.metadata = obj.metadata ?? {};
-          obj.metadata.namespace = args.namespace;
-        },
-      ],
-    }, { parent: this });
   }
 }

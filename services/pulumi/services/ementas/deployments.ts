@@ -3,11 +3,8 @@ import * as k8s from "@pulumi/kubernetes";
 import { namespace } from "./namespace";
 import { labels, containerPort } from "./values";
 import { apps } from "../databases/mongodb";
-import { MongoDBCommunityRbac } from "../../resources/mongodb";
 
 const config = new pulumi.Config();
-
-new MongoDBCommunityRbac("ementas-mongodb-rbac", { namespace: namespace.metadata.name });
 
 apps
   .addUser({
@@ -20,10 +17,8 @@ apps
         db: "nimentas",
       },
     ],
-    connectionStringSecretMetadata: {
-      namespace: namespace.metadata.name,
-      name: "ementas-mongodb-secret",
-    },
+    connectionStringSecretNamespace: namespace.metadata.name,
+    connectionStringSecretName: "ementas-mongodb-secret",
   });
 
 export const website = new k8s.apps.v1.Deployment("ementas-website", {

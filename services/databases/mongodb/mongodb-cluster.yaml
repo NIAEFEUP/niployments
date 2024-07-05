@@ -1,46 +1,175 @@
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: testing
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mongodb-kubernetes-operator
+  namespace: testing
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - services
+  - configmaps
+  - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mongodbcommunity.mongodb.com
+  resources:
+  - mongodbcommunity
+  - mongodbcommunity/status
+  - mongodbcommunity/spec
+  - mongodbcommunity/finalizers
+  verbs:
+  - get
+  - patch
+  - list
+  - update
+  - watch
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: mongodb-kubernetes-operator
+  namespace: testing
+subjects:
+- kind: ServiceAccount
+  name: mongodb-kubernetes-operator
+roleRef:
+  kind: Role
+  name: mongodb-kubernetes-operator
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mongodb-kubernetes-operator
+  namespace: testing
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mongodb-database
+  namespace: testing
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: mongodb-database
+  namespace: testing
+subjects:
+- kind: ServiceAccount
+  name: mongodb-database
+roleRef:
+  kind: Role
+  name: mongodb-database
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: mongodb-database
+  namespace: testing
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - patch
+      - delete
+      - get
+---
 apiVersion: mongodbcommunity.mongodb.com/v1
 kind: MongoDBCommunity
 metadata:
-  name: mongodb-op
+  name: mongodb-apps
+  namespace: mongodb
 spec:
   members: 3
   type: ReplicaSet
-  version: "6.0.5"
+  version: 6.0.5
   security:
     authentication:
-      modes: ["SCRAM"]
+      modes:
+      - SCRAM
   users:
-    - name: ni
-      db: admin
-      passwordSecretRef: # a reference to the secret that will be used to generate the user's password
-        name: ni-secret
-      roles:
-        - name: root
-          db: admin
-
-      scramCredentialsSecretName: my-scram
-  additionalMongodConfig:
-    storage.wiredTiger.engineConfig.journalCompressor: zlib
+  - db: admin
+    name: adminuser
+    passwordSecretRef:
+      name: mongodb-apps-adminuser-credentials
+    roles:
+    - db: admin
+      name: root
+    - db: testingdb
+      name: root
+    scramCredentialsSecretName: mongodb-apps-adminuser
+  - connectionStringSecretName: testinguser-mongodb-secret
+    connectionStringSecretNamespace: testing
+    db: testingdb
+    name: testinguser
+    passwordSecretRef:
+      name: mongodb-apps-testinguser-credentials
+    roles:
+    - db: testingdb
+      name: readWrite
+    scramCredentialsSecretName: mongodb-apps-testinguser
   statefulSet:
     spec:
       volumeClaimTemplates:
-        - metadata:
-            name: data-volume
-          spec:
-            accessModes: ["ReadWriteOnce"]
-            storageClassName: longhorn-locality-retain
-            resources:
-              requests:
-                storage: 5G
-# the user credentials will be generated from this secret
-# once the credentials are generated, this secret is no longer required
+      - metadata:
+          name: data-volume
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ni-secret
+  name: mongodb-apps-adminuser-credentials
+  namespace: mongodb
 type: Opaque
 stringData:
-  username: ni
-  password: pass
+  password: my-passwd
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-apps-testinguser-credentials
+  namespace: mongodb
+type: Opaque
+stringData:
+  password: my-passwd
