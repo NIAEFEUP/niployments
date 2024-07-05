@@ -9,7 +9,7 @@ export const chart = new k8s.helm.v4.Chart("mongodb-community-operator-chart", {
   chart: "community-operator",
   namespace: "mongodb",
   valueYamlFiles: [
-    new pulumi.asset.FileAsset("./charts/mongodb/values.yaml"),
+    new pulumi.asset.FileAsset("./assets/mongodb/values.yaml"),
   ],
   repositoryOpts: {
     repo: "https://mongodb.github.io/helm-charts",
