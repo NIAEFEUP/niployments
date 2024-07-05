@@ -3,6 +3,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
 import * as crds from "#crds";
 import { replicateTo } from "../utils/replicator";
+import { CommitSignal, PendingValue } from "../utils/pending";
 
 type Role =
   // Database user roles
@@ -56,38 +57,36 @@ type Args<Databases extends string> = {
 
 export class MongoDBCommunityController<
   const Databases extends string
-> extends pulumi.ComponentResource<{}> {
-  private name: string;
-  private namespace: pulumi.Input<string> | undefined;
-  private commitAction: PromiseWithResolvers<void>;
-  private committed = false;
+> extends pulumi.ComponentResource<void> {
+  private name;
+  private namespace;
 
-  private users: pulumi.Input<crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs>[] =
-    [];
-
-  private operatorDependsOn: pulumi.Input<pulumi.Resource | undefined>[] = [];
+  public readonly commitSignal;
+  private users;
+  private operatorDependencies;
 
   constructor(
     name: string,
     args: Args<Databases>,
     opts?: pulumi.ComponentResourceOptions
   ) {
-    const commitAction = Promise.withResolvers<void>();
+    const commitSignal = new CommitSignal({ rejectIfNotCommitted: true });
     super(
       "niployments:mongodb:MongoDBCommunityController",
       name,
-      { commit: commitAction.promise },
+      { commitSignal },
       opts
     );
-
+    
     this.name = name;
     this.namespace = args?.namespace;
-    this.commitAction = commitAction;
 
-    const definedOperatorDependsOn = pulumi.output(this.commitAction.promise.then(() => {
-      const definedDeps = pulumi.output(this.operatorDependsOn).apply((deps) => deps.filter(pulumi.Resource.isInstance));
-      return definedDeps;
-  }).catch(() => pulumi.output([])));
+    this.commitSignal = commitSignal;
+    this.users = new PendingValue<pulumi.Input<crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs>[]>([], { commitSignal });
+    this.operatorDependencies = new PendingValue<pulumi.Input<pulumi.Resource | undefined>[]>([], { commitSignal });
+
+    const dependsOn = this.operatorDependencies.asOutput()
+      .apply((deps) => deps.filter(pulumi.Resource.isInstance));
 
     const operatorName = `${this.name}-operator`;
     new crds.mongodbcommunity.v1.MongoDBCommunity(
@@ -99,34 +98,16 @@ export class MongoDBCommunityController<
         },
         spec: args.mdbc?.spec && {
           ...args.mdbc?.spec,
-          users: pulumi.output(
-            this.commitAction.promise.then(() => this.users)
-          ),
+          users: this.users.asOutput(),
         },
       },
-      { parent: this, dependsOn: definedOperatorDependsOn }
+      { parent: this, dependsOn }
     );
   }
 
-  protected async initialize({
-    commit,
-  }: {
-    commit: Promise<void>;
-  }): Promise<{}> {
-    await commit;
-    return {};
-  }
-
-  public commit() {
-    if (this.committed) {
-      pulumi.log.warn(
-        "MongoDBCommunityController has already been committed. This may cause some users to not be properly added to the replica set.",
-        this
-      );
-    }
-
-    this.committed = true;
-    this.commitAction.resolve();
+  protected initialize({ commitSignal }: { commitSignal: CommitSignal }): Promise<void> {
+    commitSignal.resource = this;
+    return commitSignal.waitForCommit();
   }
 
   public addUser(user: User<Databases>) {
@@ -167,8 +148,12 @@ export class MongoDBCommunityController<
         } satisfies crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs)
     );
 
-    this.users.push(userSpec);
+    this.users.run(users => users.push(userSpec));
 
     return this;
+  }
+
+  public addOperatorDependency(dependency: pulumi.Input<pulumi.Resource | undefined>) {
+    return this.operatorDependencies.run(dependencies => dependencies.push(dependency));
   }
 }

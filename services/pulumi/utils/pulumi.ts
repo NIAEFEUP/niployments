@@ -1,4 +1,5 @@
 import * as pulumi from "@pulumi/pulumi";
+import { CommitSignal } from "./pending";
 
 type RecursivePulumiInput<T> = 
     T extends object
