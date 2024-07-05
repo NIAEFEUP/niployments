@@ -22,5 +22,6 @@ type FlattenArrayIntoObject<T extends readonly pulumi.Inputs[]> =
 
 export function concat<const T extends pulumi.Input<readonly pulumi.Input<pulumi.Inputs>[]>>(values: T) {
     return pulumi.output(values)
-        .apply(values => Object.assign({}, ...values.map(val => structuredClone(val))) as FlattenArrayIntoObject<pulumi.Unwrap<T>>);
+        .apply(values => Object.assign({}, ...values) as FlattenArrayIntoObject<pulumi.Unwrap<T>>)
+        .apply(val => structuredClone(val)); // structuredClone is needed to ensure values remains readonly
 }

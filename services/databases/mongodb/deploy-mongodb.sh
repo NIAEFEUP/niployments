@@ -9,4 +9,3 @@ helm upgrade --install community-operator mongodb/community-operator \
   --namespace mongodb \
   --create-namespace \
   --values "$(dirname "$0")/values.yaml"
-  
