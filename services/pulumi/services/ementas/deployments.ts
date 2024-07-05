@@ -73,4 +73,4 @@ export const website = new k8s.apps.v1.Deployment("ementas-website", {
       },
     },
   },
-});
+}, { dependsOn: [apps] });

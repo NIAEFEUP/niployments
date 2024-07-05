@@ -1,10 +1,11 @@
 import * as pulumi from "@pulumi/pulumi";
-import { MongoDBCommunityController } from "../../resources/mongodb";
+import { MongoDBCommunityController } from "../../../resources/mongodb";
+import { chart } from "./chart";
 
-const databases = ["admin", "nimentas"] as const;
+const appsDatabases = ["admin", "nimentas"] as const;
 
 export const apps = new MongoDBCommunityController("mongodb-apps", {
-  dbs: databases,
+  dbs: appsDatabases,
   namespace: "mongodb",
   mdbc: {
     metadata: {
@@ -43,7 +44,7 @@ export const apps = new MongoDBCommunityController("mongodb-apps", {
       },
     },
   },
-});
+}, { dependsOn: [chart] });
 
 const config = new pulumi.Config();
 
@@ -51,7 +52,7 @@ apps.addUser({
     name: "ni",
     db: "admin",
     password: config.requireSecret("mongodb/admin-password"),
-    roles: databases.map((db) => ({
+    roles: appsDatabases.map((db) => ({
         name: "root",
         db,
     })),
