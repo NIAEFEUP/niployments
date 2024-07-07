@@ -1,12 +1,10 @@
 import * as pulumi from "@pulumi/pulumi";
 import { MongoDBCommunityController } from "../../../resources/mongodb";
-import { chart } from "./chart";
 
 const appsDatabases = ["admin", "nimentas"] as const;
 
 export const apps = new MongoDBCommunityController("mongodb-apps", {
   dbs: appsDatabases,
-  namespace: "mongodb",
   mdbc: {
     metadata: {
         name: "mongodb-apps",
@@ -45,7 +43,7 @@ export const apps = new MongoDBCommunityController("mongodb-apps", {
       },
     },
   },
-}, { dependsOn: [chart] });
+});
 
 const config = new pulumi.Config();
 

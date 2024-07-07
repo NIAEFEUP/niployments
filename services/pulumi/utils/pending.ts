@@ -8,7 +8,7 @@ type CommitSignalOptions = {
 const warnMessage = "This may affect the deployment of certain resources.";
 
 export class CommitSignal {
-    public static globalParent = new CommitSignal();
+    public static readonly globalParent = new CommitSignal();
 
     private committed = false;
     private action = Promise.withResolvers<void>();
@@ -25,7 +25,8 @@ export class CommitSignal {
             pulumi.log.error(`Commit was not committed. ${warnMessage}`, this.resource);
         });
 
-        if (this !== CommitSignal.globalParent)
+        // CommitSignal.globalParent is undefined for globalParent
+        if (CommitSignal.globalParent !== undefined)
             this.attachTo(CommitSignal.globalParent, opts?.rejectIfNotCommitted);
     }
 
