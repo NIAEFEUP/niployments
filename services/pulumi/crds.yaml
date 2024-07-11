@@ -2,8 +2,8 @@
 repositories:
   - name: jetstack
     url: https://charts.jetstack.io
-  - name: clustersecret
-    url: https://charts.clustersecret.io/
+  # - name: clustersecret
+  #   url: https://charts.clustersecret.io/
   # mongodb official charts are not needed while temporary fix is in use
   # - name: mongodb
   #   url: https://mongodb.github.io/helm-charts
@@ -24,8 +24,8 @@ manifests:
       --namespace=cert-manager
   # cilium - no CRDs
   # cluster-secret
-  - type: helm
-    chart: clustersecret/cluster-secret
+  # - type: helm
+  #   chart: clustersecret/cluster-secret
   # databases/mongodb
   ## [version for official helm charts below]
   # - type: template
