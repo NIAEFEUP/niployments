@@ -1,4 +1,4 @@
-import { apps } from "./services/databases/mongodb";
 import "./services/ementas";
+import { CommitSignal } from "./utils/pending";
 
-apps.commit();
+CommitSignal.globalParent.resolve();

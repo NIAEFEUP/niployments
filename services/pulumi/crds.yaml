@@ -4,8 +4,9 @@ repositories:
     url: https://charts.jetstack.io
   - name: clustersecret
     url: https://charts.clustersecret.io/
-  - name: mongodb
-    url: https://mongodb.github.io/helm-charts
+  # mongodb official charts are not needed while temporary fix is in use
+  # - name: mongodb
+  #   url: https://mongodb.github.io/helm-charts
   - name: longhorn
     url: https://charts.longhorn.io
   - name: traefik
@@ -26,10 +27,15 @@ manifests:
   - type: helm
     chart: clustersecret/cluster-secret
   # databases/mongodb
-  - type: template
-    chart: mongodb/community-operator
-    options: |
-      --namespace=mongodb
+  ## [version for official helm charts below]
+  # - type: template
+  #   chart: mongodb/community-operator
+  #   options: |
+  #     --namespace=mongodb
+  ## [version for temporary fix version below]
+  - type: curl
+    name: mongodb/community-operator
+    url: https://raw.githubusercontent.com/limwa/mongodb-kubernetes-operator/master/config/crd/bases/mongodbcommunity.mongodb.com_mongodbcommunity.yaml
   # databases/postgresql
   - type: curl
     name: cloudnative-pg/cloudnative-pg

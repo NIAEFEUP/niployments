@@ -1,11 +1,10 @@
 import * as pulumi from "@pulumi/pulumi";
-import { MongoDBCommunityController } from "../../resources/mongodb";
+import { MongoDBCommunityController } from "../../../resources/mongodb";
 
-const databases = ["admin", "nimentas"] as const;
+const appsDatabases = ["admin", "nimentas"] as const;
 
 export const apps = new MongoDBCommunityController("mongodb-apps", {
-  dbs: databases,
-  namespace: "mongodb",
+  dbs: appsDatabases,
   mdbc: {
     metadata: {
         name: "mongodb-apps",
@@ -31,6 +30,7 @@ export const apps = new MongoDBCommunityController("mongodb-apps", {
               },
               spec: {
                 accessModes: ["ReadWriteOnce"],
+                storageClassName: "longhorn-locality-retain",
                 resources: {
                   requests: {
                     storage: "5Gi",
@@ -51,7 +51,7 @@ apps.addUser({
     name: "ni",
     db: "admin",
     password: config.requireSecret("mongodb/admin-password"),
-    roles: databases.map((db) => ({
+    roles: appsDatabases.map((db) => ({
         name: "root",
         db,
     })),
