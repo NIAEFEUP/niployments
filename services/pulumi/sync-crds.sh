@@ -12,9 +12,19 @@ function ensure_installed {
 
 }
 
+function ensure_yq {
+    ensure_installed yq
+
+    # https://github.com/mikefarah/yq/blob/ef6fb92e7f314e7f0ef49da4385458271203119a/cmd/version.go#L28
+    if ! yq --version | grep -q "yq (https://github.com/mikefarah/yq/)"; then
+        echo "Your yq version is not supported, please download the latest version from https://github.com/mikefarah/yq/" 1>&2
+        exit 1
+    fi
+}
+
 ensure_installed helm
 ensure_installed crd2pulumi
-ensure_installed yq
+ensure_yq
 
 function download_crds_from_helm {
     local chart_id=$1
