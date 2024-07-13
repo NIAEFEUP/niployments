@@ -4,7 +4,7 @@ import { namespace } from "./namespace";
 import { port as servicePort, service } from "./services";
 import { host } from "./values";
 
-export const ingressRoute = new crds.traefik.v1alpha1.IngressRoute("ementas-ingress-rotue", {
+export const ingressRoute = new crds.traefik.v1alpha1.IngressRoute("ementas-ingress-route", {
     metadata: {
         name: "website-https",
         namespace: namespace.metadata.name,
