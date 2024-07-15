@@ -141,6 +141,4 @@ crd_paths="$(download_crds "$SPEC_FILE" "crds/.tmp/")"
 
 crd2pulumi -n ${crd_paths[@]}
 
-# rm -rf crds/.tmp/
-
 echo "CRDs synced successfully"

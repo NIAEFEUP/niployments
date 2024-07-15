@@ -1,10 +1,8 @@
 import * as pulumi from "@pulumi/pulumi";
 import { MongoDBCommunityController } from "../../../resources/mongodb";
 
-const appsDatabases = ["admin", "nimentas"] as const;
-
 export const apps = new MongoDBCommunityController("mongodb-apps", {
-  dbs: appsDatabases,
+  dbs: ["admin", "nimentas"],
   mdbc: {
     metadata: {
         name: "mongodb-apps",
@@ -51,7 +49,7 @@ apps.addUser({
     name: "ni",
     db: "admin",
     password: config.requireSecret("mongodb/admin-password"),
-    roles: appsDatabases.map((db) => ({
+    roles: apps.dbs.map((db) => ({
         name: "root",
         db,
     })),

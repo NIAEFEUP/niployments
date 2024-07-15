@@ -5,6 +5,7 @@ import { labels, containerPort } from "./values";
 import { apps } from "../databases/mongodb";
 
 const config = new pulumi.Config();
+const connectionStringSecretName = "ementas-mongodb-secret";
 
 apps
   .addUser({
@@ -18,7 +19,7 @@ apps
       },
     ],
     connectionStringSecretNamespace: namespace.metadata.name,
-    connectionStringSecretName: "ementas-mongodb-secret",
+    connectionStringSecretName,
   });
 
 export const website = new k8s.apps.v1.Deployment("ementas-website", {
@@ -38,7 +39,7 @@ export const website = new k8s.apps.v1.Deployment("ementas-website", {
       spec: {
         containers: [
           {
-            name: "ementas-website",
+            name: "ementas-website-container",
             image: "registry.niaefeup.pt/niaefeup/nimentas-sasup:main",
             imagePullPolicy: "Always",
             resources: {
@@ -57,7 +58,7 @@ export const website = new k8s.apps.v1.Deployment("ementas-website", {
                 name: "DATABASE_URL",
                 valueFrom: {
                   secretKeyRef: {
-                    name: "ementas-mongodb-secret",
+                    name: connectionStringSecretName,
                     key: "connectionString.standard",
                   },
                 },

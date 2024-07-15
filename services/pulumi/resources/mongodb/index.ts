@@ -6,7 +6,7 @@ import { replicateTo } from "../../utils/replicator";
 import { CommitSignal, PendingValue } from "../../utils/pending";
 import { DBUser, MongoDBCommunityControllerArgs } from "./types";
 
-export const namespace = new k8s.core.v1.Namespace("mongodb-namespace", {
+const namespace = new k8s.core.v1.Namespace("mongodb-namespace", {
   metadata: {
     name: "mongodb",
   },
@@ -43,6 +43,7 @@ export class MongoDBCommunityController<
 > extends pulumi.ComponentResource<void> {
   private name;
   private namespace;
+  public readonly dbs;
 
   private users;
 
@@ -64,6 +65,7 @@ export class MongoDBCommunityController<
 
     this.name = name;
     this.namespace = args?.namespace ?? namespace.metadata.name;
+    this.dbs = args.dbs;
 
     this.users = users;
 
