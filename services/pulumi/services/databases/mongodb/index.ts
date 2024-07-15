@@ -5,7 +5,7 @@ export const apps = new MongoDBCommunityController("mongodb-apps", {
   dbs: ["admin", "nimentas"],
   mdbc: {
     metadata: {
-        name: "mongodb-apps",
+      name: "mongodb-apps",
     },
     spec: {
       type: "ReplicaSet",
@@ -46,11 +46,11 @@ export const apps = new MongoDBCommunityController("mongodb-apps", {
 const config = new pulumi.Config();
 
 apps.addUser({
-    name: "ni",
-    db: "admin",
-    password: config.requireSecret("mongodb/admin-password"),
-    roles: apps.dbs.map((db) => ({
-        name: "root",
-        db,
-    })),
+  name: "ni",
+  db: "admin",
+  password: config.requireSecret("mongodb/admin-password"),
+  roles: apps.dbs.map((db) => ({
+    name: "root",
+    db,
+  })),
 });

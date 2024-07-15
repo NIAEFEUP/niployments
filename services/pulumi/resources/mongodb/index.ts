@@ -17,7 +17,7 @@ const chartCrds = new k8s.yaml.v2.ConfigFile(
   {
     skipAwait: true,
     file: "https://raw.githubusercontent.com/limwa/mongodb-kubernetes-operator/master/config/crd/bases/mongodbcommunity.mongodb.com_mongodbcommunity.yaml",
-  }
+  },
 );
 
 const chart = new k8s.helm.v4.Chart(
@@ -35,11 +35,11 @@ const chart = new k8s.helm.v4.Chart(
       repo: "https://mongodb.github.io/helm-charts",
     },
   },
-  { dependsOn: [chartCrds] }
+  { dependsOn: [chartCrds] },
 );
 
 export class MongoDBCommunityController<
-  const DB extends string
+  const DB extends string,
 > extends pulumi.ComponentResource<void> {
   private name;
   private namespace;
@@ -50,7 +50,7 @@ export class MongoDBCommunityController<
   constructor(
     name: string,
     args: MongoDBCommunityControllerArgs<DB>,
-    opts?: pulumi.ComponentResourceOptions
+    opts?: pulumi.ComponentResourceOptions,
   ) {
     const users = new PendingValue<
       pulumi.Input<crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs>[]
@@ -60,7 +60,7 @@ export class MongoDBCommunityController<
       "niployments:mongodb:MongoDBCommunityController",
       name,
       { commitSignal: users.commit },
-      opts
+      opts,
     );
 
     this.name = name;
@@ -114,13 +114,13 @@ export class MongoDBCommunityController<
     return new crds.mongodbcommunity.v1.MongoDBCommunity(
       operatorName,
       mdbcArgs,
-      { parent: this, dependsOn: [chart], deletedWith: chart }
+      { parent: this, dependsOn: [chart], deletedWith: chart },
     );
   }
 
   private createCredentialsSecret(
     username: string,
-    password: pulumi.Input<string>
+    password: pulumi.Input<string>,
   ) {
     const credentialsSecretName = `${this.name}-${username}-credentials`;
     const credentialsSecret = new k8s.core.v1.Secret(
@@ -134,7 +134,7 @@ export class MongoDBCommunityController<
           password: password,
         },
       },
-      { parent: this }
+      { parent: this },
     );
 
     return credentialsSecret;
@@ -145,7 +145,7 @@ export class MongoDBCommunityController<
 
     const credentialsSecret = this.createCredentialsSecret(
       user.name,
-      resolvedUser.password
+      resolvedUser.password,
     );
 
     const userSpec = resolvedUser.apply(
@@ -164,7 +164,7 @@ export class MongoDBCommunityController<
             name: credentialsSecret.metadata.name,
           },
           scramCredentialsSecretName: `${this.name}-${user.name}`,
-        } satisfies crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs)
+        }) satisfies crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs,
     );
 
     this.users.run((users) => users.push(userSpec));
