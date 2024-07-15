@@ -4,5 +4,5 @@
     "checkJs": true,
     "allowJs": true
   },
-  "include": ["**/*.ts", "**/*.js"]
+  "include": ["*.(c|m)?js"]
 }

@@ -21,8 +21,8 @@ export function applyInDeployment<Input, Output>(
 }
 
 type MergeObjects<
-  Base extends Record<string, any>,
-  Overrides extends Record<string, any>,
+  Base extends Record<string, unknown>,
+  Overrides extends Record<string, unknown>,
 > = Omit<Base, keyof Overrides> & Overrides;
 
 type FindPossibleLists<T extends readonly (pulumi.Inputs | undefined)[]> =
@@ -41,7 +41,9 @@ type FlattenArrayIntoObject<T extends readonly pulumi.Inputs[]> =
     ...infer Rest extends readonly pulumi.Inputs[],
   ]
     ? MergeObjects<NonNullable<First>, FlattenArrayIntoObject<Rest>>
-    : {};
+    : // T is empty array and flattening it produces an empty object
+      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+      {};
 
 export function concat<
   const T extends pulumi.Input<

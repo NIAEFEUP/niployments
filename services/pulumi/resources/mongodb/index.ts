@@ -1,4 +1,4 @@
-import { concat, PulumiInputify } from "../../utils/pulumi";
+import { concat } from "../../utils/pulumi";
 import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
 import * as crds from "#crds";
