@@ -1,5 +1,6 @@
 // @ts-check
 
+import "eslint-plugin-only-warn";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 
