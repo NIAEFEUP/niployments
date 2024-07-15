@@ -1,0 +1,10 @@
+# Pnpm files
+node_modules/
+package.json
+pnpm-lock.yaml
+
+# Automatically generated files
+crds/
+
+# Assets
+assets/
