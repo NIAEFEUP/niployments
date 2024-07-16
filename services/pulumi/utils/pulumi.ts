@@ -54,11 +54,11 @@ export function concat<
   return pulumi
     .output(values)
     .apply((values) => values.filter(Boolean))
-    .apply((values) => Object.assign({}, ...values))
     .apply(
-      (val) =>
-        structuredClone(val) as FlattenArrayIntoObject<
+      (values) =>
+        Object.assign({}, ...values) as FlattenArrayIntoObject<
           FindPossibleLists<pulumi.Unwrap<T>>
         >,
-    ); // structuredClone is needed to ensure values remains readonly
+    )
+    .apply((val) => structuredClone(val)); // structuredClone is needed to ensure values remains readonly
 }

@@ -18,10 +18,10 @@ export class CommitSignal {
   constructor(opts?: CommitSignalOptions) {
     this.resource = opts?.resource;
 
-    this.action.promise.finally(() => {
+    void this.action.promise.finally(() => {
       if (this.committed) return;
 
-      pulumi.log.error(
+      void pulumi.log.error(
         `Commit was not committed. ${warnMessage}`,
         this.resource,
       );
@@ -38,7 +38,7 @@ export class CommitSignal {
 
   public resolve() {
     if (this.committed) {
-      pulumi.log.error(
+      void pulumi.log.error(
         `Commit resolved after being committed. ${warnMessage}`,
         this.resource,
       );
@@ -51,7 +51,7 @@ export class CommitSignal {
 
   public reject(error: Error) {
     if (this.committed) {
-      pulumi.log.error(
+      void pulumi.log.error(
         `Commit rejected after being committed. ${warnMessage}`,
         this.resource,
       );
@@ -64,7 +64,7 @@ export class CommitSignal {
 
   public attachTo(parent: CommitSignal, rejectIfNotCommitted?: boolean) {
     if (parent.committed) {
-      pulumi.log.warn(
+      void pulumi.log.warn(
         `Commit attached when parent was already committed. ${warnMessage}`,
         this.resource,
       );
@@ -85,7 +85,9 @@ export class CommitSignal {
       })
       .catch((err) => {
         if (this.committed) return;
-
+        /* eslint-disable-next-line @typescript-eslint/no-unsafe-argument --
+         * we reject with whatever error we get
+         */
         this.reject(err);
       });
   }
