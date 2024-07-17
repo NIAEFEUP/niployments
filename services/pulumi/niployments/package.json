@@ -1,7 +1,8 @@
 {
-    "name": "niployments",
+    "name": "@niaefeup/niployments-pulumi",
     "main": "bin/index.js",
     "type": "module",
+    "private": true,
     "scripts": {
         "lint": "eslint --max-warnings=0 .",
         "lint:fix": "eslint --fix .",
