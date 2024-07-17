@@ -5,10 +5,10 @@ import { labels, containerPort } from "./values.js";
 import { apps } from "#services/databases/mongodb/index.js";
 
 const config = new pulumi.Config();
-const connectionStringSecretName = "ementas-mongodb-secret";
+const connectionStringSecretName = "nimentas-mongodb-secret";
 
 apps.addUser({
-  name: "ementas",
+  name: "nimentas",
   db: "nimentas",
   password: config.requireSecret("mongodb/nimentas-password"),
   roles: [
