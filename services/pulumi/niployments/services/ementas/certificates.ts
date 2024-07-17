@@ -1,6 +1,6 @@
-import * as crds from "#crds";
-import { namespace } from "./namespace";
-import { host } from "./values";
+import * as crds from "@pulumi/crds";
+import { namespace } from "./namespace.js";
+import { host } from "./values.js";
 
 export const certificate = new crds.certmanager.v1.Certificate(
   "ementas-certificate",

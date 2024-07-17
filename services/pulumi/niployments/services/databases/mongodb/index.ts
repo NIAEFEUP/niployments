@@ -1,5 +1,5 @@
 import * as pulumi from "@pulumi/pulumi";
-import { MongoDBCommunityController } from "../../../resources/mongodb";
+import { MongoDBCommunityController } from "#resources/mongodb/index.js";
 
 export const apps = new MongoDBCommunityController("mongodb-apps", {
   dbs: ["admin", "nimentas"],

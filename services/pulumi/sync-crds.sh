@@ -133,6 +133,18 @@ function download_crds {
     echo "${crds[@]}"
 }
 
+function patch_crds_package() {
+    local crds_package=$1
+    yq -i '.version = "0.0.0"' "$crds_package/package.json"
+    yq -i '.exports.["."] = "./bin/index.js"' "$crds_package/package.json"
+}
+
+function build_crds_package() {
+    local crds_package=$1
+    pnpm install -C "$crds_package" --use-stderr
+    pnpm run -C "$crds_package" build
+}
+
 rm -rf crds/
 
 SPEC_FILE="crds.yaml"
@@ -140,5 +152,7 @@ add_repositories "$SPEC_FILE"
 crd_paths="$(download_crds "$SPEC_FILE" "crds/.tmp/")"
 
 crd2pulumi -n ${crd_paths[@]}
+patch_crds_package "crds/nodejs/"
+build_crds_package "crds/nodejs/"
 
 echo "CRDs synced successfully"

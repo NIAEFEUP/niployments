@@ -1,10 +1,10 @@
-import { concat } from "../../utils/pulumi";
+import { concat } from "#utils/pulumi.js";
 import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
-import * as crds from "#crds";
-import { replicateTo } from "../../utils/replicator";
-import { CommitSignal, PendingValue } from "../../utils/pending";
-import { DBUser, MongoDBCommunityControllerArgs } from "./types";
+import * as crds from "@pulumi/crds";
+import { replicateTo } from "#utils/replicator.js";
+import { CommitSignal, PendingValue } from "#utils/pending.js";
+import type { DBUser, MongoDBCommunityControllerArgs } from "./types.js";
 
 const namespace = new k8s.core.v1.Namespace("mongodb-namespace", {
   metadata: {

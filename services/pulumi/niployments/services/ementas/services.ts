@@ -1,6 +1,6 @@
 import * as k8s from "@pulumi/kubernetes";
-import { namespace } from "./namespace";
-import { containerPort, labels } from "./values";
+import { namespace } from "./namespace.js";
+import { containerPort, labels } from "./values.js";
 
 export const port = 80;
 

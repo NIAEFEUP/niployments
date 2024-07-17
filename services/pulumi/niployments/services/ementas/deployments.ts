@@ -1,8 +1,8 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
-import { namespace } from "./namespace";
-import { labels, containerPort } from "./values";
-import { apps } from "../databases/mongodb";
+import { namespace } from "./namespace.js";
+import { labels, containerPort } from "./values.js";
+import { apps } from "#services/databases/mongodb/index.js";
 
 const config = new pulumi.Config();
 const connectionStringSecretName = "ementas-mongodb-secret";

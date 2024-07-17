@@ -1,8 +1,8 @@
-import * as crds from "#crds";
-import { certificate } from "./certificates";
-import { namespace } from "./namespace";
-import { port as servicePort, service } from "./services";
-import { host } from "./values";
+import * as crds from "@pulumi/crds";
+import { certificate } from "./certificates.js";
+import { namespace } from "./namespace.js";
+import { port as servicePort, service } from "./services.js";
+import { host } from "./values.js";
 
 export const ingressRoute = new crds.traefik.v1alpha1.IngressRoute(
   "ementas-ingress-route",

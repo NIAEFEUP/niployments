@@ -1,5 +1,5 @@
 import * as pulumi from "@pulumi/pulumi";
-import { chart } from "../resources/replicator/charts";
+import { chart } from "#resources/replicator/charts.js";
 
 export function replicateTo<const T extends string>(name: pulumi.Input<T>) {
   // chart.resources is used to create an implicit dependency
