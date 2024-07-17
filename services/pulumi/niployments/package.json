@@ -7,6 +7,8 @@
         "lint:fix": "eslint --fix .",
         "prettier": "prettier --check .",
         "prettier:fix": "prettier --write .",
+        "build": "tsc",
+        "build:watch": "tsc --watch",
         "check": "pnpm run lint && pnpm run prettier"
     },
     "devDependencies": {

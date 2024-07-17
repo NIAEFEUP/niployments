@@ -24,6 +24,7 @@ function ensure_yq {
 
 ensure_installed helm
 ensure_installed crd2pulumi
+ensure_installed pnpm
 ensure_yq
 
 function download_crds_from_helm {
@@ -141,18 +142,31 @@ function patch_crds_package() {
 
 function build_crds_package() {
     local crds_package=$1
-    pnpm install -C "$crds_package" --use-stderr
-    pnpm run -C "$crds_package" build
+    pnpm install --use-stderr
+    pnpm run -C "$crds_package" build > /dev/null
 }
 
 rm -rf crds/
 
 SPEC_FILE="crds.yaml"
+CRDS_PROJECT_DIR="crds/nodejs/"
+
+# 1. Add helm repositories
+echo
 add_repositories "$SPEC_FILE"
-crd_paths="$(download_crds "$SPEC_FILE" "crds/.tmp/")"
 
+# 2. Download CRDs from sources
+echo
+crd_paths="$(download_crds "$SPEC_FILE" "$(dirname "$CRDS_PROJECT_DIR")/.tmp/")"
+
+# 3. Generate Pulumi CRDs package
+echo
 crd2pulumi -n ${crd_paths[@]}
-patch_crds_package "crds/nodejs/"
-build_crds_package "crds/nodejs/"
 
-echo "CRDs synced successfully"
+# 4. Patch and build Pulumi CRDs package
+echo
+patch_crds_package "$CRDS_PROJECT_DIR"
+build_crds_package "$CRDS_PROJECT_DIR"
+
+echo
+echo "CRDs synced successfully."
