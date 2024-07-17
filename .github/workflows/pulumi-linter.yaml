@@ -8,57 +8,23 @@ on:
     branches: [ "main" ]
     paths: [ "services/pulumi/**" ]
 
-defaults:
-  run:
-    working-directory: services/pulumi
-
 jobs:
   format:
     name: Prettier
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          package_json_file: services/pulumi/package.json
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: "pnpm"
-          cache-dependency-path: services/pulumi/pnpm-lock.yaml
-      - name: Install dependencies
-        run: pnpm install
+      - uses: ./.github/actions/prepare-pulumi-project
       - name: Run prettier
+        working-directory: services/pulumi/niployments
         run: pnpm run prettier
 
   lint:
     name: ESLint
     runs-on: ubuntu-latest
     steps:
-      - name: Install yq
-        working-directory: ${{ github.workspace }}
-        run: sudo curl -L https://github.com/mikefarah/yq/releases/download/v4.40.3/yq_linux_amd64 -o /usr/bin/yq && sudo chmod +x /usr/bin/yq
-      - name: Install crd2pulumi
-        working-directory: ${{ github.workspace }}
-        run: |
-          mkdir -p ./bin/crd2pulumi
-          cd ./bin/crd2pulumi
-          echo "crd2pulumi" > files.txt
-          curl -L https://github.com/pulumi/crd2pulumi/releases/download/v1.4.0/crd2pulumi-v1.4.0-linux-amd64.tar.gz | tar -T files.txt -xvz
-          sudo mv crd2pulumi /usr/bin/crd2pulumi
-          sudo chmod +x /usr/bin/crd2pulumi
       - uses: actions/checkout@v4
-      - name: Sync CRDs
-        run: ./sync-crds.sh
-      - uses: pnpm/action-setup@v4
-        with:
-          package_json_file: services/pulumi/package.json
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: "pnpm"
-          cache-dependency-path: services/pulumi/pnpm-lock.yaml
-      - name: Install dependencies
-        run: pnpm install
+      - uses: ./.github/actions/prepare-pulumi-project
       - name: Run ESLint
+        working-directory: services/pulumi/niployments
         run: pnpm run lint

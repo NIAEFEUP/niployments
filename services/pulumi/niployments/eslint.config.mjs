@@ -17,6 +17,6 @@ export default tseslint.config(
     ignores: ["eslint.config.mjs"],
   },
   {
-    ignores: ["node_modules", "crds", "assets"],
+    ignores: ["node_modules", "bin", "assets"],
   },
 );
