@@ -136,8 +136,8 @@ function download_crds {
 
 function patch_crds_package() {
     local crds_package=$1
-    yq -i '.version = "0.0.0"' "$crds_package/package.json"
-    yq -i '.exports.["."] = "./bin/index.js"' "$crds_package/package.json"
+    yq -i '.version = "0.0.0"' -oj "$crds_package/package.json"
+    yq -i '.exports.["."] = "./bin/index.js"' -oj "$crds_package/package.json"
 }
 
 function build_crds_package() {
