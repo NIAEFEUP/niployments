@@ -1,7 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
-import * as crds from "#crds";
-import { PulumiInputify } from "../../utils/pulumi";
+import * as crds from "@pulumi/crds";
+import { PulumiInputify } from "#utils/pulumi.js";
 
 type DBRole =
   // Database user roles

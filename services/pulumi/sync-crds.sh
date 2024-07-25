@@ -12,9 +12,20 @@ function ensure_installed {
 
 }
 
+function ensure_yq {
+    ensure_installed yq
+
+    # https://github.com/mikefarah/yq/blob/ef6fb92e7f314e7f0ef49da4385458271203119a/cmd/version.go#L28
+    if ! yq --version | grep -q "yq (https://github.com/mikefarah/yq/)"; then
+        echo "Your yq version is not supported, please download the latest version from https://github.com/mikefarah/yq/" 1>&2
+        exit 1
+    fi
+}
+
 ensure_installed helm
 ensure_installed crd2pulumi
-ensure_installed yq
+ensure_installed pnpm
+ensure_yq
 
 function download_crds_from_helm {
     local chart_id=$1
@@ -123,14 +134,39 @@ function download_crds {
     echo "${crds[@]}"
 }
 
+function patch_crds_package() {
+    local crds_package=$1
+    yq -i '.version = "0.0.0"' -oj "$crds_package/package.json"
+    yq -i '.exports.["."] = "./bin/index.js"' -oj "$crds_package/package.json"
+}
+
+function build_crds_package() {
+    local crds_package=$1
+    pnpm install --use-stderr
+    pnpm run -C "$crds_package" build > /dev/null
+}
+
 rm -rf crds/
 
 SPEC_FILE="crds.yaml"
-add_repositories "$SPEC_FILE"
-crd_paths="$(download_crds "$SPEC_FILE" "crds/.tmp/")"
+CRDS_PROJECT_DIR="crds/nodejs/"
 
+# 1. Add helm repositories
+echo
+add_repositories "$SPEC_FILE"
+
+# 2. Download CRDs from sources
+echo
+crd_paths="$(download_crds "$SPEC_FILE" "$(dirname "$CRDS_PROJECT_DIR")/.tmp/")"
+
+# 3. Generate Pulumi CRDs package
+echo
 crd2pulumi -n ${crd_paths[@]}
 
-# rm -rf crds/.tmp/
+# 4. Patch and build Pulumi CRDs package
+echo
+patch_crds_package "$CRDS_PROJECT_DIR"
+build_crds_package "$CRDS_PROJECT_DIR"
 
-echo "CRDs synced successfully"
+echo
+echo "CRDs synced successfully."

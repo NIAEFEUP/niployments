@@ -7,6 +7,8 @@ repositories:
   # mongodb official charts are not needed while temporary fix is in use
   # - name: mongodb
   #   url: https://mongodb.github.io/helm-charts
+  - name: mittwald
+    url: https://helm.mittwald.de
   - name: longhorn
     url: https://charts.longhorn.io
   - name: traefik
@@ -41,6 +43,7 @@ manifests:
     name: cloudnative-pg/cloudnative-pg
     url: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.22/releases/cnpg-1.22.2.yaml
   # image-registry (harbor) - no CRDs
+  # replicator - no CRDs
   # storage/longhorn
   - type: template
     chart: longhorn/longhorn

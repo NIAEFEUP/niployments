@@ -1,0 +1,7 @@
+# Pnpm files
+/node_modules/
+/bin/
+package.json
+
+# Assets
+/assets/

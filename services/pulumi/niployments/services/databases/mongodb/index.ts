@@ -1,13 +1,11 @@
 import * as pulumi from "@pulumi/pulumi";
-import { MongoDBCommunityController } from "../../../resources/mongodb";
-
-const appsDatabases = ["admin", "nimentas"] as const;
+import { MongoDBCommunityController } from "#resources/mongodb/index.js";
 
 export const apps = new MongoDBCommunityController("mongodb-apps", {
-  dbs: appsDatabases,
+  dbs: ["admin", "nimentas"],
   mdbc: {
     metadata: {
-        name: "mongodb-apps",
+      name: "mongodb-apps",
     },
     spec: {
       type: "ReplicaSet",
@@ -48,11 +46,11 @@ export const apps = new MongoDBCommunityController("mongodb-apps", {
 const config = new pulumi.Config();
 
 apps.addUser({
-    name: "ni",
-    db: "admin",
-    password: config.requireSecret("mongodb/admin-password"),
-    roles: appsDatabases.map((db) => ({
-        name: "root",
-        db,
-    })),
+  name: "ni",
+  db: "admin",
+  password: config.requireSecret("mongodb/admin-password"),
+  roles: apps.dbs.map((db) => ({
+    name: "root",
+    db,
+  })),
 });

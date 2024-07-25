@@ -1,0 +1,6 @@
+encryptionsalt: v1:upriG3hjats=:v1:Mjju6ZYDjjKKyVPn:Bn6nuCMHoUCltZWaXycxDl5bvv7ndA==
+config:
+  niployments:mongodb/admin-password:
+    secure: v1:GXCb2z0V4Az3053O:y6EgjlKVYr6BWebVazmAmdC/YCI=
+  niployments:mongodb/nimentas-password:
+    secure: v1:HxF47P+9RXfi4nfc:47vWUGoYJgjmqxaWwT2M8SSCgI0=
