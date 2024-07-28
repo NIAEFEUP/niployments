@@ -36,7 +36,7 @@ spec:
           name: sinf-website-2023-secret
 
   storage:
-    size: 10Gi
+    size: 20Gi
     #backups are handled by cloudnative postgres
     storageClass: longhorn-strict-local-no-backup
 
