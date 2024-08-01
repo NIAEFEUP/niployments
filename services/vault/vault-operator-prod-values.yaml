@@ -1,7 +1,7 @@
 defaultVaultConnection:
   enabled: true
   address: "https://vault.vault.svc.cluster.local:8200"
-  skipTLSVerify: false
+  skipTLSVerify: true
 controller:
   manager:
     clientCache:

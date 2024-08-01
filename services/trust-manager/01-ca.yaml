@@ -1,23 +1,15 @@
 apiVersion: cert-manager.io/v1
-kind: Certificate
+kind: ClusterIssuer
 metadata:
-  name: website-cert
-  namespace: vault
+  name: trust-manager-selfsigned-issuer
 spec:
-  secretName: website-cert
-  issuerRef:
-    name: letsencrypt-production
-    kind: ClusterIssuer
-  commonName: vault.niaefeup.pt
-  dnsNames:
-    - vault.niaefeup.pt
+  selfSigned: {}
 ---
 
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: trust-manager-example-ca
-  namespace: vault
 spec:
   isCA: true
   commonName: trust-manager-ca

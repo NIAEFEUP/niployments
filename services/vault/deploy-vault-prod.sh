@@ -6,6 +6,7 @@ helm repo update
 kubectl apply -f "$(dirname "$0")"/00-namespaces.yaml
 kubectl apply -f "$(dirname "$0")"/01-certificates.yaml
 kubectl apply -f "$(dirname "$0")"/02-ingress-routes.yaml
+# kubectl apply -f "$(dirname "$0")"/03-bundle.yaml
 kubectl apply -f "$(dirname "$0")"/vault-sa.yaml
 
 helm upgrade --install vault hashicorp/vault --namespace vault --values $(dirname $0)/vault-prod-values.yaml
