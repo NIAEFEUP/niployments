@@ -1,42 +1,52 @@
 #https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration
+global:
+  enabled: true
+  tlsDisable: false
+  namespace: vault
+
 server:
   dev:
     enabled: false
   logLevel: debug
+  volumes:
+    - name: tls
+      secret:
+        secretName: vault-cluster-ca-secret
+  volumeMounts:
+    - name: tls
+      mountPath: "/opt/vault/tls"
+      readOnly: true
+
 ui:
   enabled: true
-  serviceType: "ClusterIP"
-  externalPort: 80
+  serviceType: "LoadBalancer"
+  targetPort: 8200
+  externalPort: 8200
 
 dataStorage:
   enabled: true
   size: 2Gi
   storageClass: longhorn-locality-retain
-  mountPath: "opt/vault/raft"
+  mountPath: "/opt/vault/raft"
   accessMode: ReadWriteOnce
 
 ha:
   enabled: true
   config: |
+    ui = true
     disable_mlock = true # avoids out of memory errors by blocking swapping of its virtual pages
     
     listener "tcp" {
       address = "0.0.0.0:8200"
-      tls_cert_file      = "/opt/vault/tls/vault-cert.pem"
-      tls_key_file       = "/opt/vault/tls/vault-key.pem"
-      tls_client_ca_file = "/opt/vault/tls/vault-ca.pem" # certificate of the CA root
+      cluster_address = "0.0.0.0:8201"
+      tls_disable = false
+      tls_cert_file      = "/opt/vault/tls/tls.crt"
+      tls_key_file       = "/opt/vault/tls/tls.key"
+      tls_client_ca_file = "/opt/vault/tls/ca.crt" # certificate of the CA root
     }
 
     storage "raft" {
-      path    = "/opt/vault/raft"
-
-      #retry_join {
-      #  leader_tls_servername   = "vault"
-      #  leader_api_addr         = "https://0.0.0.0:8200"
-      #  leader_ca_cert_file     = "/opt/vault/tls/vault-ca.pem"
-      #  leader_client_cert_file = "/opt/vault/tls/vault-cert.pem"
-      #   leader_client_key_file  = "/opt/vault/tls/vault-key.pem"
-      #}
+      path = "/opt/vault/raft"
     }
   raft:
     enabled: true

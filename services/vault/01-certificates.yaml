@@ -11,3 +11,21 @@ spec:
   commonName: vault.niaefeup.pt
   dnsNames:
     - vault.niaefeup.pt
+---
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vault-cluster-ca
+  namespace: vault
+spec:
+  isCA: true
+  commonName: "*"
+  secretName: vault-cluster-ca-secret
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: trust-manager-selfsigned-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
