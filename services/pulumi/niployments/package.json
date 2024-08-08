@@ -1,0 +1,36 @@
+{
+    "name": "@niaefeup/niployments-pulumi",
+    "main": "bin/index.js",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "lint": "eslint --max-warnings=0 .",
+        "lint:fix": "eslint --fix .",
+        "prettier": "prettier --check .",
+        "prettier:fix": "prettier --write .",
+        "build": "tsc",
+        "build:watch": "tsc --watch",
+        "check": "pnpm run lint && pnpm run prettier"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.7.0",
+        "@types/eslint__js": "^8.42.3",
+        "@types/node": "^18.19.39",
+        "eslint": "^9.7.0",
+        "eslint-plugin-only-warn": "^1.1.0",
+        "prettier": "3.3.3",
+        "typescript": "^5.5.3",
+        "typescript-eslint": "8.0.0-alpha.44"
+    },
+    "dependencies": {
+        "@pulumi/crds": "workspace:^",
+        "@pulumi/kubernetes": "^4.14.0",
+        "@pulumi/pulumi": "^3.121.0"
+    },
+    "imports": {
+        "#resources/*": "./bin/resources/*",
+        "#services/*": "./bin/services/*",
+        "#utils/*": "./bin/utils/*"
+    },
+    "packageManager": "pnpm@9.1.0+sha512.67f5879916a9293e5cf059c23853d571beaf4f753c707f40cb22bed5fb1578c6aad3b6c4107ccb3ba0b35be003eb621a16471ac836c87beb53f9d54bb4612724"
+}

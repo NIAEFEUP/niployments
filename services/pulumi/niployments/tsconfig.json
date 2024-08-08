@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "experimentalDecorators": true,
+    "outDir": "bin",
+    "target": "ESNext",
+    "sourceMap": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "pretty": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "rootDir": ".",
+    "paths": {
+      "#resources/*": ["./resources/*"],
+      "#services/*": ["./services/*"],
+      "#utils/*": ["./utils/*"]
+    }
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "bin", "crds"]
+}

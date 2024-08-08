@@ -1,0 +1,30 @@
+name: pulumi-lint
+
+on:
+  pull_request: 
+    branches: [ "main" ]
+    paths: [ "services/pulumi/**" ]
+  push:
+    branches: [ "main" ]
+    paths: [ "services/pulumi/**" ]
+
+jobs:
+  format:
+    name: Prettier
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/prepare-pulumi-project
+      - name: Run prettier
+        working-directory: services/pulumi/niployments
+        run: pnpm run prettier
+
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/prepare-pulumi-project
+      - name: Run ESLint
+        working-directory: services/pulumi/niployments
+        run: pnpm run lint

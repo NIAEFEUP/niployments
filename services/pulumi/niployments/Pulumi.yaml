@@ -1,0 +1,7 @@
+name: niployments
+runtime: nodejs
+description: Pulumi program to manage the niployments cluster
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: kubernetes-typescript
