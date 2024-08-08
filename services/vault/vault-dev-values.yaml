@@ -1,0 +1,23 @@
+#https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration
+server:
+  dev:
+    enabled: true
+    devRootToken: "root"
+  logLevel: debug
+  # A service is not needed since we are not going to be using the vault agent injector
+ui:
+  enabled: true
+  serviceType: "LoadBalancer"
+  targetPort: 8200
+  externalPort: 8200
+
+ha:
+  enabled: true
+  raft:
+    enabled: true
+
+volumes:
+  - name: vault-secrets-volume  
+
+injector:
+  enabled: "false"
