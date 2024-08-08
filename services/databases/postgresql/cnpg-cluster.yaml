@@ -40,6 +40,10 @@ spec:
     #backups are handled by cloudnative postgres
     storageClass: longhorn-strict-local-no-backup
 
+  postgresql:
+    parameters:
+      max_slot_wal_keep_size: "10GB"
+
   backup:
     barmanObjectStore:
       destinationPath: s3://niployments-postgres-backup/
