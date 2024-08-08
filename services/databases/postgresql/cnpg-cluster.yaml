@@ -3,6 +3,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cnpg-cluster
+  namespace: pg
 spec:
   instances: 3
 
@@ -35,5 +36,39 @@ spec:
           name: sinf-website-2023-secret
 
   storage:
-    size: 10Gi
-    storageClass: longhorn-strict-local-retain
+    size: 20Gi
+    #backups are handled by cloudnative postgres
+    storageClass: longhorn-strict-local-no-backup
+
+  postgresql:
+    parameters:
+      max_slot_wal_keep_size: "10GB"
+
+  backup:
+    barmanObjectStore:
+      destinationPath: s3://niployments-postgres-backup/
+      endpointURL: https://52d22ed664e31a094229250acd87ccfb.eu.r2.cloudflarestorage.com
+      s3Credentials:
+        accessKeyId:
+          name: cnpg-backup-secret
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: cnpg-backup-secret
+          key: ACCESS_SECRET_KEY
+      wal:
+        compression: gzip
+    retentionPolicy: "15d"
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: cluster-backup-object-store
+  namespace: pg
+spec:
+  cluster:
+    name: cnpg-cluster
+  method: barmanObjectStore
+  #Run on sundays, tuesdays and thursdays
+  schedule: '0 0 0 * * 0,2,4'
+  backupOwnerReference: cluster
+  immediate: true

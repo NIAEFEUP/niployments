@@ -4,10 +4,13 @@
 
 pods=$(cat $(dirname $0)/cnpg-cluster.yaml | awk '{if ($1 == "instances:") print $2}')
 
-kubectl apply --server-side -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.22/releases/cnpg-1.22.2.yaml
+# NOTE(luisd): https://cloudnative-pg.io/documentation/1.23/installation_upgrade/#server-side-apply-of-manifests 
+#  they recommend force conflicts because such errors might happend when upgrading the controler
+kubectl apply --server-side --force-conflicts -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.23/releases/cnpg-1.23.2.yaml
 kubectl wait --for=condition=available=true -n cnpg-system deployment/cnpg-controller-manager --timeout=120s
 
 kubectl create namespace pg
+kubectl apply -f $(dirname $0)/cnpg-backup-secrets.yaml -n pg
 kubectl apply -f $(dirname $0)/cnpg-secrets.yaml -n pg
 kubectl apply -f $(dirname $0)/cnpg-cluster.yaml -n pg
 sleep 5  # Wait a little bit for first pod to be created
