@@ -15,4 +15,4 @@ parameters:
   replicaAutoBalance: "least-effort"
 #  diskSelector: "ssd,fast"
 #  nodeSelector: "storage,fast"
-  recurringJobSelector: '[{"name":"default", "isGroup":true},{"name":"backup", "isGroup":false}]'
+  recurringJobSelector: '[{"name":"default", "isGroup":true},{"name":"backup", "isGroup":true}]'
