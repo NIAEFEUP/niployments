@@ -1,0 +1,46 @@
+name: "Prepare Pulumi project"
+description: "Installs dependencies and clones the project"
+inputs:
+  node-version:
+    description: "Node version"
+    required: false
+    default: "22"
+  crd2pulumi-version:
+    description: "crd2pulumi version"
+    required: false
+    default: "v1.4.0"
+  yq-version:
+    description: "yq version"
+    required: false
+    default: "v4.40.3"
+runs:
+  using: composite
+  steps:
+
+    - name: Install yq
+      shell: sh
+      run: sudo curl -L https://github.com/mikefarah/yq/releases/download/${{ inputs.yq-version }}/yq_linux_amd64 -o /usr/bin/yq && sudo chmod +x /usr/bin/yq
+  
+    - name: Install crd2pulumi
+      shell: sh
+      run: |
+        mkdir -p ./bin/crd2pulumi
+        cd ./bin/crd2pulumi
+        echo "crd2pulumi" > files.txt
+        curl -L https://github.com/pulumi/crd2pulumi/releases/download/${{ inputs.crd2pulumi-version }}/crd2pulumi-${{ inputs.crd2pulumi-version }}-linux-amd64.tar.gz | tar -T files.txt -xvz
+        sudo mv crd2pulumi /usr/bin/crd2pulumi
+        sudo chmod +x /usr/bin/crd2pulumi
+  
+    - uses: pnpm/action-setup@v4
+      with:
+        package_json_file: services/pulumi/package.json
+  
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: "pnpm"
+        cache-dependency-path: services/pulumi/pnpm-lock.yaml
+  
+    - name: Sync CRDs
+      shell: sh
+      run: ./services/pulumi/sync-crds.sh
