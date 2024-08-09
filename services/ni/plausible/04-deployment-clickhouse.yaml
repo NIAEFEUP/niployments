@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: clickhouse
-        image: clickhouse/clickhouse-server:23.3.7.5-alpine
+        image: clickhouse/clickhouse-server:24.3.3.102-alpine
         resources:
           limits:
             memory: "2048Mi"
