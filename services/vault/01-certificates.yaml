@@ -21,6 +21,10 @@ metadata:
 spec:
   isCA: true
   commonName: "*"
+  ipAddresses:
+    - 127.0.0.1
+  dnsNames:
+    - vault.vault.svc.cluster.local
   secretName: vault-cluster-ca-secret
   privateKey:
     algorithm: ECDSA

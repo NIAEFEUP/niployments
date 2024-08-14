@@ -8,6 +8,10 @@ server:
   dev:
     enabled: false
   logLevel: debug
+  extraEnvironmentVars:
+      VAULT_CACERT: /opt/vault/tls/ca.crt
+      VAULT_TLSCERT: /opt/vault/tls/tls.crt
+      VAULT_TLSKEY: /opt/vault/tls/tls.key
   volumes:
     - name: tls
       secret:

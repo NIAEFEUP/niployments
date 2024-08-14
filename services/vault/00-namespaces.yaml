@@ -2,10 +2,3 @@ kind: Namespace
 apiVersion: v1
 metadata:
   name: vault
-
----
-
-kind: Namespace
-apiVersion: v1
-metadata:
-  name: vault-operator

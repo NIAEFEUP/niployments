@@ -1,7 +1,9 @@
+# https://github.com/hashicorp/vault-secrets-operator/blob/main/chart/values.yaml
 defaultVaultConnection:
   enabled: true
   address: "https://vault.vault.svc.cluster.local:8200"
   skipTLSVerify: false
+  caCertSecret: "vault-cluster-ca-secret"
 controller:
   manager:
     clientCache:

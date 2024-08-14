@@ -9,4 +9,4 @@ kubectl apply -f "$(dirname "$0")"/02-ingress-routes.yaml
 kubectl apply -f "$(dirname "$0")"/vault-sa.yaml
 
 helm upgrade --install vault hashicorp/vault --namespace vault --values $(dirname $0)/vault-dev-values.yaml
-helm upgrade --install vault-secrets-operator hashicorp/vault-secrets-operator --namespace vault-operator --values $(dirname $0)/vault-operator-dev-values.yaml
+helm upgrade --install vault-secrets-operator hashicorp/vault-secrets-operator --namespace vault --values $(dirname $0)/vault-operator-dev-values.yaml
