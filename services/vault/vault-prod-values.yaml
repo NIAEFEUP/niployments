@@ -16,6 +16,34 @@ server:
     - name: tls
       mountPath: "/opt/vault/tls"
       readOnly: true
+  dataStorage:
+    enabled: true
+    size: 2Gi
+    storageClass: longhorn-locality-retain
+    mountPath: "/opt/vault/raft"
+    accessMode: ReadWriteOnce
+  ha:
+    enabled: true
+    raft:
+      enabled: true
+      replicas: 3
+      setNodeId: true
+      config: |
+        ui = true
+        disable_mlock = true # avoids out of memory errors by blocking swapping of its virtual pages
+    
+        listener "tcp" {
+          address = "0.0.0.0:8200"
+          cluster_address = "0.0.0.0:8201"
+          tls_disable = "false"
+          tls_cert_file      = "/opt/vault/tls/tls.crt"
+          tls_key_file       = "/opt/vault/tls/tls.key"
+          tls_client_ca_file = "/opt/vault/tls/ca.crt" # certificate of the CA root
+        }
+
+        storage "raft" {
+          path = "/opt/vault/raft"
+        }
 
 ui:
   enabled: true
@@ -23,34 +51,7 @@ ui:
   targetPort: 8200
   externalPort: 8200
 
-dataStorage:
-  enabled: true
-  size: 2Gi
-  storageClass: longhorn-locality-retain
-  mountPath: "/opt/vault/raft"
-  accessMode: ReadWriteOnce
 
-ha:
-  enabled: true
-  config: |
-    ui = true
-    disable_mlock = true # avoids out of memory errors by blocking swapping of its virtual pages
-    
-    listener "tcp" {
-      address = "0.0.0.0:8200"
-      cluster_address = "0.0.0.0:8201"
-      tls_disable = false
-      tls_cert_file      = "/opt/vault/tls/tls.crt"
-      tls_key_file       = "/opt/vault/tls/tls.key"
-      tls_client_ca_file = "/opt/vault/tls/ca.crt" # certificate of the CA root
-    }
-
-    storage "raft" {
-      path = "/opt/vault/raft"
-    }
-  raft:
-    enabled: true
-    replicas: 3
        
 injector:
   enabled: "false"

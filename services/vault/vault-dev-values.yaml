@@ -11,13 +11,5 @@ ui:
   targetPort: 8200
   externalPort: 8200
 
-ha:
-  enabled: true
-  raft:
-    enabled: true
-
-volumes:
-  - name: vault-secrets-volume  
-
 injector:
   enabled: "false"
