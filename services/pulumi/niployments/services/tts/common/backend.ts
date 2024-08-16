@@ -58,9 +58,9 @@ export class TTSBackend extends pulumi.ComponentResource {
                     {
                       secretRef: {
                         name: args.envSecretRef,
-                      }
+                      },
                     },
-                  ]
+                  ],
                 },
               ],
               imagePullSecrets: [
