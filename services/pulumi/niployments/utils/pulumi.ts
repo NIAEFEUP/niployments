@@ -62,3 +62,17 @@ export function concat<
     )
     .apply((val) => structuredClone(val)); // structuredClone is needed to ensure values remains readonly
 }
+
+export function ensureOutputIsDefined<T>(output: pulumi.Output<T | undefined> | undefined) {
+  if (output == undefined) {
+      throw new Error("output is undefined");
+  }
+
+  return output.apply(value => {
+      if (value == undefined) {
+          throw new Error("output is undefined");
+      }
+
+      return value;
+  });
+}
