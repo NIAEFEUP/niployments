@@ -1,0 +1,108 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema",
+    "$id": "https://niployments.niaefeup.pt/schemas/crds.schema.json",
+    "title": "CRDs Download Configuration",
+    "description": "Configuration for the download and extraction of CRDs, used for Pulumi-based resources",
+    "type": "object",
+    "required": ["manifests"],
+    "additionalProperties": false,
+    "properties": {
+        "repositories": {
+            "description": "List of repositories to add to the Helm client",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": ["name", "url"],
+                "additionalProperties": false,
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "manifests": {
+            "description": "List of manifests to download and extract CRDs from",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "oneOf": [
+                    {
+                        "type":"object",
+                        "required": ["type", "chart"],
+                        "additionalProperties": false,
+                        "properties": {
+                            "type": {
+                                "description": "Method for downloading the CRDs",
+                                "type": "string",
+                                "enum": ["helm"]
+                            },
+                            "chart": {
+                                "description": "Name of the Helm chart to download",
+                                "type": "string",
+                                "examples": ["traefik/traefik"]
+                            },
+                            "version": {
+                                "description": "Version of the Helm chart to download",
+                                "type": "string",
+                                "examples": ["28.3.0"]
+                            }
+                        }
+                    },
+                    {
+                        "type":"object",
+                        "required": ["type", "chart"],
+                        "additionalProperties": false,
+                        "properties": {
+                            "type": {
+                                "description": "Method for downloading the CRDs",
+                                "type": "string",
+                                "enum": ["template"]
+                            },
+                            "chart": {
+                                "description": "Name of the Helm chart to download",
+                                "type": "string",
+                                "examples": ["jetstack/cert-manager"]
+                            },
+                            "version": {
+                                "description": "Version of the Helm chart to download",
+                                "type": "string",
+                                "examples": ["v1.14.7"]
+                            },
+                            "options": {
+                                "description": "Options to pass to the Helm template command",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type":"object",
+                        "required": ["type", "name", "url"],
+                        "additionalProperties": false,
+                        "properties": {
+                            "type": {
+                                "description": "Method for downloading the CRDs",
+                                "type": "string",
+                                "enum": ["curl"]
+                            },
+                            "name": {
+                                "description": "Name of the manifest to download",
+                                "type": "string",
+                                "examples": ["cloudnative-pg/cloudnative-pg"]
+                            },
+                            "url": {
+                                "description": "URL to download the chart from",
+                                "type": "string"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}
