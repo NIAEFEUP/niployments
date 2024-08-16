@@ -16,7 +16,7 @@ export class Prefixer<const T extends string> {
   public deployment() {
     return this.create("deployment");
   }
-  
+
   public service() {
     return this.create("service");
   }
@@ -33,6 +33,3 @@ export class Prefixer<const T extends string> {
     return this.create("namespace");
   }
 }
-
-
-
