@@ -30,7 +30,7 @@ export class TTSBackend extends pulumi.ComponentResource {
           annotations: {
             "keel.sh/policy": "force",
             "keel.sh/match-tag": "true",
-          }
+          },
         },
         spec: {
           replicas: 1,
