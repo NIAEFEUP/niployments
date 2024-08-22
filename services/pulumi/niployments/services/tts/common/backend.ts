@@ -27,6 +27,10 @@ export class TTSBackend extends pulumi.ComponentResource {
       {
         metadata: {
           namespace: args.namespace,
+          annotations: {
+            "keel.sh/policy": "force",
+            "keel.sh/match-tag": "true",
+          }
         },
         spec: {
           replicas: 1,
