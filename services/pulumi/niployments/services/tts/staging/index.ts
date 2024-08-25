@@ -9,7 +9,7 @@ import { namespace } from "./namespace.js";
 const branch = "develop";
 const primaryHost = "tts-staging.niaefeup.pt";
 
-const config = new pulumi.Config("tts:staging");
+const config = new pulumi.Config("tts-staging");
 
 const frontend = new TTSFrontend(prefixer.create("frontend"), {
   namespace: namespace.metadata.name,
