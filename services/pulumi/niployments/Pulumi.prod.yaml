@@ -1,6 +1,8 @@
-encryptionsalt: v1:upriG3hjats=:v1:Mjju6ZYDjjKKyVPn:Bn6nuCMHoUCltZWaXycxDl5bvv7ndA==
+encryptionsalt: v1:vcKJMHA+4iI=:v1:e3jUh+xx0WgDWY6G:q2pOOhKgl7SGqFxV8uvsb1Kk7Ak9oA==
 config:
+  niployments:minio/root-secret:
+    secure: v1:kvZP8Y8P467RUkhA:x26ulATfs7XIw0T4NH4VUCtcKmRLew==
   niployments:mongodb/admin-password:
-    secure: v1:GXCb2z0V4Az3053O:y6EgjlKVYr6BWebVazmAmdC/YCI=
+    secure: v1:+r7V2XJ515b5e9G4:tNcpo4Lqkz5nnplay+3ev3xoAvYDgQ==
   niployments:mongodb/nimentas-password:
-    secure: v1:HxF47P+9RXfi4nfc:47vWUGoYJgjmqxaWwT2M8SSCgI0=
+    secure: v1:ud1QrQI7peJMh0OC:I2QeTvr+r9kiFtqWjMk75C7Aimk/ow==
