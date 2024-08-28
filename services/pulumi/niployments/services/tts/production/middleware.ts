@@ -33,7 +33,7 @@ const redirectToPrimaryAddressMiddleware = new crds.traefik.v1alpha1.Middleware(
     },
     spec: {
       redirectRegex: {
-        regex: "^https://ni.fe.up.pt/tts/(.*)",
+        regex: "^https://ni.fe.up.pt/tts/?(.*)",
         replacement: "https://tts.niaefeup.pt/$1",
         permanent: false,
       },
