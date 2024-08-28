@@ -86,6 +86,10 @@ new crds.traefik.v1alpha1.IngressRoute(
           kind: "Rule",
           match: `Host(\`ni.fe.up.pt\`) && PathPrefix(\`/tts\`)`,
           middlewares: [redirectToPrimaryAddress],
+          services: [{
+            kind: "TraefikService",
+            name: "noop@internal"
+          }]
         },
       ],
       tls: {
