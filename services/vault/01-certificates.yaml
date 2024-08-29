@@ -25,6 +25,9 @@ spec:
     - 127.0.0.1
   dnsNames:
     - vault.vault.svc.cluster.local
+    - vault-0.vault-internal
+    - vault-1.vault-internal
+    - vault-2.vault-internal
   secretName: vault-cluster-ca-secret
   privateKey:
     algorithm: ECDSA

@@ -47,6 +47,35 @@ server:
 
         storage "raft" {
           path = "/opt/vault/raft"
+
+          retry_join {
+            leader_api_addr = "https://vault-0.vault-internal:8200"
+            leader_ca_cert_file = "/opt/vault/tls/ca.crt"
+            leader_client_cert_file = "/opt/vault/tls/tls.crt"
+            leader_client_key_file = "/opt/vault/tls/tls.key"
+          }
+
+          retry_join {
+            leader_api_addr = "https://vault-1.vault-internal:8200"
+            leader_ca_cert_file = "/opt/vault/tls/ca.crt"
+            leader_client_cert_file = "/opt/vault/tls/tls.crt"
+            leader_client_key_file = "/opt/vault/tls/tls.key"
+          }
+
+          retry_join {
+            leader_api_addr = "https://vault-2.vault-internal:8200"
+            leader_ca_cert_file = "/opt/vault/tls/ca.crt"
+            leader_client_cert_file = "/opt/vault/tls/tls.crt"
+            leader_client_key_file = "/opt/vault/tls/tls.key"
+          }
+
+          autopilot {
+            cleanup_dead_servers = "true"
+            last_contact_threshold = "10s"
+            max_trailing_logs = 250000
+            min_quorum = 2
+            server_stabilization_time = "10s"
+          }
         }
 
 ui:

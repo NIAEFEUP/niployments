@@ -12,7 +12,7 @@ controller:
         enabled: true
         mount: demo-auth-mount
         keyName: vso-client-cache
-        namespace: vault-operator
+        namespace: vault
         transitMount: demo-transit
         kubernetes:
           role: auth-role-operator
