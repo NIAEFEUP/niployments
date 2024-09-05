@@ -19,7 +19,7 @@ metadata:
   name: vault-cluster-ca
   namespace: vault
 spec:
-  isCA: true
+  isCA: false
   commonName: "*"
   ipAddresses:
     - 127.0.0.1

@@ -7,6 +7,7 @@ global:
 server:
   dev:
     enabled: false
+  affinity: null
   logLevel: debug
   extraEnvironmentVars:
       VAULT_CACERT: /opt/vault/tls/ca.crt
@@ -83,8 +84,6 @@ ui:
   serviceType: "LoadBalancer"
   targetPort: 8200
   externalPort: 8200
-
-
        
 injector:
   enabled: "false"
