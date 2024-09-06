@@ -11,3 +11,47 @@ data:
   SMTP_HOST_PORT: "465"
   BASE_URL: https://plausible.niaefeup.pt
   CLICKHOUSE_DATABASE_URL: http://plausible-events-db:8123/plausible_events_db
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clickhouse-config
+  namespace: plausible-ni
+data:
+  docker_related_config.xml: |
+    <clickhouse>
+        <!-- Listen wildcard address to allow accepting connections from other containers and host network. -->
+        <listen_host>::</listen_host>
+        <listen_host>0.0.0.0</listen_host>
+        <listen_try>1</listen_try>
+
+        <!--
+        <logger>
+            <console>1</console>
+        </logger>
+        -->
+    </clickhouse>
+  z_log_disable.xml: |
+    <?xml version="1.0"?>
+    <clickhouse>
+        <asynchronous_metric_log remove="1"/>
+        <backup_log remove="1"/>
+        <metric_log remove="1"/>
+        <part_log remove="1"/>
+        <session_log remove="1"/>
+        <text_log remove="1" />
+        <trace_log remove="1"/>
+        <crash_log remove="1"/>
+        <opentelemetry_span_log remove="1"/>
+        <zookeeper_log remove="1"/>
+        <processors_profile_log remove="1"/>
+    </clickhouse>
+  query_log_ttl.xml: |
+    <?xml version="1.0"?>
+    <clickhouse>
+        <query_log>
+            <database>system</database>
+            <table>query_log</table>
+            <ttl>event_date + INTERVAL 30 DAY DELETE</ttl>
+        </query_log>
+    </clickhouse>
