@@ -7,13 +7,6 @@ metadata:
 spec:
   instances: 3
 
-  bootstrap:
-    initdb:
-      database: tts-db
-      owner: tts
-      secret:
-        name: tts-secret
-
   managed:
     roles:
       - name: ni
@@ -34,6 +27,18 @@ spec:
         login: true
         passwordSecret:
           name: sinf-website-2023-secret
+      - name: tts
+        ensure: present
+        createdb: false
+        login: true
+        passwordSecret:
+          name: tts-secret
+      - name: tts-staging
+        ensure: present
+        createdb: false
+        login: true
+        passwordSecret:
+          name: tts-staging-secret
 
   storage:
     size: 20Gi
