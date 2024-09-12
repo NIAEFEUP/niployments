@@ -18,17 +18,22 @@ spec:
         image: clickhouse/clickhouse-server:24.3.3.102-alpine
         resources:
           limits:
-            memory: "2048Mi"
+            memory: "3072Mi"
             cpu: "500m"
         ports:
         - containerPort: 8123
         volumeMounts:
           - name: clickhouse-db
             mountPath: /var/lib/clickhouse
+          - name: config-volume
+            mountPath: /etc/clickhouse-server/config.d
       volumes:
         - name: clickhouse-db
           persistentVolumeClaim:
             claimName: plausible-events-db-no-backup
+        - name: config-volume
+          configMap:
+            name: clickhouse-config
 ---
 apiVersion: v1
 kind: Service
