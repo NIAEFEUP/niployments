@@ -1,0 +1,12 @@
+grafana:
+  enabled: true
+  adminPassword: tosta-mista-789  # TODO: Change password
+
+  aditionalDataSources:
+    - name: Loki
+      type: loki
+      # basicAuth: true
+      # basicAuthUser: ni
+      # basicAuthPassword: pass  # TODO: Change password
+      url: http://logging-loki-gateway.loki.svc.cluster.local
+      isDefault: true
