@@ -7,6 +7,63 @@
         vrrp_secret: "{{ lookup('password', '/dev/null length=64 chars=ascii_letters') }}"
       delegate_to: localhost
       run_once: true
+
+    - name: Read and register interface
+      changed_when: true
+      ansible.builtin.command: grep 'Name=' /etc/systemd/network/01-external.network
+      register: interface
+
+    - name: Set interface fact
+      ansible.builtin.set_fact:
+        external_interface: "{{ interface.stdout.split('=')[1] }}"
+
+    - name: Get master IP details
+      when: master == "true"
+      block:
+        - name: Get master MAC override
+          changed_when: true
+          ansible.builtin.command: grep 'MACAddress=' /etc/systemd/network/01-external.network
+          register: mac_address
+          ignore_errors: true # it's fine because the MACAddress override might not even exist (vagrant or another configuration)
+
+        - name: Set global master MAC override fact
+          ansible.builtin.set_fact:
+            master_mac_override: "{{ mac_address.stdout.split('=')[1] if mac_address.stdout else None }}"
+          delegate_to: "{{ item }}"
+          delegate_facts: true
+          with_items: "{{ groups['routers'] }}"
+
+        - name: Set global master facts
+          ansible.builtin.set_fact:
+            master_ipv4: "{{ ansible_facts[external_interface]['ipv4'] }}"
+          delegate_to: "{{ item }}"
+          delegate_facts: true
+          with_items: "{{ groups['routers'] }}"
+
+    - name: Get child IP details
+      when: master == "false"
+      block:
+        - name: Get secondary MAC override
+          changed_when: true
+          ansible.builtin.command: grep 'MACAddress=' /etc/systemd/network/01-external.network
+          register: mac_address
+          ignore_errors: true # it's fine because the MACAddress override might not even exist (vagrant or another configuration)
+
+
+        - name: Set secondary MAC override fact
+          ansible.builtin.set_fact:
+            secondary_mac_override: "{{ mac_address.stdout.split('=')[1] if mac_address.stdout else None }}"
+          delegate_to: "{{ item }}"
+          delegate_facts: true
+          with_items: "{{ groups['routers'] }}"
+
+        - name: Set global secondary facts
+          ansible.builtin.set_fact:
+            secondary_ipv4: "{{ ansible_facts[external_interface]['ipv4'] }}"
+          delegate_to: "{{ item }}"
+          delegate_facts: true
+          with_items: "{{ groups['routers'] }}"
+
     - name: Install Keepalived
       become: true
       ansible.builtin.apt:
@@ -19,18 +76,18 @@
         mode: "744"
     - name: Copy notify script
       become: true
-      ansible.builtin.copy:
-        src: templates/vrrp-notify-script.sh
+      ansible.builtin.template:
+        src: templates/vrrp-notify-script.sh.j2
         dest: /etc/keepalived/vrrp-notify-script.sh
         mode: "777"
-    - name: Configure Keepalived
-      become: true
-      ansible.builtin.template:
-        src: templates/keepalived.conf.j2
-        dest: /etc/keepalived/keepalived.conf
-        mode: "644"
-    - name: Restart Keepalived
-      become: true
-      ansible.builtin.systemd:
-        name: keepalived
-        state: restarted
+    # - name: Configure Keepalived
+    #   become: true
+    #   ansible.builtin.template:
+    #     src: templates/keepalived.conf.j2
+    #     dest: /etc/keepalived/keepalived.conf
+    #     mode: "644"
+    # - name: Restart Keepalived
+    #   become: true
+    #   ansible.builtin.systemd:
+    #     name: keepalived
+    #     state: restarted

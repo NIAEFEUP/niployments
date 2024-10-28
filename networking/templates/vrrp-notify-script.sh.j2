@@ -6,6 +6,14 @@ STATE=$3
 
 case $STATE in
         "MASTER") systemctl start haproxy
+                  ip link set dev {{ external_interface }} down
+                  ip addr flush dev {{ external_interface }} 
+                  {% if master_mac_override != "" %}
+                  ip link set dev {{ external_interface }} address {{ master_mac_override }}
+                  {% endif %}
+                  ip addr add {{master_ipv4['address']}}/{{master_ipv4['prefix']}} dev {{ external_interface }}
+                  ip route add default via {{master_ipv4['gateway']}}
+                  ip link set dev {{ external_interface }} up
                   exit 0
                   ;;
         "BACKUP") systemctl stop haproxy

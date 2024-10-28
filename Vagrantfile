@@ -61,10 +61,6 @@ def configure_router(i, config)
             :ip => "10.69.0."+ (i+1).to_s,
             :libvirt__dhcp_enable => false
 
-            router.vm.provision "shell",
-            run: "always",
-            inline: "ip r add default via 10.69.0.1" 
-
             #NOTE (luisd): i think virtualbox doesnt have this problem
             # it mostly applies to wireless configs or  you don't want to
             # expose the router to your network
