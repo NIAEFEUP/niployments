@@ -53,7 +53,7 @@ export class MongoDBCommunityController<
     opts?: pulumi.ComponentResourceOptions,
   ) {
     const users = new PendingValue<
-      pulumi.Input<crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs>[]
+      pulumi.Input<crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsers>[]
     >([]);
 
     super(
@@ -164,7 +164,7 @@ export class MongoDBCommunityController<
             name: credentialsSecret.metadata.name,
           },
           scramCredentialsSecretName: `${this.name}-${user.name}`,
-        }) satisfies crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsersArgs,
+        }) satisfies crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecUsers,
     );
 
     this.users.run((users) => users.push(userSpec));

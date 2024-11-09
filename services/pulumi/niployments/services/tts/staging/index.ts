@@ -27,7 +27,7 @@ const backend = new TTSBackend(prefixer.create("backend"), {
 const backendService = { name: backend.name, port: backend.port };
 
 const certificateSecretName = prefixer.create("certificate-secret");
-const certificate = new crds.certmanager.v1.Certificate(
+const certificate = new crds.cert_manager.v1.Certificate(
   prefixer.certificate(),
   {
     metadata: {

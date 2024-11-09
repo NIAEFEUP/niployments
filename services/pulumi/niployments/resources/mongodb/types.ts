@@ -47,7 +47,7 @@ export type MongoDBCommunityControllerArgs<DB extends string> = {
   mdbc?: {
     metadata?: Omit<k8s.types.input.meta.v1.ObjectMeta, "namespace">;
     spec?: Omit<
-      crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpecArgs,
+      crds.types.input.mongodbcommunity.v1.MongoDBCommunitySpec,
       "users"
     >;
   };
