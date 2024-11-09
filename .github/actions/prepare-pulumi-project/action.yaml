@@ -8,11 +8,11 @@ inputs:
   crd2pulumi-version:
     description: "crd2pulumi version"
     required: false
-    default: "v1.4.0"
+    default: "v1.5.3"
   yq-version:
     description: "yq version"
     required: false
-    default: "v4.40.3"
+    default: "v4.44.1"
 runs:
   using: composite
   steps:
