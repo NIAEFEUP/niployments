@@ -7,7 +7,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 
 kubectl create namespace monitoring
-helm upgrade --install --namespace monitoring loki grafana/loki -f $(dirname $0)/loki-values.yaml --set loki.auth_enabled=false --set loki.useTestSchema=true  # Install Loki
+helm upgrade --install --namespace monitoring loki grafana/loki -f $(dirname $0)/loki-values.yaml --set loki.auth_enabled=false --set loki.schemaConfig=$(dirname $0)/loki-schema.yaml  # Install Loki
 
 helm install kube-prometheus prometheus-community/kube-prometheus-stack --namespace monitoring -f $(dirname $0)/prometheus-config.yaml  # Install Kube Prometheus Stack
 
