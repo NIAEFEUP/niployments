@@ -55,7 +55,8 @@ storageClass:
   volumeBindingMode: Immediate
 
   # Storage class annotations
-  annotations: {}
+  annotations:
+    niployments/make-pulumi-happy: "idk-why"
 
 leaderElection:
   # When set to false leader election will be disabled
