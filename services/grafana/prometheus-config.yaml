@@ -6,9 +6,6 @@ grafana:
   additionalDataSources:
     - name: Loki
       type: loki
-      # basicAuth: true
-      # basicAuthUser: ni
-      # basicAuthPassword: pass  # TODO: Change password
       access: proxy
       url: http://loki-gateway.monitoring.svc.cluster.local/
       isDefault: false
