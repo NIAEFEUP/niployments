@@ -14,5 +14,5 @@ export const chart = new k8s.helm.v4.Chart("keel-chart", {
   repositoryOpts: {
     repo: "https://charts.keel.sh",
   },
-  valueYamlFiles: [new pulumi.asset.FileAsset("./assets/keel/values.yaml"),],
+  valueYamlFiles: [new pulumi.asset.FileAsset("./assets/keel/values.yaml")],
 });

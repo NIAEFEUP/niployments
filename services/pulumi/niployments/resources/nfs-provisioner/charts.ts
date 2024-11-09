@@ -14,5 +14,7 @@ export const chart = new k8s.helm.v4.Chart("nfs-provisioner-chart", {
   repositoryOpts: {
     repo: "https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner",
   },
-  valueYamlFiles: [new pulumi.asset.FileAsset("./assets/nfs-provisioner/values.yaml")],
+  valueYamlFiles: [
+    new pulumi.asset.FileAsset("./assets/nfs-provisioner/values.yaml"),
+  ],
 });
