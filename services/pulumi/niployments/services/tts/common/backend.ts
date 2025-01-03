@@ -49,7 +49,7 @@ export class TTSBackend extends pulumi.ComponentResource {
                   imagePullPolicy: "Always",
                   resources: {
                     limits: {
-                      memory: "128Mi",
+                      memory: "256Mi",
                       cpu: "500m",
                     },
                   },
