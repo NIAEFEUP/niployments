@@ -13,8 +13,7 @@ RUN npx tailwindcss -o twd.css -m
 FROM nginx:alpine
 
 # LOGO
-COPY --from=build /app/logo-niaefeup.png /usr/share/nginx/html/logo-niaefeup.png
-COPY --from=build /app/pages /user/share/nginx/html/pages
-
+COPY --from=build /app/logo-niaefeup.png /app/twd.css /usr/share/nginx/html/
+COPY --from=build /app/pages/ /usr/share/nginx/html/pages/
 
 EXPOSE 8080
