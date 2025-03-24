@@ -8,8 +8,7 @@ image:
   pullPolicy: Always
 
 # Image pull secrets
-imagePullSecrets:
-  - harbor-pull-secret
+imagePullSecrets: []
 
 # Enable insecure registries
 insecureRegistry: false
