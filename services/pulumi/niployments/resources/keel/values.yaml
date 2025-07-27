@@ -9,7 +9,7 @@ image:
 
 # Image pull secrets
 imagePullSecrets:
-  - harbor-pull-secret
+  - name: harbor-pull-secret
 
 # Enable insecure registries
 insecureRegistry: false
