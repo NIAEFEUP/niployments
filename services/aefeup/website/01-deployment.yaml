@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website-ae
+  namespace: website-ae
+  annotations:
+    keel.sh/policy: "force"
+    keel.sh/match-tag: "true" 
+spec:
+  selector:
+    matchLabels:
+      app: website-ae
+  template:
+    metadata:
+      labels:
+        app: website-ae
+    spec:
+      containers:
+      - name: website-ae
+        image: registry.niaefeup.pt/niaefeup/website-ae:main
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "64m"
+        ports:
+        - containerPort: 80
+        imagePullPolicy: Always
+      imagePullSecrets:
+        - name: harbor-pull-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: website-ae-service
+  namespace: website-ae
+spec:
+  selector:
+    app: website-ae
+  ports:
+  - port: 80
+    targetPort: 80
+  type: "ClusterIP"
+
