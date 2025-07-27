@@ -12,8 +12,8 @@ spec:
       services:
         - name: website-ae-service
           port: 80
-  tls:
-    secretName: website-ae-cert
+            #tls:
+            #secretName: website-ae-cert
 ---
 
 apiVersion: traefik.io/v1alpha1
@@ -30,6 +30,6 @@ spec:
       services:
         - name: website-ae-service
           port: 80
-  tls:
-    secretName: website-ae-cert
+            #tls:
+            # secretName: website-ae-cert
 ---

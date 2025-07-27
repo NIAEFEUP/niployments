@@ -21,7 +21,7 @@ spec:
         image: registry.niaefeup.pt/niaefeup/website-ae:main
         resources:
           limits:
-            memory: "64Mi"
+            memory: "256Mi"
             cpu: "64m"
         ports:
         - containerPort: 80
