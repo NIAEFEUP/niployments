@@ -1,0 +1,4 @@
+encryptionsalt: v1:LLJ5ke5Ww9o=:v1:ddsG1qITNqde9ogE:Cu3HODBEwnzy6lwCDEl3tj9tUBPsCg==
+config:
+  tts-production:envSecretRef: tts-be-secret
+  tts-staging:envSecretRef: tts-be-secret
