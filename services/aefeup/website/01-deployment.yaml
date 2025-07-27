@@ -22,9 +22,9 @@ spec:
         resources:
           limits:
             memory: "256Mi"
-            cpu: "64m"
+            cpu: "500m"
         ports:
-        - containerPort: 80
+        - containerPort: 3000
         imagePullPolicy: Always
       imagePullSecrets:
         - name: harbor-pull-secret
@@ -39,6 +39,6 @@ spec:
     app: website-ae
   ports:
   - port: 80
-    targetPort: 80
+    targetPort: 3000
   type: "ClusterIP"
 

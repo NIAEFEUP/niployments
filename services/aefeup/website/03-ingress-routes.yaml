@@ -7,29 +7,13 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`aefeup.pt`)
+    - match: Host(`aefeup.pt`) || Host(`www.aefeup.pt`)
       kind: Rule
       services:
         - name: website-ae-service
           port: 80
-            #tls:
-            #secretName: website-ae-cert
+
+  tls:
+    secretName: website-ae-cert
 ---
 
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: website-ae-staging-https
-  namespace: website-ae
-spec:
-  entryPoints:
-    - websecure
-  routes:
-    - match: Host(`aefeup-staging.niaefeup.pt`)
-      kind: Rule
-      services:
-        - name: website-ae-service
-          port: 80
-            #tls:
-            # secretName: website-ae-cert
----

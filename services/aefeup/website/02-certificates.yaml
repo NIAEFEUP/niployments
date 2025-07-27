@@ -6,8 +6,9 @@ metadata:
 spec:
   secretName: website-ae-cert
   issuerRef:
-    name: letsencrypt-production
+    name: letsencrypt-aefeup
     kind: ClusterIssuer
   commonName: aefeup.pt
   dnsNames:
     - aefeup.pt
+    - www.aefeup.pt

@@ -9,6 +9,16 @@ stringData:
   api-token: <FILL-IN>
 
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflare-aefeup-api-token-secret
+  namespace: cert-manager
+type: Opaque
+stringData:
+  api-token: <FILL-IN>
+
+---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -25,6 +35,24 @@ spec:
           email: ni@aefeup.pt
           apiTokenSecretRef:
             name: cloudflare-api-token-secret
+            key: api-token
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-aefeup
+spec:
+  acme:
+    email: geral@aefeup.pt
+    privateKeySecretRef:
+      name: letsencrypt-aefeup
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+    - dns01:
+        cloudflare:
+          email: geral@aefeup.pt
+          apiTokenSecretRef:
+            name: cloudflare-aefeup-api-token-secret
             key: api-token
 ---
 apiVersion: cert-manager.io/v1
