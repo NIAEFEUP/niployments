@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: automated-scrapper
+  namespace: tts
+  annotations:
+    keel.sh/policy: "force"
+    keel.sh/match-tag: "true" 
+spec:
+  schedule: "0 */6 * * *"   # every 3 hours
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            keel.sh/policy: force
+        spec:
+          containers:
+          - name: runner
+            image: registry.niaefeup.pt/niaefeup/uporto-schedule-scrapper:master
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                apt update && apt install -y postgresql-client;
+                psql;
+                make clean;
+                make info faculties courses course_units course_metadata slots;
+                make dump;
+                make convert_postgres;
+                PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -p 5432 -U $POSTGRES_USER -d $POSTGRES_DB -f ./scripts/dump/data/01_data.sql;  
+            envFrom:
+            - secretRef:
+                name: tts-scrapper-secrets
+            imagePullPolicy: Always
+          restartPolicy: OnFailure
+          imagePullSecrets:
+            - name: harbor-pull-secret
+
