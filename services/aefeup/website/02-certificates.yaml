@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: website-ae-cert
+  namespace: website-ae
+spec:
+  secretName: website-ae-cert
+  issuerRef:
+    name: letsencrypt-aefeup
+    kind: ClusterIssuer
+  commonName: aefeup.pt
+  dnsNames:
+    - aefeup.pt
+    - www.aefeup.pt

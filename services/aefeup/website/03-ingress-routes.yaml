@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: website-ae-https
+  namespace: website-ae
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`aefeup.pt`) || Host(`www.aefeup.pt`)
+      kind: Rule
+      services:
+        - name: website-ae-service
+          port: 80
+
+  tls:
+    secretName: website-ae-cert
+---
+

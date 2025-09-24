@@ -39,6 +39,12 @@ spec:
         login: true
         passwordSecret:
           name: tts-staging-secret
+      - name: website-ae
+        ensure: present
+        createdb: false
+        login: true
+        passwordSecret:
+          name: website-ae-secret
 
   storage:
     size: 20Gi
