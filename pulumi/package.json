@@ -1,0 +1,7 @@
+{
+  "name": "@niaefeup/niployments",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "packageManager": "pnpm@10.23.0"
+}

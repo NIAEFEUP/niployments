@@ -1,0 +1,7 @@
+packages:
+  - crds/nodejs
+  - niployments
+
+onlyBuiltDependencies:
+  - '@pulumi/kubernetes'
+  - protobufjs
