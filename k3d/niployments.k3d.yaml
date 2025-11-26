@@ -1,0 +1,25 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+
+image: docker.io/rancher/k3s:v1.34.2-k3s1
+
+metadata:
+  name: niployments
+
+network: niployments-network
+
+servers: 1
+agents: 0
+
+options:
+  k3d:
+    wait: true
+
+# registries:
+#   create:
+#     name: niployments-registry
+#     host: "0.0.0.0"
+#     hostPort: "5000"
+#     image: docker.io/library/registry:2
+#     volumes:
+#       - niployments-registry:/var/lib/registry
