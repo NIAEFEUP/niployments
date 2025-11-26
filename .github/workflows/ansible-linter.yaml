@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - fix/ansible-lint
 
 
 jobs:
@@ -12,8 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get --assume-yes --no-install-recommends install python3-pip
+          python3 -m pip install --user -U ansible ansible-lint jmespath 
+
+
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@main # or version tag instead of 'main'
+        run: |
+          ansible-lint
+  
       - name: Upload sarif
         if: always()
         uses: github/codeql-action/upload-sarif@v2
