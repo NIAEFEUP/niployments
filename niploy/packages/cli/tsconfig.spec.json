@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/vitest",
+    "types": ["vitest", "vitest/importMeta", "node"],
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "vitest.config.ts",
+    "tests/**/*.spec.ts",
+    "tests/**/*.d.ts",
+    "src/**/*.d.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.lib.json"
+    }
+  ]
+}

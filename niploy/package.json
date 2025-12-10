@@ -1,0 +1,36 @@
+{
+  "name": "@niploy/source",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "nx": "nx"
+  },
+  "engines": {
+    "node": ">=24.11.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "catalog:",
+    "@nx/eslint": "catalog:",
+    "@nx/eslint-plugin": "catalog:",
+    "@nx/js": "catalog:",
+    "@nx/vitest": "catalog:",
+    "@swc-node/register": "~1.9.1",
+    "@swc/core": "catalog:",
+    "@swc/helpers": "~0.5.11",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "jsonc-eslint-parser": "catalog:",
+    "nx": "catalog:",
+    "prettier": "catalog:",
+    "tslib": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:",
+    "vite": "^7.0.0",
+    "vitest": "catalog:"
+  },
+  "packageManager": "pnpm@10.25.0"
+}
