@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nextcloud-https
+  namespace: nextcloud
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`172.28.255.205`) && PathPrefix(`/nextcloud`)
+      kind: Rule
+      services:
+        - name: nextcloud
+          port: 8080
+
+  # tls:
+  #   secretName: website-ae-cert
+---
+
