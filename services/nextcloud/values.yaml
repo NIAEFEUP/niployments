@@ -37,11 +37,11 @@ lifecycle: {}
 #   preStopCommand: []
 
 phpClientHttpsFix:
-  enabled: false
+  enabled: true
   protocol: https
 
 nextcloud:
-  host: nextcloud.kube.home
+  host: nextcloud.niaefeup.pt
   username: admin
   password: changeme
   ## Use an existing secret
@@ -61,7 +61,8 @@ nextcloud:
   persistence:
     subPath:
   # if set, we'll template this list to the NEXTCLOUD_TRUSTED_DOMAINS env var
-  trustedDomains: []
+  trustedDomains:
+    - nextcloud.niaefeup.pt
   ## SMTP configuration
   mail:
     enabled: false
@@ -342,6 +343,7 @@ postgresql:
   primary:
     persistence:
       enabled: false
+      storageClass: "longhorn-strict-local-retain" # TODO change the storage class to the selfmade one
       # Use an existing Persistent Volume Claim (must be created ahead of time)
       # existingClaim: ""
       # storageClass: ""

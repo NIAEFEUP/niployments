@@ -7,13 +7,13 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`172.28.255.205`) && PathPrefix(`/nextcloud`)
+    - match: Host(`nextcloud.niaefeup.pt`)
       kind: Rule
       services:
         - name: nextcloud
-          port: 8080
+          port: 80
 
-  # tls:
-  #   secretName: website-ae-cert
+  tls:
+    secretName: nextcloud-cert
 ---
 

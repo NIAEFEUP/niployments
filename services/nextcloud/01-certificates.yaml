@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nextcloud-cert
+  namespace: nextcloud
+spec:
+  secretName: nextcloud-cert
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: nextcloud.niaefeup.pt
+  dnsNames:
+    - nextcloud.niaefeup.pt
