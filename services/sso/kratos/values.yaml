@@ -10,7 +10,7 @@ kratos:
         cors:
           enabled: true
       admin:
-        base_url: http://kratos:4434/
+        base_url: http://127.0.0.1:4434/
 
     identity:
       default_schema_id: default
@@ -41,6 +41,8 @@ kratos:
         link:
           enabled: true
         code:
+          enabled: true
+        oidc:
           enabled: true
 
       flows:

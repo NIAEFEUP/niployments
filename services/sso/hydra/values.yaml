@@ -1,0 +1,34 @@
+image:
+  tag: latest-sqlite
+
+hydra:
+  config:
+    dsn: memory
+
+    serve:
+      cookies:
+        same_site_mode: Lax
+
+    urls:
+      self:
+        issuer: http://127.0.0.1:4444
+      consent: http://127.0.0.1:4455/welcome
+      login: http://127.0.0.1:4455/login
+      logout: http://127.0.0.1:4455/login
+      # device:
+      #   verification: http://127.0.0.1:4455/device/verify
+      #   success: http://127.0.0.1:4455/device/success
+
+    secrets:
+      system:
+        - youReallyNeedToChangeThis
+
+    oidc:
+      subject_identifiers:
+        supported_types:
+          - pairwise
+          - public
+        pairwise:
+          salt: youReallyNeedToChangeThis
+
+    dangerousForceHttp: true
