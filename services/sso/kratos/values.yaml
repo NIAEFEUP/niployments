@@ -83,6 +83,12 @@ kratos:
                 - hook: session
                 - hook: show_verification_ui
 
+    oauth2_provider:
+      url: http://127.0.0.1/4444
+      headers:
+        Authorization: Bearer some-token
+      override_return_to: false
+
   development: true
 
   automigration:
