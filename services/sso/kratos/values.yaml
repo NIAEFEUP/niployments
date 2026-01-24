@@ -83,6 +83,8 @@ kratos:
                 - hook: session
                 - hook: show_verification_ui
 
+  development: true
+
   automigration:
     enabled: true
   identitySchemas:

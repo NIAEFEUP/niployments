@@ -10,4 +10,3 @@ helm repo update
 helm upgrade --install -f $ROOT/kratos/values.yaml --namespace sso kratos ory/kratos
 
 helm upgrade --install -f $ROOT/hydra/values.yaml --namespace sso hydra ory/hydra
-

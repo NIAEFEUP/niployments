@@ -1,5 +1,3 @@
-image:
-  tag: latest-sqlite
 
 hydra:
   config:
@@ -11,13 +9,20 @@ hydra:
 
     urls:
       self:
-        issuer: http://127.0.0.1:4444
+        issuer: http://127.0.0.1:4444/
       consent: http://127.0.0.1:4455/welcome
       login: http://127.0.0.1:4455/login
       logout: http://127.0.0.1:4455/login
       # device:
       #   verification: http://127.0.0.1:4455/device/verify
       #   success: http://127.0.0.1:4455/device/success
+
+
+      identity_provider:
+        url: http://127.0.0.1:4434
+        publicUrl: http://127.0.0.1:4433
+        headers:
+          Authorization: Bearer some-token
 
     secrets:
       system:
@@ -31,4 +36,4 @@ hydra:
         pairwise:
           salt: youReallyNeedToChangeThis
 
-    dangerousForceHttp: true
+  dev: true
