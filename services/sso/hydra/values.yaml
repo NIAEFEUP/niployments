@@ -10,12 +10,12 @@ hydra:
     urls:
       self:
         issuer: http://127.0.0.1:4444/
-      consent: http://127.0.0.1:4455/welcome
+      consent: http://127.0.0.1:4455/consent
       login: http://127.0.0.1:4455/login
       logout: http://127.0.0.1:4455/login
-      # device:
-      #   verification: http://127.0.0.1:4455/device/verify
-      #   success: http://127.0.0.1:4455/device/success
+      device:
+        verification: http://127.0.0.1:4455/device/verify
+        success: http://127.0.0.1:4455/device/success
 
 
       identity_provider:
@@ -23,6 +23,7 @@ hydra:
         publicUrl: http://127.0.0.1:4433
         headers:
           Authorization: Bearer some-token
+          
 
     secrets:
       system:

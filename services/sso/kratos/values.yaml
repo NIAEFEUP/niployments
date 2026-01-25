@@ -84,7 +84,7 @@ kratos:
                 - hook: show_verification_ui
 
     oauth2_provider:
-      url: http://127.0.0.1/4444
+      url: http://hydra-admin.sso.svc.cluster.local:4445
       headers:
         Authorization: Bearer some-token
       override_return_to: false
