@@ -7,6 +7,9 @@
         vrrp_secret: "{{ lookup('password', '/dev/null length=64 chars=ascii_letters') }}"
       delegate_to: localhost
       run_once: true
+    - name: Import router vars
+      ansible.builtin.include_vars:
+        file: "../router/router-vars.json"
     - name: Install Keepalived
       become: true
       ansible.builtin.apt:
@@ -17,10 +20,10 @@
         src: templates/keepalived_check.sh
         dest: /etc/keepalived/keepalived_check.sh
         mode: "744"
-    - name: Copy notify script
+    - name: Configure notify script
       become: true
-      ansible.builtin.copy:
-        src: templates/vrrp-notify-script.sh
+      ansible.builtin.template:
+        src: templates/vrrp-notify-script.sh.j2
         dest: /etc/keepalived/vrrp-notify-script.sh
         mode: "777"
     - name: Configure Keepalived

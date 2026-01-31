@@ -1,0 +1,49 @@
+#!/bin/bash
+
+TYPE=$1
+NAME=$2
+STATE=$3
+
+INTERFACE="{{ hostvars[inventory_hostname]['target_interface'] }}"
+MASTER_IP="{{ external_eth_config[0].ip }}"
+BACKUP_IP="{{ external_eth_config[1].ip }}"
+PREFIX="{{ external_eth_config[0].prefix }}"
+GATEWAY="{{ external_eth_config[0].gateway }}"
+
+case $STATE in
+        "MASTER") 
+                  # Remove backup IP and old default routes
+                  ip addr del ${BACKUP_IP}/${PREFIX} dev ${INTERFACE} 2>/dev/null
+                  ip route del default 2>/dev/null
+                  # Add master IP and default route
+                  ip addr add ${MASTER_IP}/${PREFIX} dev ${INTERFACE} 2>/dev/null
+                  ip route add default via ${GATEWAY} dev ${INTERFACE}
+                  systemctl start haproxy
+                  exit 0
+                  ;;
+        "BACKUP") 
+                  # Remove master IP and old default routes
+                  ip addr del ${MASTER_IP}/${PREFIX} dev ${INTERFACE} 2>/dev/null
+                  ip route del default 2>/dev/null
+                  # Add backup IP and default route
+                  ip addr add ${BACKUP_IP}/${PREFIX} dev ${INTERFACE} 2>/dev/null
+                  ip route add default via ${GATEWAY} dev ${INTERFACE}
+                  systemctl stop haproxy
+                  exit 0
+                  ;;
+        # NOTE(luisd): FAULT state removes all IPs and routes as a clean slate.
+        #  When recovering, Keepalived transitions to BACKUP first (which will
+        #  reassign the backup IP), then potentially to MASTER if this router
+        #  has higher priority.
+        "FAULT")  
+                  # Remove all IPs and routes - clean slate for recovery
+                  ip addr del ${MASTER_IP}/${PREFIX} dev ${INTERFACE} 2>/dev/null
+                  ip addr del ${BACKUP_IP}/${PREFIX} dev ${INTERFACE} 2>/dev/null
+                  ip route del default 2>/dev/null
+                  systemctl stop haproxy
+                  exit 0
+                  ;;
+        *)        echo "unknown state"
+                  exit 1
+                  ;;
+esac

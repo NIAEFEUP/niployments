@@ -5,8 +5,8 @@
   hosts: nodes
   gather_facts: true
   vars:
-    target_interface: 169.254.0.0
-    # target_interface: 10.10.0.0
+    # target_interface: 169.254.0.0
+    target_interface: 10.10.0.0
   tasks:
     - name: Extract nodes MAC addresses
       run_once: true # noqa: run-once[task]
