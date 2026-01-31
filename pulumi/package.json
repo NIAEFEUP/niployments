@@ -3,5 +3,5 @@
   "version": "1.0.0",
   "license": "MIT",
   "private": true,
-  "packageManager": "pnpm@10.23.0"
+  "packageManager": "pnpm@10.25.0"
 }

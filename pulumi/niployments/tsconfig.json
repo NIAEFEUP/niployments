@@ -13,12 +13,14 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "rootDir": ".",
-    "paths": {
-      "#resources/*": ["./resources/*"],
-      "#services/*": ["./services/*"],
-      "#utils/*": ["./utils/*"]
-    }
+    "customConditions": ["@niaefeup/niployments"]
   },
-  "include": ["**/*.ts"],
+  "include": [
+    "assets/**/*.ts",
+    "resources/**/*.ts",
+    "services/**/*.ts",
+    "utils/**/*.ts",
+    "index.ts"
+  ],
   "exclude": ["node_modules", "bin", "crds"]
 }

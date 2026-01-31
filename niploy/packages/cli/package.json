@@ -3,10 +3,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "tsx src/bin.ts"
+    "start": "tsx -C '@niploy/tsx' src/bin.ts"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "bin": {
+    "niploy": "dist/bin.js"
   },
   "files": [
     "dist",
@@ -14,8 +17,9 @@
     "!**/*.tsbuildinfo"
   ],
   "imports": {
-    "#niploy/*": {
+    "#niploy/*.js": {
       "@niploy/source": "./src/*.ts",
+      "@niploy/tsx": "./src/*.js",
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js",
       "default": "./dist/*.js"
@@ -37,9 +41,12 @@
     "effect": "catalog:",
     "ink": "catalog:",
     "react": "catalog:",
+    "signal-exit": "catalog:",
     "tslib": "catalog:"
   },
   "devDependencies": {
+    "@types/react": "catalog:",
+    "@types/signal-exit": "catalog:",
     "tsx": "catalog:"
   }
 }

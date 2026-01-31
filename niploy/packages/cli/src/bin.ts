@@ -2,7 +2,8 @@
 import { Effect, Layer, Logger, LogLevel } from "effect";
 import { CliConfig } from "@effect/cli";
 import { NodeContext, NodeRuntime } from "@effect/platform-node";
-import { cli } from "#niploy/Cli";
+import { cli } from "#niploy/Cli.js";
+
 
 const MainLive = Layer.mergeAll(
   Logger.minimumLogLevel(LogLevel.Debug),
@@ -11,7 +12,6 @@ const MainLive = Layer.mergeAll(
 );
 
 cli(process.argv).pipe(
-  Effect.orDie,
   Effect.provide(MainLive),
   NodeRuntime.runMain({
     disablePrettyLogger: false,

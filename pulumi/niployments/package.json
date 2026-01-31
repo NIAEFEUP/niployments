@@ -24,13 +24,24 @@
     },
     "dependencies": {
         "@pulumi/crds": "workspace:^",
-        "@pulumi/kubernetes": "^4.14.0",
-        "@pulumi/pulumi": "^3.121.0"
+        "@pulumi/kubernetes": "^4.24.1",
+        "@pulumi/pulumi": "^3.209.0"
     },
     "imports": {
-        "#resources/*": "./bin/resources/*",
-        "#services/*": "./bin/services/*",
-        "#utils/*": "./bin/utils/*"
-    },
-    "packageManager": "pnpm@9.1.0+sha512.67f5879916a9293e5cf059c23853d571beaf4f753c707f40cb22bed5fb1578c6aad3b6c4107ccb3ba0b35be003eb621a16471ac836c87beb53f9d54bb4612724"
+        "#resources/*": {
+            "default": "./bin/resources/*",
+            "import": "./bin/resources/*",
+            "@niaefeup/niployments": "./resources/*"
+        },
+        "#services/*": {
+            "default": "./bin/services/*",
+            "import": "./bin/services/*",
+            "@niaefeup/niployments": "./services/*"
+        },
+        "#utils/*": {
+            "default": "./bin/utils/*",
+            "import": "./bin/utils/*",
+            "@niaefeup/niployments": "./utils/*"
+        }
+    }
 }
