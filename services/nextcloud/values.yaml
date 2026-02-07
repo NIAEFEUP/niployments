@@ -1,6 +1,6 @@
 global:
   image:
-   # -- if set it will overwrite all registry entries
+    # -- if set it will overwrite all registry entries
     registry:
 
   security:
@@ -37,7 +37,9 @@ lifecycle: {}
 #   preStopCommand: []
 
 phpClientHttpsFix:
-  enabled: true
+  # For local/dev testing via `kubectl port-forward` over plain HTTP,
+  # forcing https causes redirects like `https://127.0.0.1:<port>` and browsers error.
+  enabled: false
   protocol: https
 
 nextcloud:
@@ -79,7 +81,7 @@ nextcloud:
       password: pass
   ## Primary ObjectStore options
   # see: https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#configuring-object-storage-as-primary-storage
-  
+
   ## PHP Configuration files
   # Will be injected in /usr/local/etc/php/conf.d for apache image and in /usr/local/etc/php-fpm.d when nginx.enabled: true
   phpConfigs: {}
@@ -568,7 +570,7 @@ service:
 ## TODO adicionar os volumes aqui
 persistence:
   # Nextcloud Data (/var/www/html)
-  enabled: false
+  enabled: true
   annotations: {}
   labels: {}
   ## nextcloud data Persistent Volume Storage Class
@@ -578,7 +580,7 @@ persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  # storageClass: "-"
+  # storageClass: "niployments-hdd-nfs"
 
   ## A manually managed Persistent Volume and Claim
   ## Requires persistence.enabled: true
