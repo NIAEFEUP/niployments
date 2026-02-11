@@ -1,0 +1,37 @@
+[15:27:43] [ServerMain/INFO]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, profilesHost=https://api.mojang.com, name=PROD]
+[15:27:44] [ServerMain/INFO]: Loaded 1470 recipes
+[15:27:44] [ServerMain/INFO]: Loaded 1584 advancements
+[15:27:44] [Server thread/INFO]: Starting minecraft server version 1.21.11
+[15:27:44] [Server thread/INFO]: Loading properties
+[15:27:44] [Server thread/INFO]: Default game type: SURVIVAL
+[15:27:44] [Server thread/INFO]: Generating keypair
+[15:27:44] [Server thread/INFO]: Starting Minecraft server on *:25565
+[15:27:44] [Server thread/INFO]: Preparing level "world"
+[15:27:45] [Server thread/INFO]: Loading 0 persistent chunks...
+[15:27:45] [Server thread/INFO]: Preparing spawn area: 100%
+[15:27:45] [Server thread/INFO]: Time elapsed: 13 ms
+[15:27:45] [Server thread/INFO]: Done (0.255s)! For help, type "help"
+[15:27:45] [Server thread/INFO]: Starting remote control listener
+[15:27:45] [Server thread/INFO]: Thread RCON Listener started
+[15:27:45] [Server thread/INFO]: RCON running on 0.0.0.0:25575
+[15:28:45] [Server thread/INFO]: Server empty for 60 seconds, pausing
+[15:28:58] [User Authenticator #1/INFO]: UUID of player Sp1kyBtw is 566000e0-7b6d-4e4a-82d5-0db24f238da0
+[15:28:58] [Server thread/INFO]: Sp1kyBtw[/172.17.0.1:55180] logged in with entity id 56 at (-5.6226871609148095, 75.0, 39.13176308140323)
+[15:28:58] [Server thread/INFO]: Sp1kyBtw joined the game
+[15:29:20] [Server thread/INFO]: Sp1kyBtw lost connection: Disconnected
+[15:29:20] [Server thread/INFO]: Sp1kyBtw left the game
+[15:30:20] [Server thread/INFO]: Server empty for 60 seconds, pausing
+[15:57:33] [RCON Listener #1/INFO]: Thread RCON Client /0:0:0:0:0:0:0:1 started
+[15:57:33] [Server thread/INFO]: [Rcon: Stopping the server]
+[15:57:33] [RCON Client /0:0:0:0:0:0:0:1 #2/INFO]: Thread RCON Client /0:0:0:0:0:0:0:1 shutting down
+[15:57:33] [Server thread/INFO]: Stopping server
+[15:57:33] [Server thread/INFO]: Saving players
+[15:57:33] [Server thread/INFO]: Saving worlds
+[15:57:33] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[15:57:33] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[15:57:33] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[15:57:33] [Server thread/INFO]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[15:57:33] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[15:57:33] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[15:57:33] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
+[15:57:33] [Server thread/INFO]: Thread RCON Listener stopped
