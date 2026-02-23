@@ -1,0 +1,2 @@
+NAME                   TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+redisinsight-service   LoadBalancer   10.96.229.11   <pending>     80:31033/TCP   22h

@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: valkey
+  namespace: datastores
+data:
+  valkey.conf: |
+    protected-mode yes
+    notify-keyspace-events "KEA$"
+    cluster-enabled yes 
+    cluster-config-file nodes.conf
+    cluster-node-timeout 5000
+    cluster-allow-reads-when-down yes
+    cluster-announce-port 6379
+    cluster-announce-bus-port 16379
+    port 6379
+    cluster-port 16379
+    appendonly yes
+    replica-read-only no
+  init-config.sh: |
+    #!/bin/sh
+
+    cp /etc/valkey/valkey.conf /tmp/valkey.conf
+    if [ "${REPLICAS}" -gt "1" ]; then
+      echo "replica-announce-ip ${POD_IP}" >> /tmp/valkey.conf
+      echo "cluster-announce-ip ${POD_IP}" >> /tmp/valkey.conf
+    fi
+    cp /tmp/valkey.conf /config/valkey.conf
+
+    mkdir -p /data
+    chown -R 1000:1000 /data
+  init-cluster.sh: |
+    #!/bin/sh
+
+    if [ "${REPLICAS}" -eq "1" ]; then
+      echo "Single node deployment. Skipping cluster initialization"
+      exit 0
+    fi
+
+    ORDINAL=$(echo ${HOSTNAME} | rev | cut -d'-' -f1 | rev)
+    PRIMARIES=$(((${REPLICAS} + 1) / 2))
+
+    echo "Initializing as ordinal $ORDINAL and $PRIMARIES primaries"
+    if [ "${ORDINAL}" = "0" ]; then
+      echo "This is the primary-0 node"
+
+      until valkey-cli -h localhost -p 6379 ping 2>/dev/null; do
+        echo "Waiting for local Valkey to start..."
+        sleep 2
+      done
+      echo "Local Valkey is ready"
+
+      if ! valkey-cli -h localhost -p 6379 cluster info 2>/dev/null | grep -q 'cluster_state:ok'; then
+        echo "Initializing cluster..."
+
+      NODES=""
+      for i in $(seq 0 $((${REPLICAS}-1))); do
+        if [ "$i" = "0" ]; then
+          NODES="${NODES} ${POD_IP}:6379"
+        else
+          NODES="${NODES} valkey-${i}.valkey.datastores.svc.cluster.local:6379"
+        fi
+      done
+      
+      
+      for i in $(seq 0 $((${REPLICAS}-1))); do
+        HOST="valkey-${i}.valkey.datastores.svc.cluster.local"
+        echo "Waiting for ${HOST}..."
+        until valkey-cli -h "${HOST}" -p 6379 ping 2>/dev/null | grep -q PONG; do
+          sleep 2
+        done
+      done
+
+      echo "All nodes reachable. Proceeding with cluster create."
+          REPLICA_COUNT=$(((${REPLICAS} - ${PRIMARIES}) / ${PRIMARIES}))
+
+        echo "Creating cluster with ${PRIMARIES} primaries and ${REPLICA_COUNT} replicas per primary"
+        echo "Creating cluster with nodes: ${NODES}"
+        echo "yes" | valkey-cli --cluster create ${NODES} --cluster-replicas ${REPLICA_COUNT}
+      else
+        echo "Cluster already initialized"
+      fi
+    elif [ "${ORDINAL}" -ge "${PRIMARIES}" ]; then
+      PRIMARY_INDEX=$((${ORDINAL} % ${PRIMARIES}))
+      PRIMARY_HOST="valkey-${PRIMARY_INDEX}.valkey.datastores.svc.cluster.local"
+
+      echo "This is a replica node. Will join cluster via ${PRIMARY_HOST}"
+      until valkey-cli -h ${PRIMARY_HOST} -p 6379 ping 2>/dev/null; do
+        echo "Waiting for primary ${PRIMARY_HOST} to be ready..."
+        sleep 5
+      done
+
+      echo "Primary is ready, joining cluster..."
+      valkey-cli --cluster add-node ${POD_IP}:6379 ${PRIMARY_HOST}:6379 --cluster-replica
+    else
+      echo "This is a primary node. Will join cluster via valkey-0"
+      until valkey-cli -h valkey-0.valkey.datastores.svc.cluster.local -p 6379 ping 2>/dev/null; do
+        echo "Waiting for valkey-0 to be ready..."
+        sleep 5
+      done
+
+      echo "Cluster primary is ready, joining cluster..."
+      valkey-cli --cluster add-node ${POD_IP}:6379 valkey-0.valkey.datastores.svc.cluster.local:6379
+    fi
