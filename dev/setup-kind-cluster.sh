@@ -88,3 +88,6 @@ $HELM_EXECUTABLE upgrade --install traefik traefik/traefik \
 $(dirname $0)/../services/cert-manager/deploy-dev.sh
 
 $KUBECTL_EXECUTABLE apply -f $(dirname "$0")/../services/storage/longhorn/storageClasses/fakeDevClasses
+
+# Deploy etcd backup service
+bash $(dirname $0)/../services/etcd-backup/deploy-dev.sh
