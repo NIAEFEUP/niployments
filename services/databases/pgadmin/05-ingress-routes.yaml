@@ -1,0 +1,17 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: pgadmin-https
+  namespace: pgadmin
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`pgadmin.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: pgadmin
+          port: 80
+  tls:
+    secretName: pgadmin-cert
