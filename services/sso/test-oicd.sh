@@ -1,6 +1,5 @@
 #!/bin/sh
 
-# KRATOS_POD=$(kubectl get pods --no-headers -n sso -o custom-columns=":metadata.name" | grep '^kratos' | head -n 1)
 HYDRA_POD=$(kubectl get pods --no-headers -n sso -o custom-columns=":metadata.name" | grep '^hydra' | head -n 1)
 
 kubectl -n sso exec -it $HYDRA_POD -- /bin/sh << 'EOF'
