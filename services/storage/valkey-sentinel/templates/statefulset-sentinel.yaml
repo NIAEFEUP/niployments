@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "valkey-sentinel.sentinelName" . }}
+  namespace: {{ include "valkey-sentinel.namespace" . }}
+spec:
+  serviceName: {{ include "valkey-sentinel.sentinelName" . }}
+  replicas: {{ .Values.sentinel.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "valkey-sentinel.sentinelName" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "valkey-sentinel.sentinelName" . }}
+    spec:
+      # Sentinel rewrites its config at runtime, so sentinel.conf must be writable.
+      # We mount the ConfigMap read-only and copy it into a writable emptyDir.
+      initContainers:
+        - name: init-sentinel-config
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              cp /etc/valkey-ro/sentinel.conf /etc/valkey/sentinel.conf
+          volumeMounts:
+            - name: sentinel-config-ro
+              mountPath: /etc/valkey-ro
+              readOnly: true
+            - name: sentinel-config-rw
+              mountPath: /etc/valkey
+
+      containers:
+        - name: sentinel
+          image: {{ .Values.sentinel.image }}
+          ports:
+            - name: sentinel
+              containerPort: {{ .Values.sentinel.port }}
+          command: ["valkey-sentinel", "/etc/valkey/sentinel.conf"]
+          env:
+            - name: VALKEY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: valkey-auth
+                  key: password
+          volumeMounts:
+            - name: sentinel-config-rw
+              mountPath: /etc/valkey
+          resources:
+{{ toYaml .Values.sentinel.resources | indent 12 }}
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "valkey-cli -a \"$VALKEY_PASSWORD\" -p {{ .Values.sentinel.port }} ping | grep -q PONG"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 6
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "valkey-cli -a \"$VALKEY_PASSWORD\" -p {{ .Values.sentinel.port }} ping | grep -q PONG"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 6
+
+      volumes:
+        - name: sentinel-config-ro
+          configMap:
+            name: valkey-config
+            items:
+              - key: sentinel.conf
+                path: sentinel.conf
+
+        - name: sentinel-config-rw
+          emptyDir: {}

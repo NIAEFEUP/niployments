@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: valkey-config
+  namespace: {{ include "valkey-sentinel.namespace" . }}
+data:
+  valkey.conf: |
+    protected-mode yes
+    port {{ .Values.valkey.port }}
+    appendonly yes
+    dir /data
+
+    requirepass {{ .Values.auth.password }}
+    masterauth {{ .Values.auth.password }}
+
+    # Good defaults
+    tcp-keepalive 60
+    save 900 1
+    save 300 10
+    save 60 10000
+
+  sentinel.conf: |
+    port {{ .Values.sentinel.port }}
+    dir /tmp
+
+    sentinel monitor {{ .Values.sentinel.masterName }} {{ include "valkey-sentinel.name" . }}-0.{{ include "valkey-sentinel.name" . }}-headless.{{ include "valkey-sentinel.namespace" . }}.svc.cluster.local {{ .Values.valkey.port }} {{ .Values.sentinel.quorum }}
+    sentinel auth-pass {{ .Values.sentinel.masterName }} {{ .Values.auth.password }}
+    sentinel down-after-milliseconds {{ .Values.sentinel.masterName }} {{ .Values.sentinel.downAfterMilliseconds }}
+    sentinel failover-timeout {{ .Values.sentinel.masterName }} {{ .Values.sentinel.failoverTimeout }}
+    sentinel parallel-syncs {{ .Values.sentinel.masterName }} {{ .Values.sentinel.parallelSyncs }}
+
+    # Helpful in k8s DNS environments
+    sentinel resolve-hostnames yes
+    sentinel announce-hostnames yes
+  init-valkey.sh: |
+    #!/bin/sh
+    set -eu
+    
+    CONF_IN=/etc/valkey/valkey.conf
+    TMP_CONF=/tmp/valkey.conf
+    OUT_CONF=/config/valkey.conf
+    
+    cp "$CONF_IN" "$TMP_CONF"
+    
+    # Determine ordinal from hostname: valkey-0, valkey-1, ...
+    ORDINAL="$(echo "${HOSTNAME}" | awk -F'-' '{print $NF}')"
+    
+    if [ "$ORDINAL" != "0" ]; then
+      MASTER_HOST="valkey-0.valkey-headless.datastores.svc.cluster.local"
+      echo "replicaof ${MASTER_HOST} 6379" >> "$TMP_CONF"
+      echo "Replica node (ordinal=$ORDINAL) configured to replicate from $MASTER_HOST"
+    else
+      echo "Master node (ordinal=0) starting without replicaof"
+    fi
+    
+    # Ensure data dir exists & permissions
+    mkdir -p /data
+    chown -R 1000:1000 /data
+    
+    # Write final config to the mounted workdir
+    cp "$TMP_CONF" "$OUT_CONF"

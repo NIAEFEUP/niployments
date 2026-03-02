@@ -1,0 +1,56 @@
+namespace:
+  create: true
+  name: datastores
+
+valkey:
+  image: valkey/valkey:8.0.1
+  replicas: 3
+  port: 6379
+  persistence:
+    enabled: true
+    size: 2Gi
+    accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  # Optional exporter sidecar
+  exporter:
+    enabled: true
+    image: oliver006/redis_exporter:latest
+    port: 9121
+    resources:
+      requests:
+        cpu: 50m
+        memory: 80Mi
+
+sentinel:
+  image: valkey/valkey:8.0.1
+  replicas: 3
+  port: 26379
+  # Sentinel settings
+  masterName: MasterReplica
+  quorum: 2
+  downAfterMilliseconds: 5000
+  failoverTimeout: 60000
+  parallelSyncs: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
+
+security:
+  # Set true to enable NetworkPolicy (works fine with Cilium)
+  networkPolicy:
+    enabled: true
+    # Allow these namespaces to connect to Valkey/Sentinel (edit to your needs)
+    allowedClientNamespaces:
+      - default
+
+service:
+  client:
+    type: ClusterIP
+
+auth:
+  enabled: true
+  password: "GreatPass"
