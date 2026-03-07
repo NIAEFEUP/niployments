@@ -8,6 +8,6 @@ spec:
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
-  commonName: nextcloud.niaefeup.pt
+  commonName: drive.niaefeup.pt
   dnsNames:
-    - nextcloud.niaefeup.pt
+    - drive.niaefeup.pt

@@ -7,11 +7,11 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`nextcloud.niaefeup.pt`)
+    - match: Host(`drive.niaefeup.pt`)
       kind: Rule
       services:
         - name: nextcloud
-          port: 8080
+          port: 80
 
   tls:
     secretName: nextcloud-cert
