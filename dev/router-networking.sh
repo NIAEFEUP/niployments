@@ -10,7 +10,7 @@ DHCP=yes
 DefaultRouteOnDevice=false
 " > /etc/systemd/network/01-vagrant.network
 
-if ["$2" -eq "true"]; then
+if [ "$2" = "true" ]; then
 echo "Configuring host-only"
 echo "[Match]
 Name=eth1
@@ -23,6 +23,15 @@ DefaultRouteOnDevice=true
 else 
 echo "Public network... fallback to dhcp"
 fi
+
+# Configure eth2 for the cluster private network (10.10.0.x)
+echo "[Match]
+Name=eth2
+
+[Network]
+Address=10.10.0.$1/24
+" > /etc/systemd/network/02-cluster.network
+
 echo "[Match]
 Name=*
 
@@ -37,6 +46,7 @@ echo "
 nameserver 1.1.1.1
 " >> /etc/resolvconf/resolv.conf.d/tail
 
+apt-get update
 apt-get install -y avahi-daemon avahi-utils avahi-autoipd
 
 sed -i 's/publish-workstation=no/publish-workstation=yes/g' /etc/avahi/avahi-daemon.conf 
