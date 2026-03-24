@@ -1,0 +1,8 @@
+- name: Update Packages on Nodes
+  hosts: nodes
+  become: true
+  tasks:
+    - name: "Update OpenSSH"
+      ansible.builtin.command: dnf update openssh-server -y
+    - name: "Restart sshd"
+      ansible.builtin.command: systemctl restart sshd
