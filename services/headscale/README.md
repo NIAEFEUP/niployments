@@ -86,27 +86,7 @@ The script is interactive and prints the exact `tailscale up` command each user 
 
 Use this only for local testing.
 
-### Step 1 - Configure local network access to the dev cluster
-
-For local kind clusters, configure Traefik LB IP routing and hosts mapping:
-
-```bash
-kubectl apply -f services/cilium/load-balancer-pool-dev.yaml
-sudo ip route add 172.28.255.0/24 via 172.28.0.6
-
-kubectl get svc traefik -n kube-system
-echo "<EXTERNAL-IP> headscale.niaefeup.pt" | sudo tee -a /etc/hosts
-
-curl http://headscale.niaefeup.pt/health
-```
-
-Expected health response:
-
-```json
-{"status":"pass"}
-```
-
-### Step 2 - Deploy Headscale in dev mode
+### Step 1 - Deploy Headscale in dev mode
 
 Run:
 
@@ -120,6 +100,25 @@ This applies dev resources:
 - `06-ingress-routes-dev.yaml` (`web`, no TLS)
 
 It also removes prod-only resources (`Certificate` + HTTPS route) to avoid conflicts.
+
+### Step 2 - Configure local network access to the dev cluster
+
+For local kind clusters, configure Traefik LB IP routing and hosts mapping:
+
+```bash
+# Check what's the external IP of Traefik LoadBalancer
+# If it's `<pending>`, something went wrong with the setup
+kubectl get svc traefik -n kube-system
+echo "<EXTERNAL-IP> headscale.niaefeup.pt" | sudo tee -a /etc/hosts
+
+curl http://headscale.niaefeup.pt/health
+```
+
+Expected health response:
+
+```json
+{"status":"pass"}
+```
 
 ### Step 3 - Start the Raspberry Pi simulator
 
@@ -145,6 +144,7 @@ Connect with:
 
 ```bash
 ssh root@localhost -p 2222
+# Password: raspberry
 ```
 
 ### Step 4 - Create a Headscale key for the simulated gateway
