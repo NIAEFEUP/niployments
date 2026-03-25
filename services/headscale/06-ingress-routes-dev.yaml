@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: headscale-http
+  namespace: headscale
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`headscale.niaefeup.pt`)
+    kind: Rule
+    services:
+    - name: headscale
+      port: 80
