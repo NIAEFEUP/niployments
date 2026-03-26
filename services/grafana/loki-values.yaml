@@ -1,2 +1,4 @@
 minio:
   enabled: true
+global:
+    dnsService:  "rke2-coredns-rke2-coredns" 
