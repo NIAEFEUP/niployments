@@ -17,6 +17,3 @@ HYDRA_POD=$(kubectl get pods --no-headers -n sso -o custom-columns=":metadata.na
 
 kubectl -n sso wait --for=condition=ready pod/$KRATOS_POD
 kubectl -n sso wait --for=condition=ready pod/$HYDRA_POD
-
-kubectl -n sso port-forward $KRATOS_POD 4433:4433 4434:4434 &
-kubectl -n sso port-forward $HYDRA_POD 4444:4444 4445:4445 5555:5555 &
