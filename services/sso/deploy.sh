@@ -17,3 +17,6 @@ HYDRA_POD=$(kubectl get pods --no-headers -n sso -o custom-columns=":metadata.na
 
 kubectl -n sso wait --for=condition=ready pod/$KRATOS_POD
 kubectl -n sso wait --for=condition=ready pod/$HYDRA_POD
+
+kubectl -n sso apply -f $ROOT/certificate.yaml
+kubectl -n sso apply -f $ROOT/ingress-route.yaml

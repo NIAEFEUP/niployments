@@ -9,7 +9,7 @@ hydra:
 
     urls:
       self:
-        issuer: http://127.0.0.1:4444/
+        issuer: https://hydra.niaefeup.pt/
       consent: http://127.0.0.1:4455/consent
       login: http://127.0.0.1:4455/login
       logout: http://127.0.0.1:4455/logout
