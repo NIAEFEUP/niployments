@@ -43,9 +43,9 @@ phpClientHttpsFix:
   protocol: https
 
 nextcloud:
-  host: nextcloud.niaefeup.pt
+  host: drive.niaefeup.pt
   existingSecret:
-    enabled: true
+    enabled: false
     secretName: nextcloud-secrets
     usernameKey: nextcloud-username
     passwordKey: nextcloud-password
@@ -64,12 +64,10 @@ nextcloud:
     subPath:
   # if set, we'll template this list to the NEXTCLOUD_TRUSTED_DOMAINS env var
   trustedDomains:
-    - nextcloud.niaefeup.pt
-  ## SMTP configuration
+    - drive.niaefeup.pt
   mail:
     enabled: false
-    # the user we send email as
-    fromAddress: user
+    fromAddress: user@gmail.com
     # the domain we send email from
     domain: domain.com
     smtp:
@@ -297,12 +295,16 @@ externalDatabase:
 
   ## Use a existing secret
   existingSecret:
-    enabled: true
-    secretName: nextcloud-secrets
-    usernameKey: db-username
-    passwordKey: db-password
-    hostKey: db-hostname
-    databaseKey: db-name
+    enabled: false
+    host: cnpg-cluster-rw.pg.svc.cluster.local
+    user: nextcloud
+    password: <FILL-IN>
+    database: nextcloud-db
+    # secretName: nextcloud-secrets
+    # usernameKey: db-username
+    # passwordKey: db-password
+    # hostKey: db-hostname
+    # databaseKey: db-name
     # hostKey: db-hostname-or-ip
     # databaseKey: db-name
 
@@ -532,13 +534,13 @@ resources: {}
 # choice for the user. This also increases chances charts run on environments with little
 # resources, such as Minikube. If you do want to specify resources, uncomment the following
 # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-# resources:
-#   limits:
-#    cpu: 100m
-#    memory: 128Mi
-#   requests:
-#    cpu: 100m
-#    memory: 128Mi
+resources:
+  limits:
+   cpu: 500m
+   memory: 1024Mi
+  requests:
+   cpu: 500m
+   memory: 1024Mi
 
 # -- Priority class for pods. This is the _default_
 # priority class for pods created by this deployment - it may be
