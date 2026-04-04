@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: adguard
+  namespace: adguard
+spec:
+  selector:
+    matchLabels:
+      app: adguard
+  serviceName: adguard-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: adguard
+    spec:
+      containers:
+      - name: adguard
+        image: adguard/adguardhome:latest
+        ports:
+        - containerPort: 3000
+        # expose port 53 for direct DNS
+        # - containerPort: 53
+          # protocol: TCP
+        # - containerPort: 53
+          # protocol: UDP
+        volumeMounts:
+            - name: adguard-volume
+              mountPath: /opt/adguardhome
+      volumes:
+        - name: adguard-volume
+          persistentVolumeClaim:
+            claimName: adguard-pvc

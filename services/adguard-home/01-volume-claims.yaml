@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: adguard-data
+  name: adguard-pvc
   namespace: adguard
 spec:
   resources:
     requests:
-      storage: 512Mi
+      storage: 2Gi
   storageClassName: longhorn-locality-no-backup-retain # Should we backup config? probably
   accessModes:
     - ReadWriteOnce
