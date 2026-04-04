@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: adguard-cert-tls
+  namespace: adguard
+spec:
+  secretName: adguard-cert-tls
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: adguard.niaefeup.pt
+  dnsNames:
+    - adguard.niaefeup.pt
