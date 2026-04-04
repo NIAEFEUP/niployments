@@ -1,0 +1,4 @@
+apiVersion: vv1
+kind: Namespace
+metadata:
+  name: adguard
