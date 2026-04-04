@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: adguard-https
+  namespace: adguard
+spec:
+  entryPoints:
+  - websecure
+  routes:
+    - match: Host(`adguard.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: adguard-service
+          port: 80
+  tls:
+    secretName: adguard-cert-tls
+
