@@ -26,7 +26,11 @@ spec:
           # protocol: UDP
         volumeMounts:
             - name: adguard-volume
-              mountPath: /opt/adguardhome
+              mountPath: /opt/adguardhome/work
+              subPath: work
+            - name: adguard-volume
+              mountPath: /opt/adguardhome/conf
+              subPath: conf
       volumes:
         - name: adguard-volume
           persistentVolumeClaim:
