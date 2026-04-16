@@ -1,0 +1,47 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supertuxkart-server
+  namespace: supertuxkart
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: supertuxkart
+  template:
+    metadata:
+      labels:
+        app: supertuxkart
+    spec:
+      containers:
+      - name: supertuxkart
+        image: timoschwarzer/supertuxkart-server:latest
+        ports:
+        - containerPort: 2757
+          protocol: UDP
+        env:
+        - name: SERVER_NAME
+          value: "NI SuperTuxKart Server"
+        - name: CONFIG_NAME
+          value: "config.xml"
+        - name: MODE
+          value: "0"
+        - name: DIFFICULTY
+          value: "3"
+        - name: MAX_PLAYERS
+          value: "20"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: supertuxkart-service
+  namespace: supertuxkart
+spec:
+  selector:
+    app: supertuxkart
+  ports:
+  - port: 8008
+    targetPort: 8080
+    protocol: UDP
+  type: ClusterIP
