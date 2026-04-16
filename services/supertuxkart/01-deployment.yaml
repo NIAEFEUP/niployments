@@ -54,4 +54,4 @@ spec:
     targetPort: 2759
     protocol: UDP
     name: discovery
-  type: ClusterIP
+  type: NodePort
