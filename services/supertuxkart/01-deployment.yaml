@@ -16,21 +16,26 @@ spec:
     spec:
       containers:
       - name: supertuxkart
-        image: timoschwarzer/supertuxkart-server:latest
+        image: jwestp/supertuxkart:latest
         ports:
         - containerPort: 2757
           protocol: UDP
+        - containerPort: 2759
+          protocol: UDP
+        volumeMounts:
+        - name: config
+          mountPath: /stk
+          readOnly: true
         env:
-        - name: SERVER_NAME
-          value: "NI SuperTuxKart Server"
-        - name: CONFIG_NAME
-          value: "config.xml"
-        - name: MODE
-          value: "0"
-        - name: DIFFICULTY
-          value: "3"
-        - name: MAX_PLAYERS
-          value: "20"
+        - name: AI_KARTS
+          value: "4"
+      volumes:
+      - name: config
+        configMap:
+          name: supertuxkart-config
+          items:
+          - key: server_config.xml
+            path: server_config.xml
 ---
 apiVersion: v1
 kind: Service
@@ -41,7 +46,12 @@ spec:
   selector:
     app: supertuxkart
   ports:
-  - port: 8008
-    targetPort: 8080
+  - port: 2757
+    targetPort: 2757
     protocol: UDP
+    name: game
+  - port: 2759
+    targetPort: 2759
+    protocol: UDP
+    name: discovery
   type: ClusterIP
