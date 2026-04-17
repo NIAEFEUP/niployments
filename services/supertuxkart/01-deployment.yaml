@@ -14,28 +14,31 @@ spec:
       labels:
         app: supertuxkart
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: supertuxkart
-        image: jwestp/supertuxkart:latest
+        image: peucastro/stk-server:latest
         ports:
         - containerPort: 2757
           protocol: UDP
         - containerPort: 2759
           protocol: UDP
-        volumeMounts:
-        - name: config
-          mountPath: /stk
-          readOnly: true
         env:
-        - name: AI_KARTS
-          value: "4"
-      volumes:
-      - name: config
-        configMap:
-          name: supertuxkart-config
-          items:
-          - key: server_config.xml
-            path: server_config.xml
+        - name: SERVER_NAME
+          value: "NI SuperTuxKart Server"
+        - name: SERVER_MODE
+          value: "0"
+        - name: SERVER_DIFFICULTY
+          value: "1"
+        - name: MAX_PLAYERS
+          value: "20"
+        - name: WAN_SERVER
+          value: "false"
+        - name: SERVER_PORT
+          value: "2759"
+        - name: LAN_SERVER_NAME
+          value: "NI SuperTuxKart Server"
 ---
 apiVersion: v1
 kind: Service
