@@ -18,10 +18,10 @@ spec:
       - name: supertuxkart
         image: peucastro/stk-server:latest
         ports:
-        - containerPort: 2757
+        - containerPort: 2759
           protocol: UDP
           name: game
-        - containerPort: 2759
+        - containerPort: 2757
           protocol: UDP
           name: discovery
         env:
@@ -43,12 +43,12 @@ spec:
   selector:
     app: supertuxkart
   ports:
-  - port: 2757
-    targetPort: 2757
-    protocol: UDP
-    name: game
   - port: 2759
     targetPort: 2759
+    protocol: UDP
+    name: game
+  - port: 2757
+    targetPort: 2757
     protocol: UDP
     name: discovery
   type: ClusterIP

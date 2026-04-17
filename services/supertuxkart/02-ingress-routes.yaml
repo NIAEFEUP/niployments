@@ -10,7 +10,7 @@ spec:
   routes:
   - services:
     - name: supertuxkart-service
-      port: 2757
+      port: 2759
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRouteUDP
@@ -23,4 +23,4 @@ spec:
   routes:
   - services:
     - name: supertuxkart-service
-      port: 2759
+      port: 2757
