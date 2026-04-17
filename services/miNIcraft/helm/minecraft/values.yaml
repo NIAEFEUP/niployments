@@ -8,6 +8,8 @@ node:
 # ************************
 
 minecraft:
+  type: 'PAPER'
+  version: '1.20.4'
   gamemode: 'survival'
   motd: 'Your super-cool, super-kube, minecraft server' # Message of the Day
   port: 30565

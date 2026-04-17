@@ -28,6 +28,10 @@ spec:
           requests:
             memory: "{{ .Values.resources.requests.memory }}"
         env:
+          - name: TYPE
+            value: "{{.Values.minecraft.type}}"
+          - name: VERSION
+            value: "{{.Values.minecraft.version}}"
           - name:  EULA
             value: 'TRUE'
           - name: MODE
@@ -36,6 +40,8 @@ spec:
             value: "{{ .Values.minecraft.motd }}"
           - name: ALLOW_FLIGHT
             value: 'TRUE'
+          - name: SERVER_PORT
+            value: "{{ .Values.minecraft.port }}"
         ports:
         - containerPort: {{ .Values.minecraft.port }}
           name: minecraft
@@ -45,16 +51,22 @@ spec:
         readinessProbe:
           exec:
             command:
-            - mcstatus
+            - mc-monitor
+            - status
+            - -host
             - 127.0.0.1
-            - ping
+            - -port
+            - "{{ .Values.minecraft.port }}"
           initialDelaySeconds: 30
           periodSeconds: 30
         livenessProbe:
           exec:
             command:
-            - mcstatus
+            - mc-monitor
+            - status
+            - -host
             - 127.0.0.1
-            - ping
+            - -port
+            - "{{ .Values.minecraft.port }}"
           initialDelaySeconds: 30
           periodSeconds: 30
