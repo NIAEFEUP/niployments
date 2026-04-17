@@ -11,21 +11,30 @@
     flake-utils,
     ...
   }:
-    flake-utils.lib.eachDefaultSystem (
-      system: let
-        pkgs = import nixpkgs {inherit system;};
-      in {
-        formatter = pkgs.alejandra;
+    flake-utils.lib.eachDefaultSystem (system: let
+      pkgs = import nixpkgs {inherit system;};
+    in {
+      formatter = pkgs.alejandra;
 
-        devShells.default = pkgs.mkShell {
-          packages = with pkgs; [
-            docker
-            kind
-            cilium-cli
-            kubernetes-helm
-            kubectl
-          ];
-        };
-      }
-    );
+      devShells.default = pkgs.mkShell {
+        packages = with pkgs; [
+          # Containers / cluster
+          docker
+          kind
+          kubectl
+          kubernetes-helm
+          kustomize
+          cilium-cli
+
+          # Kubernetes UX
+          kubectx
+          stern
+          k9s
+
+          # Ansible
+          ansible
+          ansible-lint
+        ];
+      };
+    });
 }
