@@ -14,16 +14,17 @@ spec:
       labels:
         app: supertuxkart
     spec:
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true # FIXME(peucastro): remove before merge
       containers:
       - name: supertuxkart
         image: peucastro/stk-server:latest
         ports:
         - containerPort: 2757
           protocol: UDP
+          name: game
         - containerPort: 2759
           protocol: UDP
+          name: discovery
         env:
         - name: SERVER_NAME
           value: "NI SuperTuxKart Server"
@@ -33,12 +34,6 @@ spec:
           value: "1"
         - name: MAX_PLAYERS
           value: "20"
-        - name: WAN_SERVER
-          value: "false"
-        - name: SERVER_PORT
-          value: "2759"
-        - name: LAN_SERVER_NAME
-          value: "NI SuperTuxKart Server"
 ---
 apiVersion: v1
 kind: Service
@@ -57,4 +52,4 @@ spec:
     targetPort: 2759
     protocol: UDP
     name: discovery
-  type: NodePort
+  type: ClusterIP
