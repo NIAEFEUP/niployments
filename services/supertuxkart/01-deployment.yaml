@@ -21,9 +21,6 @@ spec:
         - containerPort: 2759
           protocol: UDP
           name: game
-        - containerPort: 2757
-          protocol: UDP
-          name: discovery
         env:
         - name: SERVER_NAME
           value: "NI SuperTuxKart Server"
@@ -47,8 +44,4 @@ spec:
     targetPort: 2759
     protocol: UDP
     name: game
-  - port: 2757
-    targetPort: 2757
-    protocol: UDP
-    name: discovery
   type: ClusterIP

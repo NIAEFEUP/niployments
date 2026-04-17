@@ -6,21 +6,8 @@ metadata:
   namespace: supertuxkart
 spec:
   entryPoints:
-    - stk-game
+    - boobs
   routes:
   - services:
     - name: supertuxkart-service
       port: 2759
----
-apiVersion: traefik.io/v1alpha1
-kind: IngressRouteUDP
-metadata:
-  name: supertuxkart-discovery-ingress-udp
-  namespace: supertuxkart
-spec:
-  entryPoints:
-    - stk-discovery
-  routes:
-  - services:
-    - name: supertuxkart-service
-      port: 2757
