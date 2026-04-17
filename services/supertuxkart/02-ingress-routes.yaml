@@ -1,0 +1,26 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteUDP
+metadata:
+  name: supertuxkart-game-ingress-udp
+  namespace: supertuxkart
+spec:
+  entryPoints:
+    - stk-game
+  routes:
+  - services:
+    - name: supertuxkart-service
+      port: 2757
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteUDP
+metadata:
+  name: supertuxkart-discovery-ingress-udp
+  namespace: supertuxkart
+spec:
+  entryPoints:
+    - stk-discovery
+  routes:
+  - services:
+    - name: supertuxkart-service
+      port: 2759

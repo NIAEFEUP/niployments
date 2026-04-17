@@ -740,7 +740,16 @@ ports:
     expose: true
     exposedPort: 42069
     protocol: TCP
-  
+  stk-game:
+    port: 2757
+    expose: true
+    exposedPort: 2757
+    protocol: UDP
+  stk-discovery:
+    port: 2759
+    expose: true
+    exposedPort: 2759
+    protocol: UDP
 
 # -- TLS Options are created as TLSOption CRDs
 # https://doc.traefik.io/traefik/https/tls/#tls-options
