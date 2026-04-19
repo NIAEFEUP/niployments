@@ -2,11 +2,6 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# ********REQUIRED********
-node:
-  hostname: 'dell3' # Your kube node's hostname
-# ************************
-
 minecraft:
   name: 'minicraft'
   namespace: 'minicraft' # Just for reference
@@ -19,7 +14,8 @@ minecraft:
 
 volume:
   storage: 3Gi
-  path: '/home/augusto/NI/miNIcraft/data2' # Path to wherever you want to save your worldfile
+  storageClassName: longhorn-locality-no-backup
+  mountPath: /data/miNIcraft
 
 resources:
   limits:

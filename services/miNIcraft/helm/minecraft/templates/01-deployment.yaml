@@ -49,7 +49,7 @@ spec:
           name: minecraft
         volumeMounts:
           - name: minecraft-data
-            mountPath:  /data
+            mountPath: {{ .Values.volume.mountPath }}
         readinessProbe:
           exec:
             command:

@@ -2,12 +2,12 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRouteTCP
 metadata:
   name: {{ .Values.minecraft.name }}-irtcp
-  namespace: {{ .Values.minecraft.namespace }}
+  namespace: {{ .Values.minecraft.namespace }} # shouldn't be necessary but just in case
 spec:
   entryPoints:
     - minecraft
   routes:
-    - match: HostSNI(`*`)
+    - match: minicraft.niaefeup.pt
       services:
         - name: {{ .Values.minecraft.name }}-server
           port: {{ .Values.minecraft.port }}
