@@ -1,5 +1,5 @@
 apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
+kind: IngressRouteTCP
 metadata:
   name: {{ .Values.minecraft.name }}-irtcp
   namespace: {{ .Release.Namespace }}
@@ -7,10 +7,8 @@ spec:
   entryPoints:
     - minecraft
   routes:
-    - match: HostSNI(`*`)
+    - match: ClientIP(`0.0.0.0/0`)
       kind: Rule
       services:
         - name: {{ .Values.minecraft.name }}-server
           port: {{ .Values.minecraft.port }}
-  tls:
-    secretName: {{ .Values.minecraft.name }}-cert
