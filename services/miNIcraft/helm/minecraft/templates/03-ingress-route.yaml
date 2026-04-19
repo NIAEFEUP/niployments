@@ -2,12 +2,13 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: {{ .Values.minecraft.name }}-irtcp
-  namespace: {{ .Values.minecraft.namespace }}
+  namespace: {{ .Release.Namespace }}
 spec:
   entryPoints:
     - minecraft
   routes:
     - match: HostSNI(`*`)
+      kind: Rule
       services:
         - name: {{ .Values.minecraft.name }}-server
           port: {{ .Values.minecraft.port }}

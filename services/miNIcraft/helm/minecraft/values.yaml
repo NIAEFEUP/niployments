@@ -3,12 +3,11 @@
 # Declare variables to be passed into your templates.
 
 minecraft:
-  name: 'minicraft'
-  namespace: 'minicraft' # Just for reference
-  type: 'PAPER'
-  version: '26.1.2'
-  gamemode: 'survival'
-  motd: 'Isto é a mensagem do dia.' # Message of the Day
+  name: "minicraft"
+  type: "PAPER"
+  version: "26.1.2"
+  gamemode: "survival"
+  motd: "Isto é a mensagem do dia." # Message of the Day
   port: 30565
   onlineMode: false
 
@@ -22,4 +21,3 @@ resources:
     memory: 2Gi
   requests:
     memory: 1.5Gi
-
