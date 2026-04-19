@@ -27,7 +27,7 @@ spec:
         - name: SERVER_MODE
           value: "0"
         - name: SERVER_DIFFICULTY
-          value: "1"
+          value: "3"
         - name: MAX_PLAYERS
           value: "20"
 ---

@@ -704,7 +704,7 @@ ports:
     port: 8008
     expose: true
     exposedPort: 8008
-    protocol: UDP
+    protocol: TCP
   image-registry:
     port: 9001
     expose: true
@@ -740,6 +740,7 @@ ports:
     expose: true
     exposedPort: 42069
     protocol: TCP
+  
 
 # -- TLS Options are created as TLSOption CRDs
 # https://doc.traefik.io/traefik/https/tls/#tls-options
