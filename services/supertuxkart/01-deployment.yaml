@@ -18,9 +18,12 @@ spec:
       - name: supertuxkart
         image: peucastro/stk-server:latest
         ports:
-        - containerPort: 2759
+        - containerPort: 2757
           protocol: UDP
           name: game
+        - containerPort: 2759
+          protocol: UDP
+          name: discovery
         env:
         - name: SERVER_NAME
           value: "NI SuperTuxKart Server"
@@ -40,8 +43,12 @@ spec:
   selector:
     app: supertuxkart
   ports:
+  - port: 2757
+    targetPort: 2757
+    protocol: UDP
+    name: game
   - port: 2759
     targetPort: 2759
     protocol: UDP
-    name: game
-  type: ClusterIP
+    name: discovery
+  type: NodePort
