@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: minecraft-data
+  name: {{ .Values.minecraft.name }}-data
 spec:
   capacity:
     storage: 10Gi
@@ -10,7 +10,7 @@ spec:
   accessModes:
   - ReadWriteOnce
   persistentVolumeReclaimPolicy: Delete
-  storageClassName: local-storage
+  storageClassName: longhorn-locality-no-backup
   local:
     path: "{{ .Values.volume.path }}"
   nodeAffinity:

@@ -1,7 +1,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: minecraft-data-pvc
+  name: {{ .Values.minecraft.name }}-data-pvc
 spec:
   storageClassName: longhorn-locality-no-backup
   accessModes:

@@ -8,11 +8,14 @@ node:
 # ************************
 
 minecraft:
+  name: 'minicraft'
+  namespace: 'minicraft' # Just for reference
   type: 'PAPER'
-  version: '1.20.4'
+  version: '26.1.2'
   gamemode: 'survival'
-  motd: 'Your super-cool, super-kube, minecraft server' # Message of the Day
+  motd: 'Isto é a mensagem do dia.' # Message of the Day
   port: 30565
+  onlineMode: false
 
 volume:
   storage: 3Gi
