@@ -1,8 +1,0 @@
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: pgadmin-config
-  namespace: pgadmin
-data:
-  # Configurações adicionais do pgAdmin podem ser adicionadas aqui

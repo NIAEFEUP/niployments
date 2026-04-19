@@ -17,15 +17,15 @@ spec:
       containers:
         - name: pgadmin
           image: dpage/pgadmin4:8.14
-          imagePullPolicy: IfNotPresent # ou Always, para garantir que temos a última versão?
-          resources: # Que valores devemos usar, para já temos isto como default?
+          imagePullPolicy: IfNotPresent
+          resources:
             limits:
-              memory: "512Mi" # mais, menos?
-              cpu: "1" # 1, 500m, ...?
-              requests:
-                memory: "32Mi" # mais, menos?
-                cpu: "0m" # 0m, 100m, ...?
-          ports: # que port usar? 80 ou outro?
+              memory: "512Mi"
+              cpu: "1"
+            requests:
+              memory: "32Mi"
+              cpu: "100m"
+          ports:
             - containerPort: 80
           envFrom:
             - secretRef:
@@ -75,5 +75,5 @@ spec:
   ports:
     - port: 80
       targetPort: 80
-      protocol: TCP # é preciso especificar o protocolo?
-  type: ClusterIP # ou NodePort, LoadBalancer? ClusterIP é suficiente para o Traefik aceder ao serviço, certo? Precisamos de deixar definido mesmo?
+      protocol: TCP
+  type: ClusterIP
