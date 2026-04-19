@@ -11,59 +11,17 @@ From the repository root:
 ```
 
 This applies all manifests in dependency order:
-1. Namespace creation (`00-namespace.yaml`)
-2. Secrets (`01-secrets.yaml`)
-3. ConfigMap with server configs (`02-config.yaml`)
-4. Deployment, PVC & Service (`03-deployment.yaml`)
-5. TLS Certificate (`04-certificates.yaml`)
-6. Ingress routing via Traefik (`05-ingress-routes.yaml`)
+1. Installs pgadmin with helm charts
+2. Created the certificates
+3. Create the ingress routes
 
 ### Prerequisites
 
-- Kubernetes cluster running with Traefik and cert-manager
-- CNPG PostgreSQL cluster deployed in the `pg` namespace
-- DNS record for `pgadmin.niaefeup.pt` pointing to Traefik LB IP (`10.11.11.2` on prod, `172.28.255.205` on dev)
-
-### Manual Deployment
-
-If needed, apply manifests individually:
-
-```bash
-kubectl apply -f services/databases/pgadmin/00-namespace.yaml
-kubectl apply -f services/databases/pgadmin/01-secrets.yaml
-kubectl apply -f services/databases/pgadmin/02-config.yaml
-kubectl apply -f services/databases/pgadmin/03-deployment.yaml
-kubectl apply -f services/databases/pgadmin/04-certificates.yaml
-kubectl apply -f services/databases/pgadmin/05-ingress-routes.yaml
-```
+- Have the DNS record for `pgadmin.niaefeup.pt` available
 
 ## Configuration
 
-### Pre-configured Database Servers
-
-By default, PgAdmin comes with two pre-configured CNPG cluster connections:
-
-| Server | Endpoint | Use Case |
-|--------|----------|----------|
-| CNPG Cluster (Read-Write) | `cnpg-cluster-rw.pg.svc.cluster.local:5432` | Writes, transactions, schema changes |
-| CNPG Cluster (Read-Only) | `cnpg-cluster-ro.pg.svc.cluster.local:5432` | Read-only queries, reporting, analytics |
-
-These are configured in [02-config.yaml](02-config.yaml) and automatically imported on startup.
-
-### Default Admin Credentials
-
-Stored in [01-secrets.yaml](01-secrets.yaml) (update before deploying):
-
-- `PGADMIN_DEFAULT_EMAIL`: Configure this
-- `PGADMIN_DEFAULT_PASSWORD`: Configure this (will be prompted to reset on first login)
-
-Set these before deploying, or update the secret afterward:
-
-```bash
-kubectl set env -n pgadmin deployment/pgadmin \
-  PGADMIN_DEFAULT_EMAIL=admin@niaefeup.pt \
-  PGADMIN_DEFAULT_PASSWORD='<your-secure-password>'
-```
+You can configure the PGAdmin changing the `values.yaml` file before deployment. For more information you can check the official [documentation](https://artifacthub.io/packages/helm/runix/pgadmin4).
 
 ## Adding New Database Servers Manually
 
