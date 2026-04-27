@@ -18,9 +18,6 @@ spec:
       - name: minecraft-data
         persistentVolumeClaim:
           claimName: {{ .Values.minecraft.name }}-data-pvc
-      - name: whitelist
-        configMap:
-          name: minecraft-whitelist
       containers:
       - name: minecraft-server
         image: itzg/minecraft-server:latest
@@ -46,17 +43,18 @@ spec:
             value: "{{ .Values.minecraft.port }}"
           - name: ONLINE_MODE
             value: "{{ .Values.minecraft.onlineMode }}"
+          - name: WHITELIST
+            value: "{{ .Values.minecraft.whitelist }}"
           - name: ENABLE_WHITELIST
             value: "{{ .Values.minecraft.enableWhitelist }}"
+          - name: PLUGINS
+            value: "https://github.com/SkinsRestorer/SkinsRestorer/releases/latest/download/SkinsRestorer.jar"
         ports:
         - containerPort: {{ .Values.minecraft.port }}
           name: minecraft
         volumeMounts:
           - name: minecraft-data
             mountPath: {{ .Values.volume.mountPath }}
-          - name: whitelist
-            mountPath: /data/whitelist.json
-            subPath: whitelist.json
         readinessProbe:
           exec:
             command:

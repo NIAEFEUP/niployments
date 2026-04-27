@@ -11,6 +11,7 @@ minecraft:
   port: 30565
   onlineMode: false
   enableWhitelist: true
+  whitelist: Tomili2000,peu,Pinho,Sp1kyBtw,Darguima,pmpy_,skaffoldf
 
 volume:
   storage: 6Gi
