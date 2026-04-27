@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minecraft-whitelist
+data:
+  whitelist.json: |
+    [
+      {
+        "uuid": "your-uuid-here",
+        "name": "your-username"
+      }
+    ]

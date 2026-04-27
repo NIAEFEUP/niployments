@@ -43,6 +43,8 @@ spec:
             value: "{{ .Values.minecraft.port }}"
           - name: ONLINE_MODE
             value: "{{ .Values.minecraft.onlineMode }}"
+          - name: ENABLE_WHITELIST
+            value: "{{ .Values.minecraft.enableWhitelist }}"
         ports:
         - containerPort: {{ .Values.minecraft.port }}
           name: minecraft

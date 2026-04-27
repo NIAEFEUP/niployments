@@ -10,11 +10,14 @@ minecraft:
   motd: "Isto é a mensagem do dia." # Message of the Day
   port: 30565
   onlineMode: false
+  enableWhitelist: true
 
 volume:
   storage: 3Gi
   storageClassName: longhorn-locality-no-backup
   mountPath: /data
+  configMap:
+    name: minecraft-config
 
 resources:
   limits:
