@@ -7,20 +7,18 @@ minecraft:
   type: "PAPER"
   version: "26.1.2"
   gamemode: "survival"
-  motd: "Isto é a mensagem do dia." # Message of the Day
+  motd: "Bem-vindos ao miNIcraft!"
   port: 30565
   onlineMode: false
   enableWhitelist: true
 
 volume:
-  storage: 3Gi
+  storage: 6Gi
   storageClassName: longhorn-locality-no-backup
   mountPath: /data
-  configMap:
-    name: minecraft-config
 
 resources:
   limits:
-    memory: 2Gi
+    memory: 4Gi
   requests:
-    memory: 1.5Gi
+    memory: 2Gi

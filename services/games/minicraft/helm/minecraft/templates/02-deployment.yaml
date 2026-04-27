@@ -18,6 +18,9 @@ spec:
       - name: minecraft-data
         persistentVolumeClaim:
           claimName: {{ .Values.minecraft.name }}-data-pvc
+      - name: whitelist
+        configMap:
+          name: minecraft-whitelist
       containers:
       - name: minecraft-server
         image: itzg/minecraft-server:latest
@@ -51,6 +54,9 @@ spec:
         volumeMounts:
           - name: minecraft-data
             mountPath: {{ .Values.volume.mountPath }}
+          - name: whitelist
+            mountPath: /data/whitelist.json
+            subPath: whitelist.json
         readinessProbe:
           exec:
             command:
