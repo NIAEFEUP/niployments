@@ -9,6 +9,8 @@ spec:
   selector:
     matchLabels:
       app: minecraft-server
+  # wait for announcement + world save time
+  terminationGracePeriodSeconds: {{ add .Values.minecraft.stopDelay 60 }}
   template:
     metadata:
       labels:
@@ -47,6 +49,8 @@ spec:
             value: "{{ .Values.minecraft.whitelist }}"
           - name: ENABLE_WHITELIST
             value: "{{ .Values.minecraft.enableWhitelist }}"
+          - name: STOP_SERVER_ANNOUNCE_DELAY
+            value: "{{ .Values.minecraft.stopDelay }}"
           - name: PLUGINS
             value: "https://github.com/SkinsRestorer/SkinsRestorer/releases/latest/download/SkinsRestorer.jar"
         ports:

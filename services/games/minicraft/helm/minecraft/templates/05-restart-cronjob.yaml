@@ -1,0 +1,21 @@
+# CronJob
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "minecraft.fullname" . }}-reboot
+  namespace: {{ .Release.Namespace }}
+spec:
+  schedule: {{ .Values.restart.schedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ include "minecraft.fullname" . }}-restart-sa
+          containers:
+          - name: kubectl
+            image: bitnami/kubectl:latest
+            command:
+                - /bin/sh
+                - -c
+                - kubectl rollout restart deployment/{{ .Values.minecraft.name }}-server
+          restartPolicy: OnFailure

@@ -12,6 +12,7 @@ minecraft:
   onlineMode: false
   enableWhitelist: true
   whitelist: Tomili2000,peu,Pinho,Sp1kyBtw,Darguima,pmpy_,skaffoldf
+  stopDelay: 60 # warning time for players when server shutdowns (seconds)
 
 volume:
   storage: 6Gi
@@ -23,3 +24,7 @@ resources:
     memory: 4Gi
   requests:
     memory: 2Gi
+
+restart:
+  # Run everyday at 9:00 AM
+  schedule: "0 7 * * *"
