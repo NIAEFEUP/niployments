@@ -27,6 +27,8 @@ spec:
           requests:
             memory: "{{ .Values.resources.requests.memory }}"
         env:
+          - name: MEMORY
+            value: "{{.Values.minecraft.heap_memory}}"
           - name: TYPE
             value: "{{.Values.minecraft.type}}"
           - name: VERSION

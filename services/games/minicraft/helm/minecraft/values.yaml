@@ -11,7 +11,8 @@ minecraft:
   port: 30565
   onlineMode: false
   enableWhitelist: true
-  whitelist: Tomili2000,peu,Pinho,Sp1kyBtw,Darguima,pmpy_,skaffoldf
+  whitelist: rubuy74, SellingJaguar, miltilde, peu, seymm, ramaa____, AnalyticalT, guicnunes, ttoino, Flumpe6, RickyF, Marianita21, Emerald_Scammer, Tomili2000, Montanelas, Darguima, jipinho, dtvf7, Sp1kyBtw, skaffoldf, GunaMalvado, FrozenHart, Pinho, pmpy_
+  heap_memory: 4G
 
 volume:
   storage: 6Gi
@@ -20,6 +21,6 @@ volume:
 
 resources:
   limits:
-    memory: 4Gi
+    memory: 6Gi
   requests:
-    memory: 2Gi
+    memory: 4Gi
