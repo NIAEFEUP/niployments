@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: teup-website-https
+  namespace: teup-website
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`teup.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: teup-website-service
+          port: 80
+  tls:
+    secretName: teup-website-cert
