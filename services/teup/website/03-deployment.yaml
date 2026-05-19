@@ -1,0 +1,69 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teup-website
+  namespace: teup-website
+  annotations:
+    keel.sh/policy: "force"
+    keel.sh/match-tag: "true"
+spec:
+  selector:
+    matchLabels:
+      app: teup-website
+  template:
+    metadata:
+      labels:
+        app: teup-website
+    spec:
+      containers:
+        - name: teup-website-frontend
+          image: registry.niaefeup.pt/teup/website-frontend:main
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: teup-images
+              mountPath: /usr/share/nginx/html/imagens
+        - name: teup-website-api
+          image: registry.niaefeup.pt/teup/website-api:master
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: teup-images
+              mountPath: /app/images
+            - name: teup-env
+              mountPath: /app/.env
+              subPath: env
+              readOnly: true
+      volumes:
+        - name: teup-images
+          persistentVolumeClaim:
+            claimName: teup-images-pvc
+        - name: teup-env
+          secret:
+            secretName: teup-website-env
+      imagePullSecrets:
+        - name: harbor-pull-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: teup-website-service
+  namespace: teup-website
+spec:
+  selector:
+    app: teup-website
+  ports:
+    - port: 80
+      targetPort: 80
+  type: "ClusterIP"
