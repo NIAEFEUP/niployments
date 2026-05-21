@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`teup.niaefeup.pt`)
+    - match: Host(`teup.pt`) || Host(`www.teup.pt`)
       kind: Rule
       services:
         - name: teup-website-service

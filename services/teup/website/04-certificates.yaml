@@ -8,6 +8,7 @@ spec:
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
-  commonName: teup.niaefeup.pt
+  commonName: teup.pt
   dnsNames:
-    - teup.niaefeup.pt
+    - teup.pt
+    - www.teup.pt
