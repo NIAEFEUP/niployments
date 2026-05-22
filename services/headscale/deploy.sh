@@ -1,14 +1,17 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
-DIR=$(dirname "$0")
+SCRIPT_DIR=$(dirname "$0")
 
-kubectl apply -f "$DIR/00-namespace.yaml"
-kubectl apply -f "$DIR/01-configuration.yaml"
-kubectl apply -f "$DIR/02-volume-claims.yaml"
-kubectl apply -f "$DIR/03-service.yaml"
-kubectl apply -f "$DIR/04-deployment.yaml"
-kubectl delete -f "$DIR/06-ingress-routes-dev.yaml" --ignore-not-found
-kubectl apply -f "$DIR/05-certificates.yaml"
-kubectl apply -f "$DIR/06-ingress-routes.yaml"
+kubectl create namespace headscale --dry-run=client -o yaml | kubectl apply -f -
+
+helm repo add gabe565 https://charts.gabe565.com
+helm repo update
+
+helm upgrade --install headscale gabe565/headscale \
+  --namespace headscale \
+  --values "$SCRIPT_DIR/values.yaml"
+
+kubectl apply -f "$SCRIPT_DIR/01-certificate.yaml"
+kubectl apply -f "$SCRIPT_DIR/02-ingressroute.yaml"
