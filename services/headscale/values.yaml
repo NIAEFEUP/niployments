@@ -1,6 +1,7 @@
-config:
-  server_url: https://headscale.niaefeup.pt
-  metrics_listen_addr: 0.0.0.0:9090
+env:
+  HEADSCALE_SERVER_URL: "https://headscale.niaefeup.pt"
+  HEADSCALE_METRICS_LISTEN_ADDR: "0.0.0.0:9090"
+  HEADSCALE_DNS_BASE_DOMAIN: "niaefeup.pt"
 
 ingress:
   main:
