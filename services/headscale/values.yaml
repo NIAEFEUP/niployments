@@ -3,7 +3,8 @@ config:
   metrics_listen_addr: 0.0.0.0:9090
 
 ingress:
-  enabled: false
+  main:
+    enabled: false
 
 persistence:
   config:
