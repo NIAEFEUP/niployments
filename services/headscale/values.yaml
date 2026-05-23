@@ -6,7 +6,8 @@ ingress:
   enabled: false
 
 persistence:
-  enabled: true
-  storageClassName: "longhorn-retain"
-  accessMode: ReadWriteOnce
-  size: 2Gi
+  config:
+    enabled: true
+    storageClass: "longhorn-retain"
+    accessMode: ReadWriteOnce
+    size: 2Gi
