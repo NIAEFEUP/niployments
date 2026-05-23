@@ -9,6 +9,6 @@ ingress:
 persistence:
   config:
     enabled: true
-    storageClass: "longhorn-retain"
+    storageClass: "longhorn-locality-retain"
     accessMode: ReadWriteOnce
     size: 2Gi
