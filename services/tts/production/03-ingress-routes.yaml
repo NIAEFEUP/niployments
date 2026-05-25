@@ -1,0 +1,65 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: tts-strip-api-prefix
+  namespace: tts
+spec:
+  stripPrefix:
+    prefixes:
+    - /api
+    forceSlash: false
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: tts-redirect-to-primary
+  namespace: tts
+spec:
+  redirectRegex:
+    regex: "^https://ni.fe.up.pt/tts/?(.*)"
+    replacement: "https://tts.niaefeup.pt/$1"
+    permanent: false
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: tts-primary-ingress-route
+  namespace: tts
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`tts.niaefeup.pt`) && PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: tts-backend-service
+          port: 80
+      middlewares:
+        - name: tts-strip-api-prefix
+    - match: Host(`tts.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: tts-frontend-service
+          port: 80
+  tls:
+    secretName: tts-certificate-secret
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: tts-secondary-ingress-route
+  namespace: tts
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`ni.fe.up.pt`) && PathPrefix(`/tts`)
+      kind: Rule
+      middlewares:
+        - name: tts-redirect-to-primary
+      services:
+        - kind: TraefikService
+          name: noop@internal
+  tls:
+    secretName: website-cert

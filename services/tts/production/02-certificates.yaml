@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tts-certificate
+  namespace: tts
+spec:
+  secretName: tts-certificate-secret
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  dnsNames:
+    - tts.niaefeup.pt
