@@ -220,10 +220,10 @@ providers:
       # - "default"
     # IP used for Kubernetes Ingress endpoints
     publishedService:
-      enabled: true
+      enabled: false
       # Published Kubernetes Service to copy status from. Format: namespace/servicename
       # By default this Traefik service
-      pathOverride: "kube-system/traefik"
+      # pathOverride: ""
 
 #
 # -- Add volumes to the traefik pod. The volume name will be passed to tpl.
