@@ -1,0 +1,30 @@
+provider:
+  name: cloudflare
+
+sources:
+  - ingress
+  - service
+  - traefik-proxy
+
+env:
+  - name: CF_API_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: cloudflare-api-key
+        key: apiKey
+
+rbac:
+  create: true
+  extraRules:
+    - apiGroups: [""]
+      resources: ["services", "endpoints", "pods"]
+      verbs: ["get", "list", "watch"]
+    - apiGroups: ["traefik.containo.us", "traefik.io"]
+      resources: ["ingressroutes", "ingressroutetcps", "ingressrouteudps"]
+      verbs: ["get", "list", "watch"]
+
+extraArgs:
+  - --txt-owner-id=niployments
+  - --txt-prefix=external-dns-
+  - --cloudflare-proxied
+  - --domain-filter=niaefeup.pt
