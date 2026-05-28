@@ -13,16 +13,6 @@ env:
         name: cloudflare-api-key
         key: apiKey
 
-rbac:
-  create: true
-  extraRules:
-    - apiGroups: [""]
-      resources: ["services", "endpoints", "pods"]
-      verbs: ["get", "list", "watch"]
-    - apiGroups: ["traefik.containo.us", "traefik.io"]
-      resources: ["ingressroutes", "ingressroutetcps", "ingressrouteudps"]
-      verbs: ["get", "list", "watch"]
-
 extraArgs:
   - --txt-owner-id=niployments
   - --txt-prefix=external-dns-
