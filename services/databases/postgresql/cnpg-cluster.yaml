@@ -53,7 +53,7 @@ spec:
           name: teup-secret
 
   storage:
-    size: 20Gi
+    size: 40Gi
     #backups are handled by cloudnative postgres
     storageClass: longhorn-strict-local-no-backup
 
