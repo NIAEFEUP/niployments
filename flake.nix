@@ -21,6 +21,7 @@
           packages = with pkgs; [
             docker
             kind
+            argocd
             cilium-cli
             kubernetes-helm
             kubectl

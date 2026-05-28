@@ -10,3 +10,5 @@ testbed/output-generated/**
 *.box
 .ssh/**
 ansible-inventory-prod.ini
+
+.direnv/
