@@ -11,4 +11,4 @@ metadata:
   namespace: external-dns
 type: Opaque
 stringData:
-  apiKey: <FILL-IN-YOUR-CLOUDFLARE-TOKEN-HERE>
+  apiKey: <FILL-IN>

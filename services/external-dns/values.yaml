@@ -16,5 +16,6 @@ env:
 extraArgs:
   - --txt-owner-id=niployments
   - --txt-prefix=external-dns-
+  - --interval=5m0s
   - --cloudflare-proxied
   - --domain-filter=niaefeup.pt
