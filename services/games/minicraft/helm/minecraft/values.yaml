@@ -26,5 +26,5 @@ resources:
     memory: 2Gi
 
 restart:
-  # Run everyday at 9:00 AM
+  # Run everyday at 7:00 AM
   schedule: "0 7 * * *"
