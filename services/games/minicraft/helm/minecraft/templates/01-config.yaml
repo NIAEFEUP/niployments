@@ -4,7 +4,7 @@ metadata:
   name: {{ .Values.resourceNames.configMap }}
   labels:
     {{- toYaml .Values.commonLabels | nindent 4 }}
-data:
+data: # TODO : move whitelist to a new file
   whitelist.json: |
     [
       {
