@@ -8,19 +8,159 @@ data:
   whitelist.json: |
     [
       {
-        "uuid": "838c6e1d-e176-411b-bc1c-02377a5fe570",
-        "name": "Tomili2000"
+        "uuid": "b1409833-eea2-344d-a1e2-954225ce0432",
+        "name": "AnalyticalT"
+      },
+      {
+        "uuid": "8308cd3a-ecfa-3ea6-9b68-07c8dd2c501b",
+        "name": "CapitaoDiabetes"
+      },
+      {
+        "uuid": "2567c8a3-3b33-3af8-863e-a55267ea37a9",
+        "name": "Darguima"
+      },
+      {
+        "uuid": "8bb625c8-f610-3043-8359-9fcf93d8c709",
+        "name": "DoctorRP"
+      },
+      {
+        "uuid": "69dd0490-4ea9-3632-83a4-3b3e9fbbcc49",
+        "name": "dtvf7"
+      },
+      {
+        "uuid": "2406e454-b2c5-347b-934a-c979667c2cda",
+        "name": "Emerald_Scammer"
+      },
+      {
+        "uuid": "bd980094-7ad1-31ea-b10d-91fc8a47bf11",
+        "name": "Flumpe6"
+      },
+      {
+        "uuid": "4f47ed48-fbaa-3adc-a31c-f6bac83ce5cc",
+        "name": "FrozenHart"
+      },
+      {
+        "uuid": "7156956d-28a5-3b56-a806-f6c2fabdd136",
+        "name": "guicnunes"
+      },
+      {
+        "uuid": "1652c872-bab7-37cc-bef0-f79b5dadb935",
+        "name": "GunaMalvado"
+      },
+      {
+        "uuid": "72091bca-55d6-31e8-b219-bd1c970c6f1b",
+        "name": "guuigas"
+      },
+      {
+        "uuid": "8dc1e373-fc94-3847-a2ab-b8a659d479bb",
+        "name": "Isaac3105"
+      },
+      {
+        "uuid": "45d6e6d7-6cc8-3238-ae38-45cfc587ba6e",
+        "name": "jipinho"
+      },
+      {
+        "uuid": "3e23a568-9f34-396f-9144-dc6055106b52",
+        "name": "Marianita21"
+      },
+      {
+        "uuid": "5c662d32-fb17-33b6-b200-f506201defd9",
+        "name": "miltilde"
+      },
+      {
+        "uuid": "2361277b-30a5-3617-9cca-19f43c2e5d80",
+        "name": "Montanelas"
+      },
+      {
+        "uuid": "d07564e6-8d21-3329-a855-825203763683",
+        "name": "muralhaplays"
+      },
+      {
+        "uuid": "831df172-0723-356d-ac15-e01d9a5ab09d",
+        "name": "peu"
       },
       {
         "uuid": "40af3eb2-16c4-44e2-9287-0aa5b263e5c8",
         "name": "peu"
       },
       {
+        "uuid": "de7d9c6a-7240-34d5-8283-3c0713a43396",
+        "name": "Pinho"
+      },
+      {
         "uuid": "67339cca-a6bb-4b9c-afe2-b3d2b53d19dd",
         "name": "Pinho"
       },
       {
+        "uuid": "cf2022cc-2006-3ad5-9c9b-cb2f9784c3e2",
+        "name": "pmpy_"
+      },
+      {
+        "uuid": "11ee4d66-ed0d-35bf-ba23-73f9372f6b11",
+        "name": "ramaa____"
+      },
+      {
+        "uuid": "4db143fd-4713-3be2-89e5-ade1af77f0a2",
+        "name": "ramaa____"
+      },
+      {
+        "uuid": "cb4a34f1-d3b4-3696-912a-ab159c513980",
+        "name": "rcachaldora"
+      },
+      {
+        "uuid": "5cf8cc29-3c0e-3c51-bacc-ba8aea28f1ee",
+        "name": "RickyF"
+      },
+      {
+        "uuid": "554bff4b-1959-3869-a7ac-a2f2f281e71e",
+        "name": "rubuy74"
+      },
+      {
+        "uuid": "d5d00e84-d45e-3965-aa5e-5852414d7a3f",
+        "name": "SeekerOfSouls"
+      },
+      {
+        "uuid": "a6b0be92-f3e3-3cf4-b455-142ae068d547",
+        "name": "SellingJaguar"
+      },
+      {
+        "uuid": "aa380d45-3d53-35bf-b174-7b28ff242e1c",
+        "name": "seymm"
+      },
+      {
+        "uuid": "4e4b5e50-3f7e-363b-b025-5eeaf4a0f220",
+        "name": "skaffoldf"
+      },
+      {
+        "uuid": "475a3d33-cb77-3678-b5e1-6aed498493c8",
+        "name": "Sp1kyBtw"
+      },
+      {
         "uuid": "566000e0-7b6d-4e4a-82d5-0db24f238da0",
         "name": "Sp1kyBtw"
+      },
+      {
+        "uuid": "4fdf550e-f3b3-3a06-8485-0916b2b491bc",
+        "name": "teste"
+      },
+      {
+        "uuid": "824ac86f-9bf0-315a-912b-1d6d71e3cff3",
+        "name": "Togamerp"
+      },
+      {
+        "uuid": "e19d10be-ff87-3d21-98c0-d1498366fe1e",
+        "name": "Tomili2000"
+      },
+      {
+        "uuid": "838c6e1d-e176-411b-bc1c-02377a5fe570",
+        "name": "Tomili2000"
+      },
+      {
+        "uuid": "38f5497f-ce83-3efe-9070-78b8805b6747",
+        "name": "ttoino"
+      },
+      {
+        "uuid": "b08ea29e-c717-3fce-8ec0-d2f81470a04c",
+        "name": "Vespasiano_7"
       }
     ]

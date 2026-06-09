@@ -15,7 +15,7 @@ spec:
           serviceAccountName: {{ .Values.resourceNames.serviceAccount }}
           containers:
           - name: kubectl
-            image: bitnami/kubectl:latest
+            image: {{ .Values.restart.kubectlImage }}
             command:
                 - /bin/sh
                 - -c

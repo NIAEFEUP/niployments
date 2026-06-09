@@ -22,7 +22,7 @@ commonLabels:
 minecraft:
   name: "minicraft"
   type: "FABRIC"
-  version: "1.20.1" # Standardized to a real version for Fabric
+  version: "1.20.1"
   gamemode: "survival"
   motd: "Bem-vindos ao miNIcraft!"
   port: 30565
@@ -30,6 +30,9 @@ minecraft:
   enableWhitelist: true
   whitelist: Tomili2000,peu,Pinho,Sp1kyBtw,Darguima,pmpy_,skaffoldf
   stopDelay: 60
+  replicas: 1
+  allowFlight: true
+  eula: true
   modrinth:
     projects:
       - fabric-api
@@ -55,10 +58,32 @@ image:
   tag: java21
   pullPolicy: IfNotPresent
 
+service:
+  type: ClusterIP
+
+ingress:
+  entryPoints:
+    - minecraft
+  match: "ClientIP(`0.0.0.0/0`)"
+
+probes:
+  startup:
+    initialDelaySeconds: 30
+    failureThreshold: 30
+    periodSeconds: 10
+  readiness:
+    initialDelaySeconds: 10
+    periodSeconds: 30
+  liveness:
+    initialDelaySeconds: 10
+    periodSeconds: 30
+
 volume:
   storage: 6Gi
   storageClassName: longhorn-locality-no-backup
   mountPath: /data
+  accessModes:
+    - ReadWriteOnce
 
 resources:
   limits:
@@ -76,3 +101,4 @@ securityContext:
 restart:
   # Run everyday at 7:00 AM
   schedule: "0 7 * * *"
+  kubectlImage: bitnami/kubectl:latest

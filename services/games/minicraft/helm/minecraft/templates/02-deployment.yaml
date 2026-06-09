@@ -7,16 +7,15 @@ metadata:
   labels:
     {{- toYaml .Values.commonLabels | nindent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.minecraft.replicas }}
   selector:
     matchLabels:
-      app: "minecraft-server"
+      app: {{ .Values.commonLabels.app | quote }}
   # wait for announcement + world save time
   terminationGracePeriodSeconds: {{ add .Values.minecraft.stopDelay 60 }}
   template:
     metadata:
       labels:
-        app: "minecraft-server"
         {{- toYaml .Values.commonLabels | nindent 8 }}
     spec:
       securityContext:
@@ -37,13 +36,13 @@ spec:
           - name: VERSION
             value: "{{ .Values.minecraft.version }}"
           - name: EULA
-            value: "TRUE"
+            value: {{ .Values.minecraft.eula | quote | upper }}
           - name: GAMEMODE
             value: "{{ .Values.minecraft.gamemode }}"
           - name: MOTD
             value: "{{ .Values.minecraft.motd }}"
           - name: ALLOW_FLIGHT
-            value: "TRUE"
+            value: {{ .Values.minecraft.allowFlight | quote | upper }}
           - name: SERVER_PORT
             value: "{{ .Values.minecraft.port }}"
           - name: ONLINE_MODE
@@ -81,9 +80,9 @@ spec:
             - 127.0.0.1
             - -port
             - "{{ .Values.minecraft.port }}"
-          initialDelaySeconds: 30
-          failureThreshold: 30
-          periodSeconds: 10
+          initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+          failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+          periodSeconds: {{ .Values.probes.startup.periodSeconds }}
         readinessProbe:
           exec:
             command:
@@ -93,8 +92,8 @@ spec:
             - 127.0.0.1
             - -port
             - "{{ .Values.minecraft.port }}"
-          initialDelaySeconds: 10
-          periodSeconds: 30
+          initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
         livenessProbe:
           exec:
             command:
@@ -104,8 +103,8 @@ spec:
             - 127.0.0.1
             - -port
             - "{{ .Values.minecraft.port }}"
-          initialDelaySeconds: 10
-          periodSeconds: 30
+          initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
 ---
 apiVersion: v1
 kind: Service
@@ -115,10 +114,10 @@ metadata:
   labels:
     {{- toYaml .Values.commonLabels | nindent 4 }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.minecraft.port }}
       targetPort: minecraft
       name: minecraft
   selector:
-    app: "minecraft-server"
+    app: {{ .Values.commonLabels.app | quote }}

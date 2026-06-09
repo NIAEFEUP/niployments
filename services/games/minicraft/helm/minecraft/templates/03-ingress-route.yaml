@@ -7,9 +7,9 @@ metadata:
     {{- toYaml .Values.commonLabels | nindent 4 }}
 spec:
   entryPoints:
-    - minecraft
+    {{- toYaml .Values.ingress.entryPoints | nindent 4 }}
   routes:
-    - match: ClientIP(`0.0.0.0/0`)
+    - match: {{ .Values.ingress.match }}
       kind: Rule
       services:
         - name: {{ .Values.resourceNames.service }}
