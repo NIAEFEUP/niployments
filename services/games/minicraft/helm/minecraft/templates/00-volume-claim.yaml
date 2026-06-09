@@ -1,7 +1,9 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ .Values.minecraft.name }}-data-pvc
+  name: {{ .Values.resourceNames.pvc }}
+  labels:
+    {{- toYaml .Values.commonLabels | nindent 4 }}
 spec:
   storageClassName: {{ .Values.volume.storageClassName }}
   accessModes:

@@ -1,18 +1,59 @@
 # Default values for minecraft.
-# This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+# Resource names for explicit control
+resourceNames:
+  deployment: "minicraft-server"
+  service: "minicraft-server"
+  pvc: "minicraft-data-pvc"
+  ingress: "minicraft-irtcp"
+  configMap: "minecraft-whitelist"
+  cronjob: "minicraft-reboot"
+  serviceAccount: "minicraft-restart-sa"
+  role: "minicraft-restart-role"
+  roleBinding: "minicraft-restart-rb"
+
+# Standard labels applied to all resources
+commonLabels:
+  app: "minecraft-server"
+  app.kubernetes.io/name: "minicraft"
+  managed-by: "helm"
 
 minecraft:
   name: "minicraft"
-  type: "PAPER"
-  version: "26.1.2"
+  type: "FABRIC"
+  version: "1.20.1" # Standardized to a real version for Fabric
   gamemode: "survival"
   motd: "Bem-vindos ao miNIcraft!"
   port: 30565
   onlineMode: false
   enableWhitelist: true
   whitelist: Tomili2000,peu,Pinho,Sp1kyBtw,Darguima,pmpy_,skaffoldf
-  stopDelay: 60 # warning time for players when server shutdowns (seconds)
+  stopDelay: 60
+  modrinth:
+    projects:
+      - fabric-api
+      - lithium
+      - skinrestorer
+      - servercore
+      - modernfix
+      - ferritecore
+      - memoryleakfix
+      - chunky
+      - c2me
+      - krypton
+      - vmp
+      - clumps
+      - letmedespawn
+      - get-it-together-drops
+      - spark
+    downloadDependencies: "required"
+    allowedVersionType: "release"
+
+image:
+  repository: itzg/minecraft-server
+  tag: java21
+  pullPolicy: IfNotPresent
 
 volume:
   storage: 6Gi
@@ -22,8 +63,15 @@ volume:
 resources:
   limits:
     memory: 4Gi
+    cpu: "2"
   requests:
     memory: 2Gi
+    cpu: "1"
+
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
 
 restart:
   # Run everyday at 7:00 AM
