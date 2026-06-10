@@ -1,0 +1,57 @@
+architecture: replication
+
+auth:
+  enabled: true
+  password: "GreatPass"
+  sentinel: true
+
+# In Sentinel mode
+# Bitnami deploys a single StatefulSet where each Pod runs Valkey + Sentinel.
+sentinel:
+  enabled: true
+  masterSet: "myprimary"
+  quorum: 2
+  downAfterMilliseconds: 5000
+  failoverTimeout: 60000
+  parallelSyncs: 1
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
+
+replica:
+  replicaCount: 3
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  persistence:
+    enabled: true
+    size: 2Gi
+    accessModes:
+      - ReadWriteOnce
+
+primary:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  persistence:
+    enabled: true
+    size: 2Gi
+    accessModes:
+      - ReadWriteOnce
+
+metrics:
+  enabled: true
+  image:
+    repository: bitnami/redis-exporter
+    tag: "latest"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 80Mi
+
+networkPolicy:
+  enabled: true
