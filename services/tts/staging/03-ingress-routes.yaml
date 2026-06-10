@@ -7,7 +7,7 @@ metadata:
 spec:
   stripPrefix:
     prefixes:
-    - /api
+      - /api
     forceSlash: false
 ---
 apiVersion: traefik.io/v1alpha1

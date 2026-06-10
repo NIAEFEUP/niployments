@@ -18,17 +18,17 @@ spec:
         app: tts-frontend
     spec:
       containers:
-      - name: tts-fe
-        image: registry.niaefeup.pt/niaefeup/tts-fe:develop
-        imagePullPolicy: Always
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
-        ports:
-        - containerPort: 80
+        - name: tts-fe
+          image: registry.niaefeup.pt/niaefeup/tts-fe:develop
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
       imagePullSecrets:
-      - name: harbor-pull-secret
+        - name: harbor-pull-secret
 ---
 apiVersion: v1
 kind: Service
@@ -39,8 +39,8 @@ spec:
   selector:
     app: tts-frontend
   ports:
-  - port: 80
-    targetPort: 80
+    - port: 80
+      targetPort: 80
   type: "ClusterIP"
 ---
 apiVersion: apps/v1
@@ -62,20 +62,20 @@ spec:
         app: tts-backend
     spec:
       containers:
-      - name: tts-be
-        image: registry.niaefeup.pt/niaefeup/tts-be:develop
-        imagePullPolicy: Always
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
-        ports:
-        - containerPort: 8000
-        envFrom:
-        - secretRef:
-            name: <FILL-IN>
+        - name: tts-be
+          image: registry.niaefeup.pt/niaefeup/tts-be:develop
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: <FILL-IN>
       imagePullSecrets:
-      - name: harbor-pull-secret
+        - name: harbor-pull-secret
 ---
 apiVersion: v1
 kind: Service
@@ -86,6 +86,6 @@ spec:
   selector:
     app: tts-backend
   ports:
-  - port: 80
-    targetPort: 8000
+    - port: 80
+      targetPort: 8000
   type: "ClusterIP"
