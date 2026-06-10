@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sso-https
+  namespace: sso
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`hydra.niaefeup.pt`) && PathPrefix(`/`)
+      kind: Rule
+      services:
+        - name: hydra-public
+          port: 4444
+
+  tls:
+    secretName: oidc-auth-tls
