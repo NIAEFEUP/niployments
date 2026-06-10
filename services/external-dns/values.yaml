@@ -1,0 +1,20 @@
+provider:
+  name: cloudflare
+
+sources:
+  - ingress
+  - service
+  - traefik-proxy
+
+env:
+  - name: CF_API_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: cloudflare-api-key
+        key: apiKey
+
+extraArgs:
+  - --txt-owner-id=niployments
+  - --txt-prefix=external-dns-
+  - --cloudflare-proxied
+  - --domain-filter=niaefeup.pt
