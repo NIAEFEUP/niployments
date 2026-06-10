@@ -1,44 +1,47 @@
-# docker run -d -it -v /path/on/host:/data -e EULA=TRUE -p 25565:25565 --name mc itzg/minecraft-server
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.minecraft.name }}-server
+  name: {{ .Values.resourceNames.deployment }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- toYaml .Values.commonLabels | nindent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.minecraft.replicas }}
   selector:
     matchLabels:
-      app: minecraft-server
+      app: {{ .Values.commonLabels.app | quote }}
+  # wait for announcement + world save time
+  terminationGracePeriodSeconds: {{ add .Values.minecraft.stopDelay 60 }}
   template:
     metadata:
       labels:
-        app: minecraft-server
+        {{- toYaml .Values.commonLabels | nindent 8 }}
     spec:
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
       volumes:
       - name: minecraft-data
         persistentVolumeClaim:
-          claimName: {{ .Values.minecraft.name }}-data-pvc
+          claimName: {{ .Values.resourceNames.pvc }}
       containers:
       - name: minecraft-server
-        image: itzg/minecraft-server:latest
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
-          limits:
-            memory: "{{ .Values.resources.limits.memory }}"
-          requests:
-            memory: "{{ .Values.resources.requests.memory }}"
+          {{- toYaml .Values.resources | nindent 10 }}
         env:
           - name: TYPE
-            value: "{{.Values.minecraft.type}}"
+            value: "{{ .Values.minecraft.type }}"
           - name: VERSION
-            value: "{{.Values.minecraft.version}}"
-          - name:  EULA
-            value: 'TRUE'
-          - name: MODE
+            value: "{{ .Values.minecraft.version }}"
+          - name: EULA
+            value: {{ .Values.minecraft.eula | quote | upper }}
+          - name: GAMEMODE
             value: "{{ .Values.minecraft.gamemode }}"
           - name: MOTD
             value: "{{ .Values.minecraft.motd }}"
           - name: ALLOW_FLIGHT
-            value: 'TRUE'
+            value: {{ .Values.minecraft.allowFlight | quote | upper }}
           - name: SERVER_PORT
             value: "{{ .Values.minecraft.port }}"
           - name: ONLINE_MODE
@@ -47,14 +50,38 @@ spec:
             value: "{{ .Values.minecraft.whitelist }}"
           - name: ENABLE_WHITELIST
             value: "{{ .Values.minecraft.enableWhitelist }}"
-          - name: PLUGINS
-            value: "https://github.com/SkinsRestorer/SkinsRestorer/releases/latest/download/SkinsRestorer.jar"
+          - name: STOP_SERVER_ANNOUNCE_DELAY
+            value: "{{ .Values.minecraft.stopDelay }}"
+          {{- if .Values.minecraft.modrinth.projects }}
+          - name: MODRINTH_PROJECTS
+            value: {{ join "," .Values.minecraft.modrinth.projects | quote }}
+          {{- end }}
+          {{- if .Values.minecraft.modrinth.downloadDependencies }}
+          - name: MODRINTH_DOWNLOAD_DEPENDENCIES
+            value: {{ .Values.minecraft.modrinth.downloadDependencies | quote }}
+          {{- end }}
+          {{- if .Values.minecraft.modrinth.allowedVersionType }}
+          - name: MODRINTH_ALLOWED_VERSION_TYPE
+            value: {{ .Values.minecraft.modrinth.allowedVersionType | quote }}
+          {{- end }}
         ports:
         - containerPort: {{ .Values.minecraft.port }}
           name: minecraft
         volumeMounts:
           - name: minecraft-data
             mountPath: {{ .Values.volume.mountPath }}
+        startupProbe:
+          exec:
+            command:
+            - mc-monitor
+            - status
+            - -host
+            - 127.0.0.1
+            - -port
+            - "{{ .Values.minecraft.port }}"
+          initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+          failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+          periodSeconds: {{ .Values.probes.startup.periodSeconds }}
         readinessProbe:
           exec:
             command:
@@ -64,8 +91,8 @@ spec:
             - 127.0.0.1
             - -port
             - "{{ .Values.minecraft.port }}"
-          initialDelaySeconds: 30
-          periodSeconds: 30
+          initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
         livenessProbe:
           exec:
             command:
@@ -75,18 +102,21 @@ spec:
             - 127.0.0.1
             - -port
             - "{{ .Values.minecraft.port }}"
-          initialDelaySeconds: 30
-          periodSeconds: 30
+          initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.minecraft.name }}-server
+  name: {{ .Values.resourceNames.service }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- toYaml .Values.commonLabels | nindent 4 }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.minecraft.port }}
-      targetPort: {{ .Values.minecraft.port }}
+      targetPort: minecraft
+      name: minecraft
   selector:
-    app: minecraft-server
+    app: {{ .Values.commonLabels.app | quote }}
