@@ -45,9 +45,15 @@ spec:
         login: true
         passwordSecret:
           name: website-ae-secret
+      - name: teup
+        ensure: present
+        createdb: false
+        login: true
+        passwordSecret:
+          name: teup-secret
 
   storage:
-    size: 20Gi
+    size: 40Gi
     #backups are handled by cloudnative postgres
     storageClass: longhorn-strict-local-no-backup
 
