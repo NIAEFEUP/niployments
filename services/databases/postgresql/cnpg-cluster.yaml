@@ -45,6 +45,12 @@ spec:
         login: true
         passwordSecret:
           name: website-ae-secret
+      - name: inicio
+        ensure: present
+        createdb: false
+        login: true
+        passwordSecret:
+          name: inicio-secret
 
   storage:
     size: 20Gi
