@@ -9,5 +9,6 @@ helm upgrade --install pgadmin4 runix/pgadmin4\
  --values $(dirname $0)/values.yaml\
  --namespace pgadmin
 
-kubectl apply -f $(dirname $0)/01-certificates.yaml
-kubectl apply -f $(dirname $0)/02-ingress-routes.yaml
+kubectl apply -f $(dirname $0)/01-config.yaml
+kubectl apply -f $(dirname $0)/02-certificates.yaml
+kubectl apply -f $(dirname $0)/03-ingress-routes.yaml
