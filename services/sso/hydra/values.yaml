@@ -1,4 +1,3 @@
-
 hydra:
   config:
     dsn: memory
@@ -9,7 +8,7 @@ hydra:
 
     urls:
       self:
-        issuer: https://hydra.niaefeup.pt/
+        issuer: http://127.0.0.1:4444/
       consent: http://127.0.0.1:4455/consent
       login: http://127.0.0.1:4455/login
       logout: http://127.0.0.1:4455/logout
@@ -19,7 +18,7 @@ hydra:
 
 
       identity_provider:
-        url: http://127.0.0.1:4434
+        url: http://kratos-admin.sso.svc.cluster.local:80
         publicUrl: http://127.0.0.1:4433
         headers:
           Authorization: Bearer some-token
