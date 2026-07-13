@@ -40,14 +40,12 @@ minecraft:
       - skinrestorer
       - servercore
       - modernfix
-      - ferritecore
+      - ferrite-core
       - memoryleakfix
       - chunky
-      - c2me
       - krypton
-      - vmp
       - clumps
-      - letmedespawn
+      - lmd
       - get-it-together-drops
       - spark
     downloadDependencies: "required"
