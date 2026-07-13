@@ -22,7 +22,7 @@ commonLabels:
 minecraft:
   name: "minicraft"
   type: "FABRIC"
-  version: "1.20.1"
+  version: "26.2"
   gamemode: "survival"
   motd: "Bem-vindos ao miNIcraft!"
   port: 30565
@@ -39,21 +39,21 @@ minecraft:
       - lithium
       - skinrestorer
       - servercore
-      - modernfix
       - ferrite-core
-      - memoryleakfix
       - chunky
-      - krypton
+      - c2me-fabric
+      - vmp-fabric
       - clumps
       - lmd
+      - almanac
       - get-it-together-drops
       - spark
     downloadDependencies: "required"
-    allowedVersionType: "release"
+    allowedVersionType: "alpha"
 
 image:
   repository: itzg/minecraft-server
-  tag: java21
+  tag: java25
   pullPolicy: IfNotPresent
 
 service:
@@ -67,7 +67,7 @@ ingress:
 probes:
   startup:
     initialDelaySeconds: 30
-    failureThreshold: 30
+    failureThreshold: 60
     periodSeconds: 10
   readiness:
     initialDelaySeconds: 10

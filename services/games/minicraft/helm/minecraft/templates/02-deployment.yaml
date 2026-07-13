@@ -7,6 +7,8 @@ metadata:
     {{- toYaml .Values.commonLabels | nindent 4 }}
 spec:
   replicas: {{ .Values.minecraft.replicas }}
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: {{ .Values.commonLabels.app | quote }}
