@@ -1,7 +1,7 @@
 grafana:
   defaultDashboardsTimezone: Europe/Lisbon
   enabled: true
-  adminPassword:<FILL-IN> 
+  adminPassword: tosta-mista-789  # TODO: Change password
 
   additionalDataSources:
     - name: Loki
