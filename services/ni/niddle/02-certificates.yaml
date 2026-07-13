@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: niddle-staging-cert
+  namespace: niddle-staging
+spec:
+  secretName: niddle-staging-cert
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: niddle-staging.niaefeup.pt
+  dnsNames:
+    - niddle-staging.niaefeup.pt
