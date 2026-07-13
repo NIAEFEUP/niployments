@@ -138,6 +138,7 @@ serverDefinitions:
       SSLMode: "prefer"
       MaintenanceDB: "postgres"
       Comment: "Superuser — sees all schemas"
+      Password: <FILL-IN>
 
 ## Pre-load pgAdmin4 with user preferences
 ## This mounts a preferences.json file to override default UI settings such as themes,
