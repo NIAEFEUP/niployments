@@ -103,7 +103,7 @@ strategy: {}
 ## Ref: https://www.pgadmin.org/docs/pgadmin4/latest/import_export_servers.html
 serverDefinitions:
   ## Enable/disable server import
-  enabled: false
+  enabled: true
 
   ## Storage for the server JSON:
   ##   ConfigMap - plain text (good for non-secret data)
@@ -129,14 +129,15 @@ serverDefinitions:
   ## Inline server definitions (ignore if you point to an existing resource)
   ## You can use Helm templates here, e.g. Host: "{{ .Values.example.host }}"
   servers:
-  #  firstServer:
-  #    Name: "Minimally Defined Server"
-  #    Group: "Servers"
-  #    Username: "postgres"
-  #    Host: "{{ .Values.example.host }}"
-  #    Port: "{{ .Values.example.port }}"
-  #    SSLMode: "prefer"
-  #    MaintenanceDB: "postgres"
+    ni-superuser:
+      Name: "CNPG Cluster"
+      Group: "Servers"
+      Username: "ni"
+      Host: "cnpg-cluster-rw.pg.svc.cluster.local"
+      Port: 5432
+      SSLMode: "prefer"
+      MaintenanceDB: "postgres"
+      Comment: "Superuser — sees all schemas"
 
 ## Pre-load pgAdmin4 with user preferences
 ## This mounts a preferences.json file to override default UI settings such as themes,
