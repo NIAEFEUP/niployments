@@ -10,13 +10,13 @@ spec:
   selector:
     matchLabels:
       app: {{ .Values.commonLabels.app | quote }}
-  # wait for announcement + world save time
-  terminationGracePeriodSeconds: {{ add .Values.minecraft.stopDelay 60 }}
   template:
     metadata:
       labels:
         {{- toYaml .Values.commonLabels | nindent 8 }}
     spec:
+      # wait for announcement + world save time
+      terminationGracePeriodSeconds: {{ add .Values.minecraft.stopDelay 60 }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
       volumes:

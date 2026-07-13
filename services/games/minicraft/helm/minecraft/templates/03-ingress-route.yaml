@@ -10,7 +10,6 @@ spec:
     {{- toYaml .Values.ingress.entryPoints | nindent 4 }}
   routes:
     - match: {{ .Values.ingress.match }}
-      kind: Rule
       services:
         - name: {{ .Values.resourceNames.service }}
           port: {{ .Values.minecraft.port }}
