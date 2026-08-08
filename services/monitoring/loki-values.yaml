@@ -3,19 +3,6 @@ minio:
 global:
     dnsService:  "rke2-coredns-rke2-coredns" 
 loki:
-  extraArgs:
-    - "-config.expand-env=true"
-  extraEnv:
-    - name: GARAGE_ACCESS_KEY
-      valueFrom:
-        secretKeyRef:
-          name: loki-garage-credentials
-          key: accessKeyId
-    - name: GARAGE_SECRET_KEY
-      valueFrom:
-        secretKeyRef:
-          name: loki-garage-credentials
-          key: secretAccessKey
   schemaConfig:
     configs:
       - from: "2024-11-01"
