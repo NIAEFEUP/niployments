@@ -55,6 +55,9 @@ fi
 echo "Creating Loki chunk bucket..."
 kubectl exec -n garage garage-0 -- ./garage bucket create loki-chunks 2>/dev/null || echo "Bucket already exists."
 
+echo "Granting Loki key access to loki-chunks bucket..."
+kubectl exec -n garage garage-0 -- ./garage bucket allow loki-chunks --key loki-key --read --write --owner
+
 echo "Creating S3 API key for Loki..."
 KEY_OUTPUT=$(kubectl exec -n garage garage-0 -- ./garage key create loki-key)
 ACCESS_KEY=$(echo "$KEY_OUTPUT" | grep -i "Key ID" | awk '{print $NF}')
