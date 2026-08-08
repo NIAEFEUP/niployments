@@ -1,0 +1,13 @@
+garage:
+  replicationFactor: 2
+
+deployment:
+  replicaCount: 3
+
+persistence:
+  meta:
+    storageClass: "longhorn-locality-no-backup"
+    size: 1Gi
+  data:
+    storageClass: "longhorn-locality-no-backup"
+    size: 10Gi
