@@ -1,0 +1,92 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: niddle-staging-api-deployment
+  namespace: niddle-staging
+  annotations:
+    keel.sh/policy: "force"
+    keel.sh/match-tag: "true" 
+spec:
+  selector:
+    matchLabels:
+      app: niddle-staging-api
+  template:
+    metadata:
+      labels:
+        app: niddle-staging-api
+    spec:
+      imagePullSecrets:
+        - name: harbor-pull-secret
+      containers:
+      - name: niddle-staging-api
+        image: registry.niaefeup.pt/niaefeup/niddle-api:develop
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3001
+        imagePullPolicy: Always
+        envFrom:
+        - secretRef:
+            name: niddle-staging-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: niddle-staging-api-service
+  namespace: niddle-staging
+spec:
+  selector:
+    app: niddle-staging-api
+  ports:
+  - port: 80
+    targetPort: 3001
+  type: "ClusterIP"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: niddle-staging-web-deployment
+  namespace: niddle-staging
+  annotations:
+    keel.sh/policy: "force"
+    keel.sh/match-tag: "true" 
+spec:
+  selector:
+    matchLabels:
+      app: niddle-staging-web
+  template:
+    metadata:
+      labels:
+        app: niddle-staging-web
+    spec:
+      imagePullSecrets:
+        - name: harbor-pull-secret
+      containers:
+      - name: niddle-staging-web
+        image: registry.niaefeup.pt/niaefeup/niddle-web:develop
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+        imagePullPolicy: Always
+        envFrom:
+        - secretRef:
+            name: niddle-staging-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: niddle-staging-web-service
+  namespace: niddle-staging
+spec:
+  selector:
+    app: niddle-staging-web
+  ports:
+  - port: 80
+    targetPort: 3000
+  type: "ClusterIP"

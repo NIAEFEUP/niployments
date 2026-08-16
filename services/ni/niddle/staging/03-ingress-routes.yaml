@@ -7,10 +7,15 @@ spec:
   entryPoints:
     - websecure
   routes:
+    - match: Host(`niddle-staging.niaefeup.pt`) && PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: niddle-staging-api-service
+          port: 80
     - match: Host(`niddle-staging.niaefeup.pt`)
       kind: Rule
       services:
-        - name: niddle-staging-service
+        - name: niddle-staging-web-service
           port: 80
   tls:
     secretName: niddle-staging-cert
