@@ -19,7 +19,7 @@ spec:
       imagePullSecrets:
         - name: harbor-pull-secret
       containers:
-      - name: niddle-staging-api
+      - name: niddle-api
         image: registry.niaefeup.pt/niaefeup/niddle-api:develop
         resources:
           limits:
@@ -65,7 +65,7 @@ spec:
       imagePullSecrets:
         - name: harbor-pull-secret
       containers:
-      - name: niddle-staging-web
+      - name: niddle-web
         image: registry.niaefeup.pt/niaefeup/niddle-web:develop
         resources:
           limits:
