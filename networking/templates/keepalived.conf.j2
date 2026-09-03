@@ -25,3 +25,23 @@ vrrp_instance VI_1 {
         }
         notify "/etc/keepalived/vrrp-notify-script.sh"
 }
+
+vrrp_instance VI_2 {
+        state {{ "MASTER" if hostvars[inventory_hostname]["master"] == "true" else "BACKUP"}}
+        interface {{ 'enp0s1f0' if dev_cluster == 'false' else 'eth1' }}
+        use_vmac vrrp52
+        vmac_xmit_base
+        virtual_router_id 52
+        priority {{250 if hostvars[inventory_hostname]["master"] == "true" else 240}}
+        advert_int 1
+        authentication {
+            auth_type PASS
+            auth_pass {{ hostvars[inventory_hostname]["vrrp_secret"] }}
+        }
+        virtual_ipaddress {
+            10.227.246.68/24 brd 10.227.246.255
+        }
+        track_script {
+            keepalived_check
+        }
+}
