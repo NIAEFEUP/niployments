@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kratos-ui
+  namespace: sso
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kratos-ui
+  template:
+    metadata:
+      labels:
+        app: kratos-ui
+    spec:
+      containers:
+        - name: kratos-ui
+          image: oryd/kratos-selfservice-ui-node:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: "3000"
+            
+            - name: KRATOS_PUBLIC_URL
+              value: "http://kratos-public.sso.svc.cluster.local:80" 
+            
+            - name: KRATOS_BROWSER_URL
+              value: "http://127.0.0.1:4433" 
+            
+            - name: HYDRA_ADMIN_URL
+              value: "http://hydra-admin.sso.svc.cluster.local:4445"
+            
+            - name: COOKIE_SECRET
+              value: "supersecretstring1234567890"
+            - name: CSRF_COOKIE_SECRET
+              value: "anothersecretstring0987654321"
+            - name: CSRF_COOKIE_NAME
+              value: "ory_ui_csrf_cookie"
+            - name: DANGEROUSLY_DISABLE_SECURE_CSRF_COOKIES
+              value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kratos-ui-service
+  namespace: sso
+spec:
+  selector:
+    app: kratos-ui
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
