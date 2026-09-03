@@ -7,7 +7,7 @@ spec:
   concurrency: 1
   cron: 0 2 * * */3
   groups:
-  - default
+  - backup
   labels: {}
   name: cf-backup
   retain: 3
