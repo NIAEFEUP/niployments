@@ -53,21 +53,28 @@ def configure_router(i, config)
                 router.vm.network "public_network"
             end
         else
-            router.vm.network "private_network", 
-            virtualbox__intnet: "outgoing_network",
-            :libvirt__forward_mode => "nat",
-            :libvirt__network_name => "outgoing",
-            :libvirt__host_ip => "10.69.0.1",
-            :ip => "10.69.0."+ (i+1).to_s,
-            :libvirt__dhcp_enable => false
 
-            router.vm.provision "shell",
-            run: "always",
-            inline: "ip r add default via 10.69.0.1" 
+            router.vm.provider :libvirt do |libvirt, override|
+                override.vm.network "private_network", 
+                    :libvirt__forward_mode => "nat",
+                    :libvirt__network_name => "outgoing",
+                    :libvirt__host_ip => "10.69.0.1",
+                    :ip => "10.69.0."+ (i+1).to_s,
+                    :libvirt__dhcp_enable => false
+
+
+                override.vm.provision "shell",
+                    run: "always",
+                    inline: "ip r add default via 10.69.0.1" 
+            end
 
             #NOTE (luisd): i think virtualbox doesnt have this problem
             # it mostly applies to wireless configs or  you don't want to
             # expose the router to your network
+            router.vm.provider :virtualbox do |virtualbox, override|
+                override.vm.network "private_network",
+                    :ip => "192.168.56."+ (i+1).to_s
+            end
         end
 
         configure_cpus(router, $router_cpus)
