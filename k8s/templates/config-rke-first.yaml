@@ -4,3 +4,6 @@ tls-san:
 cni: none
 disable-kube-proxy: "true"
 disable: rke2-ingress-nginx
+etcd-s3: true
+etcd-s3-bucket: https://953bb0a9ee1934ef47b66fb2217f4d5a.r2.cloudflarestorage.com/etcd
+etcd-s3-folder: etcd
