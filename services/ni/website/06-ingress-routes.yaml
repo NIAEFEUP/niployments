@@ -1,5 +1,16 @@
 ---
 apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-old-domain
+  namespace: ni-website
+spec:
+  redirectRegex:
+    regex: "^https://ni\\.fe\\.up\\.pt/(.*)"
+    replacement: "https://niaefeup.pt/${1}"
+    permanent: true
+---
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: website-https
@@ -30,5 +41,7 @@ spec:
       services:
         - name: ni-website-app
           port: 80
+      middlewares:
+        - name: redirect-old-domain
   tls:
     secretName: website-cert
