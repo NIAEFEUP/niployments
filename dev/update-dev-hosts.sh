@@ -1,14 +1,15 @@
 #!/bin/sh
 
-# Map niployments dev hostnames to the traefik LB IP in /etc/hosts.
-# Usage: sudo dev/update-dev-hosts.sh [--remove]
+# Maps hostnames to the traefik LB IP in /etc/hosts.
+# Usage: sudo dev/update-dev-hosts.sh <hostname> [<hostname>...]
+#        sudo dev/update-dev-hosts.sh --remove
 
 set -e
 [ "$(id -u)" -eq 0 ] || { echo "Re-run with sudo." >&2; exit 1; }
+[ $# -gt 0 ] || { echo "usage: $0 <hostname> [<hostname>...] | --remove" >&2; exit 1; }
 
 HOSTS_FILE=/etc/hosts
 IP=172.28.255.205
-HOSTS="registry.niployments.local harbor.niployments.local"
 MARKER="# >>> niployments-dev >>>"
 END="# <<< niployments-dev <<<"
 
@@ -21,7 +22,7 @@ fi
 
 {
   echo "$MARKER"
-  for h in $HOSTS; do echo "$IP	$h"; done
+  for h in "$@"; do echo "$IP	$h"; done
   echo "$END"
 } >> "$HOSTS_FILE"
 
