@@ -24,6 +24,7 @@
             cilium-cli
             kubernetes-helm
             kubectl
+            k9s
           ];
         };
       }
