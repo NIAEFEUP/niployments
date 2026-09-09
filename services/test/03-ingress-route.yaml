@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: test-https
+  namespace: test
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`test.niployments.local`)
+      kind: Rule
+      services:
+        - name: test-app
+          port: 80
+  tls:
+    secretName: test-tls
