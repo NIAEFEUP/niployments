@@ -4,7 +4,7 @@ KIND_EXECUTABLE=kind
 KUBECTL_EXECUTABLE=kubectl
 
 CILIUM_EXECUTABLE=cilium-cli
-command -v $CILIUM_EXECUTABLE >/dev/null 2>&1 
+command -v $CILIUM_EXECUTABLE >/dev/null 2>&1
 if [ $? -ne 0 ]; then
   echo "Did not find cilium-cli, trying cilium..."
   CILIUM_EXECUTABLE=cilium
@@ -85,6 +85,26 @@ $HELM_EXECUTABLE upgrade --install traefik traefik/traefik \
   --values $(dirname $0)/../services/traefik/values-dev.yaml \
   --namespace kube-system
 
+echo "Waiting for traefik LoadBalancer IP..."
+LB_IP=$($KUBECTL_EXECUTABLE wait --for=jsonpath='{.status.loadBalancer.ingress[0].ip}' \
+  --timeout=120s svc/traefik -n kube-system \
+  -o jsonpath='{.status.loadBalancer.ingress[0].ip}') \
+  || { echo "traefik did not get a LoadBalancer IP" >&2; exit 1; }
+
+echo "Waiting for traefik deployment..."
+$KUBECTL_EXECUTABLE wait --for=condition=available --timeout=180s \
+  deployment/traefik -n kube-system
+
 $(dirname $0)/../services/cert-manager/deploy-dev.sh
 
+echo "Waiting for cert-manager to be ready..."
+$KUBECTL_EXECUTABLE wait --for=condition=available --timeout=180s \
+  deployment/cert-manager -n cert-manager
+
 $KUBECTL_EXECUTABLE apply -f $(dirname "$0")/../services/storage/longhorn/storageClasses/fakeDevClasses
+
+cat <<EOF
+Dev cluster is ready.
+- traefik LoadBalancer IP: $LB_IP
+- To reach services by hostname, run: sudo $PWD/dev/update-dev-hosts.sh
+EOF
