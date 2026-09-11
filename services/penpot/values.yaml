@@ -1,0 +1,283 @@
+## Default values for Penpot
+## Documentation: https://help.penpot.app/technical-guide/getting-started/kubernetes/
+## Parameters: https://artifacthub.io/packages/helm/penpot/penpot#parameters
+
+global:
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
+  imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: "penpot"
+
+serviceAccount:
+  enabled: true
+  annotations: {}
+  name: "penpot"
+
+config:
+  # The public domain to serve Penpot on
+  publicUri: "https://penpot.niaefeup.pt"
+
+  # Feature flags to enable. See: https://help.penpot.app/technical-guide/configuration/
+  flags: "enable-registration enable-login-with-password disable-email-verification enable-smtp enable-mcp"
+
+  # API secret key for persistent sessions (retrieved from existingSecret)
+  apiSecretKey: ""
+  existingSecret: "penpot-secrets"
+  secretKeys:
+    apiSecretKey: "api-secret-key"
+
+  registrationDomainWhitelist: ""
+  telemetryEnabled: false
+  internalResolver: ""
+  termsOfServicesUri: ""
+  privacyPolicyUri: ""
+
+  ## PostgreSQL configuration
+  postgresql:
+    host: "cnpg-cluster-rw.pg.svc.cluster.local"
+    port: 5432
+    database: "penpot"
+    username: "penpot"
+    password: ""
+    existingSecret: "penpot-secrets"
+    secretKeys:
+      usernameKey: "db-username"
+      passwordKey: "db-password"
+      postgresqlUriKey: ""
+
+  ## Valkey / Redis configuration
+  redis:
+    host: "valkey-primary.valkey.svc.cluster.local"
+    port: 6379
+    database: "0"
+    existingSecret: "penpot-secrets"
+    secretKeys:
+      redisUriKey: "redis-uri"
+
+  ## Objects Storage configuration
+  objectsStorage:
+    storageBackend: "fs"
+    filesystem:
+      directory: "/opt/data/assets"
+    s3:
+      accessKeyID: ""
+      secretAccessKey: ""
+      region: ""
+      bucket: ""
+      endpointURI: ""
+      existingSecret: ""
+      secretKeys:
+        accessKeyIDKey: ""
+        secretAccessKey: ""
+        endpointURIKey: ""
+
+  fileDataBackend: "legacy-db"
+  httpServerMaxBodySize: "367001600"
+
+  ## SMTP email configuration
+  smtp:
+    enabled: false
+    defaultFrom: ""
+    defaultReplyTo: ""
+    host: ""
+    port: ""
+    username: ""
+    password: ""
+    tls: true
+    ssl: false
+    existingSecret: "penpot-secrets"
+    secretKeys:
+      usernameKey: "smtp-username"
+      passwordKey: "smtp-password"
+
+  ## Third-party authentication providers
+  providers:
+    google:
+      enabled: false
+      clientID: ""
+      clientSecret: ""
+    github:
+      enabled: false
+      clientID: ""
+      clientSecret: ""
+    gitlab:
+      enabled: false
+      baseURI: "https://gitlab.com"
+      clientID: ""
+      clientSecret: ""
+    oidc:
+      enabled: false
+      baseURI: ""
+      clientID: ""
+      clientSecret: ""
+    ldap:
+      enabled: false
+      host: "ldap"
+      port: 10389
+      ssl: false
+      startTLS: false
+      baseDN: ""
+      bindDN: ""
+      bindPassword: ""
+      userQuery: ""
+
+  autoFileSnapshot:
+    every: 5
+    timeout: "3h"
+
+  extraEnvs: []
+
+## Persistence using Persistent Volume Claim for assets
+persistence:
+  assets:
+    enabled: true
+    storageClass: "niployments-hdd-nfs"
+    accessModes:
+      - ReadWriteMany
+    size: 10Gi
+    annotations: {}
+    existingClaim: ""
+
+## Ingress is disabled in Helm because Traefik IngressRoute is defined in 03-ingress-routes.yaml
+ingress:
+  enabled: false
+
+## Backend configuration
+backend:
+  image:
+    repository: penpotapp/backend
+    tag: 2.17.2
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 6060
+    annotations: {}
+  deploymentAnnotations: {}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 1001
+  containerSecurityContext:
+    runAsUser: 1001
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - all
+  resources:
+    requests:
+      cpu: 200m
+      memory: 1Gi
+    limits:
+      memory: 2Gi
+  extraEnvs: []
+  volumes: []
+  volumeMounts: []
+
+## Frontend configuration
+frontend:
+  image:
+    repository: penpotapp/frontend
+    tag: 2.17.2
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 8080
+    annotations: {}
+  deploymentAnnotations: {}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 1001
+  containerSecurityContext:
+    runAsUser: 1001
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - all
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+  extraEnvs: []
+  volumes: []
+  volumeMounts: []
+
+## Exporter configuration
+exporter:
+  image:
+    repository: penpotapp/exporter
+    tag: 2.17.2
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 6061
+    annotations: {}
+  deploymentAnnotations: {}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 1001
+  containerSecurityContext:
+    runAsUser: 1001
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - all
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  extraEnvs: []
+  volumes: []
+  volumeMounts: []
+
+## MCP Server configuration
+mcp:
+  image:
+    repository: penpotapp/mcp
+    tag: 2.17.2
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    httpPort: 6062
+    wsPort: 6063
+    annotations: {}
+  deploymentAnnotations: {}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext:
+    fsGroup: 1001
+  containerSecurityContext:
+    runAsUser: 1001
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - all
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+  extraEnvs: []
+  volumes: []
+  volumeMounts: []

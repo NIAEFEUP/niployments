@@ -1,0 +1,18 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: penpot-https
+  namespace: penpot
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`penpot.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: penpot
+          port: 8080
+
+  tls:
+    secretName: penpot-cert
+---

@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: penpot-cert
+  namespace: penpot
+spec:
+  secretName: penpot-cert
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: penpot.niaefeup.pt
+  dnsNames:
+    - penpot.niaefeup.pt
