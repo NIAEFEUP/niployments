@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: website-own-cert
+  namespace: ni-website
+spec:
+  secretName: website-own-cert
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: niaefeup.pt
+  dnsNames:
+    - niaefeup.pt

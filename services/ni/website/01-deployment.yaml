@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website-ni
+  namespace: ni-website
+  annotations:
+    keel.sh/policy: "force"
+    keel.sh/match-tag: "true"
+spec:
+  selector:
+    matchLabels:
+      app: website-ni
+  template:
+    metadata:
+      labels:
+        app: website-ni
+    spec:
+      containers:
+      - name: website-ni
+        image: registry.niaefeup.pt/niaefeup/website-niaefeup-frontend:master
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+        imagePullPolicy: Always
+      imagePullSecrets:
+        - name: harbor-pull-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: website-ni-service
+  namespace: ni-website
+spec:
+  selector:
+    app: website-ni
+  ports:
+  - port: 80
+    targetPort: 80
+  type: "ClusterIP"
