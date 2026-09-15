@@ -7,6 +7,6 @@ spec:
   resources:
     requests:
       storage: 15Gi
-  storageClassName: longhorn-locality-no-backup-retain
+  storageClassName: longhorn-locality-retain
   accessModes:
     - ReadWriteOnce
