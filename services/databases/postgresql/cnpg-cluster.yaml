@@ -51,6 +51,12 @@ spec:
         login: true
         passwordSecret:
           name: inicio-secret
+      - name: inicio-staging
+        ensure: present
+        createdb: false
+        login: true
+        passwordSecret:
+          name: inicio-staging-secret
 
   storage:
     size: 20Gi
