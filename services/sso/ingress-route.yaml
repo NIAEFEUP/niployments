@@ -1,0 +1,42 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: kratos-strip-prefix
+  namespace: sso
+spec:
+  stripPrefix:
+    prefixes:
+      - /kratos
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sso-https
+  namespace: sso
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`hydra.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: hydra-public
+          port: 4444
+    
+    - match: Host(`sso.niaefeup.pt`) && PathPrefix(`/kratos`)
+      kind: Rule
+      middlewares:
+        - name: kratos-strip-prefix
+      services:
+        - name: kratos-public
+          port: 80
+
+    - match: Host(`sso.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: kratos-ui-service
+          port: 80
+
+  tls:
+    secretName: sso-tls-secret

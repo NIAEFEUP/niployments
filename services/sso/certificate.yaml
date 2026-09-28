@@ -1,0 +1,24 @@
+# 1. Create a local "Fake" Certificate Authority
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: local-selfsigned-issuer
+  namespace: sso
+spec:
+  selfSigned: {}
+
+---
+# 2. Issue the certificate using the fake CA
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: sso-tls-cert
+  namespace: sso
+spec:
+  secretName: sso-tls-secret # Traefik uses this secret
+  dnsNames:
+  - hydra.niaefeup.pt
+  - sso.niaefeup.pt
+  issuerRef:
+    name: local-selfsigned-issuer
+    kind: Issuer
