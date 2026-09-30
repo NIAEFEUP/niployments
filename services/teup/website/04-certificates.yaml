@@ -6,8 +6,10 @@ metadata:
 spec:
   secretName: teup-website-cert
   issuerRef:
-    name: letsencrypt-production
+    name: letsencrypt-teup
     kind: ClusterIssuer
-  commonName: teup.niaefeup.pt
+  commonName: teup.pt
   dnsNames:
+    - teup.pt
+    - www.teup.pt
     - teup.niaefeup.pt
