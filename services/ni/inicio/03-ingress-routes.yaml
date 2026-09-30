@@ -1,0 +1,37 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-ws
+  namespace: inicio
+spec:
+  stripPrefix:
+    prefixes:
+      - /ws
+---
+
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: inicio-https
+  namespace: inicio
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`inicio.niaefeup.pt`) && PathPrefix(`/ws`)
+      kind: Rule
+      services:
+        - name: inicio-ws-service
+          port: 80
+      middlewares:
+        - name: strip-ws
+
+    - match: Host(`inicio.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: inicio-service
+          port: 80
+
+  tls:
+    secretName: inicio-cert
+

@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: inicio-cert
+  namespace: inicio
+spec:
+  secretName: inicio-cert
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: inicio.niaefeup.pt
+  dnsNames:
+    - inicio.niaefeup.pt
