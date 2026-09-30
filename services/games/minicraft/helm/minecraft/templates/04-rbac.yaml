@@ -1,0 +1,43 @@
+# ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.resourceNames.serviceAccount }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- toYaml .Values.commonLabels | nindent 4 }}
+
+---
+
+# Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Values.resourceNames.role }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- toYaml .Values.commonLabels | nindent 4 }}
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    resourceNames: ["{{ .Values.resourceNames.deployment }}"]
+    verbs: ["get", "patch"]
+
+---
+
+# RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.resourceNames.roleBinding }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- toYaml .Values.commonLabels | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.resourceNames.serviceAccount }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: {{ .Values.resourceNames.role }}
+  apiGroup: rbac.authorization.k8s.io
