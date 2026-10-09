@@ -1,0 +1,35 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: tts-beta-strip-api-prefix
+  namespace: tts-beta
+spec:
+  stripPrefix:
+    prefixes:
+      - /api
+    forceSlash: false
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: tts-beta-ingress-route
+  namespace: tts-beta
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`tts-beta.niaefeup.pt`) && PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: tts-beta-backend-service
+          port: 80
+      middlewares:
+        - name: tts-beta-strip-api-prefix
+    - match: Host(`tts-beta.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: tts-beta-frontend-service
+          port: 80
+  tls:
+    secretName: tts-beta-certificate-secret
