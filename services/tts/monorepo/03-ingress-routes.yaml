@@ -1,0 +1,35 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: tts-monorepo-strip-api-prefix
+  namespace: tts-monorepo
+spec:
+  stripPrefix:
+    prefixes:
+      - /api
+    forceSlash: false
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: tts-monorepo-ingress-route
+  namespace: tts-monorepo
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`tts-monorepo.niaefeup.pt`) && PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: tts-monorepo-backend-service
+          port: 80
+      middlewares:
+        - name: tts-monorepo-strip-api-prefix
+    - match: Host(`tts-monorepo.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: tts-monorepo-frontend-service
+          port: 80
+  tls:
+    secretName: tts-monorepo-certificate-secret
