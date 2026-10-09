@@ -1,0 +1,91 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-monorepo-frontend-deployment
+  namespace: tts-monorepo
+  annotations:
+    keel.sh/policy: "force"
+    keel.sh/match-tag: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tts-frontend
+  template:
+    metadata:
+      labels:
+        app: tts-frontend
+    spec:
+      containers:
+        - name: tts-fe
+          image: registry.niaefeup.pt/niaefeup/tts-fe:develop
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+      imagePullSecrets:
+        - name: harbor-pull-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts-monorepo-frontend-service
+  namespace: tts-monorepo
+spec:
+  selector:
+    app: tts-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+  type: "ClusterIP"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-monorepo-backend-deployment
+  namespace: tts-monorepo
+  annotations:
+    keel.sh/policy: "force"
+    keel.sh/match-tag: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tts-backend
+  template:
+    metadata:
+      labels:
+        app: tts-backend
+    spec:
+      containers:
+        - name: tts-be
+          image: registry.niaefeup.pt/niaefeup/tts-be:monorepo
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: <FILL-IN>
+      imagePullSecrets:
+        - name: harbor-pull-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts-monorepo-backend-service
+  namespace: tts-monorepo
+spec:
+  selector:
+    app: tts-backend
+  ports:
+    - port: 80
+      targetPort: 8000
+  type: "ClusterIP"

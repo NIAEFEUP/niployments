@@ -39,6 +39,12 @@ spec:
         login: true
         passwordSecret:
           name: tts-staging-secret
+      - name: tts-monorepo
+        ensure: present
+        createdb: false
+        login: true
+        passwordSecret:
+          name: tts-monorepo-secret
       - name: website-ae
         ensure: present
         createdb: false
