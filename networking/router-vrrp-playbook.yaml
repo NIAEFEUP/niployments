@@ -11,18 +11,18 @@
       become: true
       ansible.builtin.apt:
         name: keepalived
-    - name: Configure keepalived script
+    - name: Configure keepalived network check script
       become: true
       ansible.builtin.template:
-        src: templates/keepalived_check.sh
-        dest: /etc/keepalived/keepalived_check.sh
+        src: templates/keepalived_check_network.sh
+        dest: /etc/keepalived/keepalived_check_network.sh
         mode: "744"
-    - name: Copy notify script
+    - name: Configure keepalived haproxy check script
       become: true
-      ansible.builtin.copy:
-        src: templates/vrrp-notify-script.sh
-        dest: /etc/keepalived/vrrp-notify-script.sh
-        mode: "777"
+      ansible.builtin.template:
+        src: templates/keepalived_check_haproxy.sh
+        dest: /etc/keepalived/keepalived_check_haproxy.sh
+        mode: "744"
     - name: Configure Keepalived
       become: true
       ansible.builtin.template:
