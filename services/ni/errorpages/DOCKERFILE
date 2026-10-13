@@ -1,0 +1,19 @@
+FROM node:22-alpine AS build
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
+COPY . .
+RUN npx tailwindcss -o twd.css -m
+# tailwindcss -o
+
+FROM nginx:alpine
+
+# LOGO
+COPY --from=build /app/logo-niaefeup.png /app/twd.css /usr/share/nginx/html/
+COPY --from=build /app/pages/ /usr/share/nginx/html/pages/
+
+EXPOSE 8080
