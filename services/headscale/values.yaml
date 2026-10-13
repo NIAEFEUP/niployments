@@ -1,0 +1,15 @@
+env:
+  HEADSCALE_SERVER_URL: "https://headscale.niaefeup.pt"
+  HEADSCALE_METRICS_LISTEN_ADDR: "0.0.0.0:9090"
+  HEADSCALE_DNS_BASE_DOMAIN: "1.1.1.1"
+
+ingress:
+  main:
+    enabled: false
+
+persistence:
+  config:
+    enabled: true
+    storageClass: "longhorn-locality-retain"
+    accessMode: ReadWriteOnce
+    size: 2Gi
