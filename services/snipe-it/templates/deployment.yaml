@@ -7,7 +7,7 @@ spec:
   selector: 
     matchLabels: snipe-it
   template:
-    metada:
+    metadata:
       labels: 
         app: snipe-it
     spec:
