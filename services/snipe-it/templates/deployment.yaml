@@ -2,32 +2,38 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: snipe-it
-  labels:
-    app.kubernetes.io/name: snipe-it
-containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- with .Values.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
-          env:
-            {{- range .Values.env }}
-            - name: {{ .name }}
-              value: {{ .value | quote }}
+spec:
+  replicas: {{.Values.replicaCount}}
+  selector: 
+    matchÇabels: snipe-it
+  template:
+    metada:
+      labels: 
+        app: snipe-it
+  containers:
+          - name: {{ .Chart.Name }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            {{- with .Values.securityContext }}
+            securityContext:
+              {{- toYaml . | nindent 12 }}
             {{- end }}
-          {{- if or .Values.persistence.enabled .Values.volumeMounts }}
-          volumeMounts:
-            {{- if .Values.persistence.enabled }}
-            - name: snipeit-storage
-              mountPath: {{ .Values.persistence.mountPath }}
+            ports:
+              - name: http
+                containerPort: {{ .Values.service.port }}
+                protocol: TCP
+            env:
+              {{- range .Values.env }}
+              - name: {{ .name }}
+                value: {{ .value | quote }}
+              {{- end }}
+            {{- if or .Values.persistence.enabled .Values.volumeMounts }}
+            volumeMounts:
+              {{- if .Values.persistence.enabled }}
+              - name: snipeit-storage
+                mountPath: {{ .Values.persistence.mountPath }}
+              {{- end }}
+              {{- with .Values.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+              {{- end }}
             {{- end }}
-            {{- with .Values.volumeMounts }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-          {{- end }}
