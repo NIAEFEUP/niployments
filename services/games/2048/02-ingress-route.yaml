@@ -1,0 +1,19 @@
+---
+# IngressRoute (Traefik): exposes the game outside the cluster.
+# No TLS on purpose to keep the workshop setup simple.
+# Access it at: http://2048.localhost/
+# (Traefik resolves *.localhost automatically, no /etc/hosts needed)
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: game-2048
+  namespace: game-2048
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`2048.localhost`)
+      kind: Rule
+      services:
+        - name: game-2048-service
+          port: 80
