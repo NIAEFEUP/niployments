@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nextcloud-https
+  namespace: nextcloud
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`drive.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: nextcloud
+          port: 80
+
+  tls:
+    secretName: nextcloud-cert
+---
+

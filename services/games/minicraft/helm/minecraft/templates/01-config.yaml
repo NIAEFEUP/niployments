@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minecraft-whitelist
+data:
+  whitelist.json: |
+    [
+      {
+        "uuid": "838c6e1d-e176-411b-bc1c-02377a5fe570",
+        "name": "Tomili2000"
+      },
+      {
+        "uuid": "40af3eb2-16c4-44e2-9287-0aa5b263e5c8",
+        "name": "peu"
+      },
+      {
+        "uuid": "67339cca-a6bb-4b9c-afe2-b3d2b53d19dd",
+        "name": "Pinho"
+      },
+      {
+        "uuid": "566000e0-7b6d-4e4a-82d5-0db24f238da0",
+        "name": "Sp1kyBtw"
+      }
+    ]
