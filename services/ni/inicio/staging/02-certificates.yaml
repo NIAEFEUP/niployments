@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: inicio-staging-cert
+  namespace: inicio-staging
+spec:
+  secretName: inicio-staging-cert
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: inicio-staging.niaefeup.pt
+  dnsNames:
+    - inicio-staging.niaefeup.pt

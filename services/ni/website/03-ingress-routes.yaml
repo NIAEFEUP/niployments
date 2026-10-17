@@ -11,7 +11,7 @@ spec:
     - match: Host(`niaefeup.pt`)
       kind: Rule
       services:
-        - name: ni-website-app
+        - name: website-ni-service
           port: 80
   tls:
     secretName: website-own-cert
@@ -28,7 +28,7 @@ spec:
     - match: Host(`ni.fe.up.pt`)
       kind: Rule
       services:
-        - name: ni-website-app
+        - name: website-ni-service
           port: 80
   tls:
     secretName: website-cert
