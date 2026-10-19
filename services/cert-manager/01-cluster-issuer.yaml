@@ -72,3 +72,34 @@ spec:
           apiTokenSecretRef:
             name: cloudflare-api-token-secret
             key: api-token
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-teup
+spec:
+  acme:
+    email: ni@aefeup.pt
+    privateKeySecretRef:
+      name: letsencrypt-teup
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+    - selector:
+        dnsZones:
+          - teup.pt
+      dns01:
+        cnameStrategy: Follow
+        cloudflare:
+          email: ni@aefeup.pt
+          apiTokenSecretRef:
+            name: cloudflare-api-token-secret
+            key: api-token
+    - selector:
+        dnsZones:
+          - niaefeup.pt
+      dns01:
+        cloudflare:
+          email: ni@aefeup.pt
+          apiTokenSecretRef:
+            name: cloudflare-api-token-secret
+            key: api-token
