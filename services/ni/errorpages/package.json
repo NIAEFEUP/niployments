@@ -1,0 +1,19 @@
+{
+  "name": "errorpage",
+  "version": "1.0.0",
+  "description": "Error page for multiple errors.",
+  "exports" : {
+    "./badgateway":"./badgateway/*",
+    "./pgnotfound":"./pgnotfound/*",
+    "./serviceunavailable":"./sergiceunavailable/*"
+  },
+  "scripts": {
+    "test": "echo \\\\\\\"Error: no test specified\\\\\\\" && exit 1"
+  },
+  "keywords": [
+    "errorpage",
+    "prototype"
+  ],
+  "author": "Daniel Soares",
+  "license": "ISC"
+}
