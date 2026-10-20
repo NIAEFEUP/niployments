@@ -1,0 +1,103 @@
+---
+- name: Add zfs to storage nodes
+  hosts: all
+  become: true
+  vars:
+    zfs_pool_name: "niployments-hard-storage"
+    zfs_pool_mountpoint: "/mnt/hard-storage"
+    zfs_pool_state: present
+    zfs_pool_mode: "raidz"
+
+  tasks:
+    - name: Only run play if storage is not enabled
+      when: hostvars[inventory_hostname]['storage'] is defined and hostvars[inventory_hostname]['storage'] == "true"
+      block:
+        - name: Get stoarge definitions
+          ansible.builtin.include_vars:
+            file: storage-defs.json
+            name: storage_definitions
+        - name: Use storage definition for node
+          ansible.builtin.set_fact:
+            zfs_pool_devices: "{{ storage_definitions[inventory_hostname] }}"
+        - name: Enable EPEL repository
+          ansible.builtin.yum:
+            name: epel-release
+            state: present
+        - name: Add ZFS GPG key
+          ansible.builtin.rpm_key:
+            state: present
+            key: https://raw.githubusercontent.com/zfsonlinux/zfsonlinux.github.com/master/zfs-release/RPM-GPG-KEY-openzfs-key2
+        - name: Install DKMS manually
+          ansible.builtin.yum:
+            name: dkms
+            state: present
+        - name: Install zfs repo
+          ansible.builtin.yum:
+            name: "https://zfsonlinux.org/epel/zfs-release-2-3.el9.noarch.rpm"
+            state: present
+        - name: Install ZFS
+          ansible.builtin.dnf:
+            name:
+              - zfs
+              - zfs-dkms
+              - kernel-devel
+            state: present
+        - name: Install dkms modules
+          ansible.builtin.command: dkms autoinstall
+          changed_when: true
+        - name: Load ZFS kernel module
+          ansible.builtin.command: modprobe zfs
+          failed_when: false
+          ignore_errors: true
+        - name: Check ZFS pool existance
+          ansible.builtin.command: zpool list -Ho name {{ zfs_pool_name }}
+          register: result_pool_list
+          ignore_errors: true
+          failed_when: false
+
+        - name: Create ZFS pool
+          ansible.builtin.command: >-
+            zpool create
+            {{ '-m ' + zfs_pool_mountpoint if zfs_pool_mountpoint else '' }}
+            {{ zfs_pool_name }}
+            {{ zfs_pool_mode if zfs_pool_mode else '' }}
+            {{ zfs_pool_devices | join(' ') }}
+          when:
+            - zfs_pool_state | default('present') == 'present'
+            - result_pool_list.rc == 1
+        - name: Install NFS utilities
+          ansible.builtin.dnf:
+            name: nfs-utils
+            state: present
+
+        - name: Force nfs version 4
+          ansible.builtin.lineinfile:
+            path: /etc/nfsmount.conf
+            regexp: "^# Nfsvers=4"
+            line: "Nfsvers=4"
+        - name: Enable and start the NFS server service
+          ansible.builtin.systemd:
+            name: nfs-server
+            enabled: true
+            state: started
+
+        - name: Create export directory
+          ansible.builtin.file:
+            path: "{{ zfs_pool_mountpoint }}/shared_dir"
+            state: directory
+            mode: '0755'
+
+        - name: Set SELinux context for the export directory
+          ansible.builtin.command: chcon -t nfs_t {{ zfs_pool_mountpoint }}/shared_dir
+          args:
+            creates: /export/shared_dir
+
+        - name: Configure NFS exports
+          ansible.builtin.copy:
+            dest: /etc/exports
+            content: "{{ zfs_pool_mountpoint }}/shared_dir *(rw,sync,no_root_squash,no_subtree_check)\n"
+            mode: "0644"
+
+        - name: Export NFS shares
+          ansible.builtin.command: exportfs -r
+          changed_when: true
