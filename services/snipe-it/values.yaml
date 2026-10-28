@@ -1,0 +1,110 @@
+# Default values for snipe-it.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Number of application pods. Keep this at one unless shared upload storage is configured.
+replicaCount: 1
+
+image:
+  repository: snipe/snipe-it
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+securityContext: {}
+
+serviceAccount:
+  create: false
+  automount: false
+  annotations: {}
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: snipeit.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+httpRoute:
+  enabled: false
+  annotations: {}
+  parentRefs:
+    - name: gateway
+      sectionName: http
+  hostnames: []
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+
+resources: {}
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+volumes: []
+
+volumeMounts: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+snipeit:
+  appUrl: "http://snipeit.local"
+
+env:
+  - name: DB_CONNECTION
+    value: "pgsql"
+  - name: DB_HOST
+    value: "" 
+  - name: DB_PORT
+    value: "5432"
+  - name: DB_DATABASE
+    value: "snipeit"  
+  - name: DB_USERNAME
+    value: "snipeit"
+
+secrets:
+  existingSecret: ""
+  appKeyKey: APP_KEY
+  databasePasswordKey: MYSQL_PASSWORD
+
+persistence:
+  enabled: true
+  existingClaim: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 8Gi
+  storageClassName: ""
+  mountPath: /var/lib/snipeit
