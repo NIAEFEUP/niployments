@@ -1,5 +1,5 @@
-vrrp_script keepalived_check {
-    script "/etc/keepalived/keepalived_check.sh"
+vrrp_script keepalived_check_network {
+    script "/etc/keepalived/keepalived_check_network.sh"
     interval 10
     timeout 5
     rise 3
@@ -17,11 +17,37 @@ vrrp_instance VI_1 {
             auth_pass {{ hostvars[inventory_hostname]["vrrp_secret"] }}
         }
         virtual_ipaddress {
-            10.11.11.1/24 brd 10.11.11.255
             10.10.0.254/24 brd 10.10.0.255
         }
         track_script {
-            keepalived_check
+            keepalived_check_network
         }
-        notify "/etc/keepalived/vrrp-notify-script.sh"
+}
+
+## consider using vrrp_track_process
+vrrp_script keepalived_check_haproxy {
+    script "/etc/keepalived/keepalived_check_haproxy.sh"
+
+    fall 3                               # 3 fails required for failure
+    rise 3                               # 3 OKs required to consider the
+                                         #   process up after failure
+    interval 5                           # check every 5 seconds
+}
+
+vrrp_instance VI_2 {
+        state {{ "MASTER" if hostvars[inventory_hostname]["master"] == "true" else "BACKUP"}}
+        interface {{ hostvars[inventory_hostname]["target_interface"] }}
+        virtual_router_id 52
+        priority {{250 if hostvars[inventory_hostname]["master"] == "true" else 240}}
+        advert_int 1
+        authentication {
+            auth_type PASS
+            auth_pass {{ hostvars[inventory_hostname]["vrrp_secret"] }}
+        }
+        virtual_ipaddress {
+            10.11.11.1/24 brd 10.11.11.255
+        }
+        track_script {
+            keepalived_check_haproxy
+        }
 }
