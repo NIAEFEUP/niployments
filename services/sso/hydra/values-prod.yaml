@@ -1,0 +1,37 @@
+hydra:
+  config:
+    dsn: memory
+
+    serve:
+      cookies:
+        same_site_mode: Lax
+
+    urls:
+      self:
+        issuer: https://hydra.niaefeup.pt/
+      consent: https://sso.niaefeup.pt/consent
+      login: https://sso.niaefeup.pt/login
+      logout: https://sso.niaefeup.pt/logout
+      device:
+        verification: https://sso.niaefeup.pt/device/verify
+        success: https://sso.niaefeup.pt/device/success
+
+      identity_provider:
+        url: http://kratos-admin.sso.svc.cluster.local:4434
+        publicUrl: https://sso.niaefeup.pt/kratos
+        headers:
+          Authorization: Bearer some-token
+
+    secrets:
+      system:
+        - youReallyNeedToChangeThis
+
+    oidc:
+      subject_identifiers:
+        supported_types:
+          - pairwise
+          - public
+        pairwise:
+          salt: youReallyNeedToChangeThis
+
+  dev: true
