@@ -1,0 +1,20 @@
+# Overrides on top of values.yaml for development (no Longhorn storage classes)
+expose:
+  tls:
+    auto:
+      commonName: "harbor"
+  ingress:
+    annotations: {}
+persistence:
+  persistentVolumeClaim:
+    registry:
+      storageClass: ""
+    jobservice:
+      jobLog:
+        storageClass: ""
+    database:
+      storageClass: ""
+    redis:
+      storageClass: ""
+    trivy:
+      storageClass: ""

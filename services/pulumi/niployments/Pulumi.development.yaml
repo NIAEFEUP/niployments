@@ -1,1 +1,8 @@
-encryptionsalt: v1:0NsGBm3D7Kk=:v1:2wg0URErHSlppn9v:SuxWBUSeQWT//98givIZvx+7ye19CQ==
+config:
+  niployments:env: development
+  niployments:cilium/lb-pool:
+    start: 172.28.255.200
+    stop: 172.28.255.250
+  # Enable what you need in your local cluster, e.g.:
+  # niployments:features:
+  #   inicio: true

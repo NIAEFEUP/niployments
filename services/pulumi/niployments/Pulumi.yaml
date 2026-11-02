@@ -1,7 +1,21 @@
 name: niployments
-runtime: nodejs
 description: Pulumi program to manage the niployments cluster
-config:
-  pulumi:tags:
-    value:
-      pulumi:template: kubernetes-typescript
+runtime:
+  name: nodejs
+  options:
+    packagemanager: pnpm
+packages:
+  crds:
+    source: kubernetes
+    version: 4.34.2
+    extensions:
+      - name=crds
+      - version=1.0.0
+      - crd-manifest=crd-manifests/cilium/ciliumbgppeeringpolicies.yaml
+      - crd-manifest=crd-manifests/cilium/ciliuml2announcementpolicies.yaml
+      - crd-manifest=crd-manifests/cilium/ciliumloadbalancerippools.yaml
+      - crd-manifest=crd-manifests/cloudnative-pg/cloudnative-pg.yaml
+      - crd-manifest=crd-manifests/jetstack/cert-manager.yaml
+      - crd-manifest=crd-manifests/longhorn/longhorn.yaml
+      - crd-manifest=crd-manifests/mongodb/community-operator.yaml
+      - crd-manifest=crd-manifests/traefik/traefik.yaml

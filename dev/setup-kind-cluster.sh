@@ -60,51 +60,15 @@ $HELM_EXECUTABLE upgrade --install cilium cilium/cilium \
 
 $CILIUM_EXECUTABLE status --wait
 
-$KUBECTL_EXECUTABLE apply -f $(dirname $0)/../services/cilium/load-balancer-pool-dev.yaml
+cat <<MSG
+The kind cluster and Cilium are ready.
+Everything else (load balancer pool, Traefik, cert-manager, storage classes, apps) is deployed by Pulumi:
 
-cat <<EOF | $KUBECTL_EXECUTABLE apply -f -
-apiVersion: "cilium.io/v2alpha1"
-kind: CiliumL2AnnouncementPolicy
-metadata:
-  name: default
-spec:
-  nodeSelector:
-    matchExpressions:
-      - key: node-role.kubernetes.io/control-plane
-        operator: DoesNotExist
-  interfaces:
-  - ^eth[0-9]+
-  externalIPs: true
-  loadBalancerIPs: true
-EOF
+  cd services/pulumi/niployments
+  pulumi login --local
+  pulumi stack init development
+  pulumi up
 
-$HELM_EXECUTABLE repo add traefik https://traefik.github.io/charts
-
-$HELM_EXECUTABLE upgrade --install traefik traefik/traefik \
-  --version 25.0.0 \
-  --values $(dirname $0)/../services/traefik/values-dev.yaml \
-  --namespace kube-system
-
-echo "Waiting for traefik LoadBalancer IP..."
-LB_IP=$($KUBECTL_EXECUTABLE wait --for=jsonpath='{.status.loadBalancer.ingress[0].ip}' \
-  --timeout=120s svc/traefik -n kube-system \
-  -o jsonpath='{.status.loadBalancer.ingress[0].ip}') \
-  || { echo "traefik did not get a LoadBalancer IP" >&2; exit 1; }
-
-echo "Waiting for traefik deployment..."
-$KUBECTL_EXECUTABLE wait --for=condition=available --timeout=180s \
-  deployment/traefik -n kube-system
-
-bash $(dirname $0)/../services/cert-manager/deploy-dev.sh
-
-echo "Waiting for cert-manager to be ready..."
-$KUBECTL_EXECUTABLE wait --for=condition=available --timeout=180s \
-  deployment/cert-manager -n cert-manager
-
-$KUBECTL_EXECUTABLE apply -f $(dirname "$0")/../services/storage/longhorn/storageClasses/fakeDevClasses
-
-cat <<EOF
-Dev cluster is ready.
-- traefik LoadBalancer IP: $LB_IP
-- To reach services by hostname, run: sudo $PWD/dev/update-dev-hosts.sh
-EOF
+Traefik will be reachable at 172.28.255.205. To reach services by hostname run:
+  sudo $PWD/dev/update-dev-hosts.sh <hostname>...
+MSG

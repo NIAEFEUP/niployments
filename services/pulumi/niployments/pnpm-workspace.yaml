@@ -1,0 +1,15 @@
+# pnpm settings for this project (it is not a workspace).
+
+# One copy of each, shared by the program and the generated CRD SDK (sdks/crds)
+overrides:
+  "@pulumi/kubernetes": ^4.34.2
+  "@pulumi/pulumi": ^3.273.0
+  typescript: 6.0.3
+
+# Install scripts are reviewed explicitly (pnpm refuses to install otherwise).
+allowBuilds:
+  # the generated CRD SDK compiles itself on install (added by `pulumi package add`)
+  "@pulumi/crds@file:sdks/crds": true
+  # Pulumi downloads the provider plugins itself, so the SDK's install hook is not needed
+  "@pulumi/kubernetes": false
+  protobufjs: false

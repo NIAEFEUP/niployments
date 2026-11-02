@@ -10,21 +10,31 @@ on:
 
 jobs:
   format:
-    name: Prettier
+    name: oxfmt
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/prepare-pulumi-project
-      - name: Run prettier
+      - name: Run oxfmt
         working-directory: services/pulumi/niployments
-        run: pnpm run prettier
+        run: pnpm run format
 
   lint:
-    name: ESLint
+    name: oxlint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/prepare-pulumi-project
-      - name: Run ESLint
+      - name: Run oxlint
         working-directory: services/pulumi/niployments
         run: pnpm run lint
+
+  test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/prepare-pulumi-project
+      - name: Type check and build the resource graph with Pulumi mocks
+        working-directory: services/pulumi/niployments
+        run: pnpm run test

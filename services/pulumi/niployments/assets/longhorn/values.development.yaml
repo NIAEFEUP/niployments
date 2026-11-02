@@ -1,0 +1,5 @@
+# Overrides on top of values.yaml. (Longhorn is disabled by default in development.)
+defaultSettings:
+  nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
+ingress:
+  enabled: true

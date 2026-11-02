@@ -1,1 +1,11 @@
-encryptionsalt: v1:EJ9KJm5XZxI=:v1:mM6v3sfEo91wnwwa:2D6KD4QQdVUx8fzdWXHNtRhxGmmbyw==
+# Fresh stack: `pulumi stack init production --secrets-provider passphrase` adds the encryptionsalt.
+config:
+  niployments:env: production
+  # Inventory of the objects that already exist in the cluster, adopted instead of created (see MIGRATION.md).
+  # Generate it with scripts/adopt-inventory.sh.
+  # niployments:adopt: adopt.production.json
+  niployments:cilium/lb-pool:
+    start: 10.11.11.2
+    stop: 10.11.11.254
+  # niployments:charts holds the versions of the Helm charts that are running in the cluster.
+  # They must all be pinned before the first preview, see MIGRATION.md.
