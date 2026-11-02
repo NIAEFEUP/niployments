@@ -1,0 +1,41 @@
+---
+# Deployment: runs 2 copies (replicas) of the 2048 game.
+# Image: alexwhen/docker-2048 = nginx + static 2048 game from
+# https://github.com/gabrielecirulli/2048, listens on port 80.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: game-2048
+  namespace: game-2048
+  labels:
+    app: game-2048
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: game-2048
+  template:
+    metadata:
+      labels:
+        app: game-2048
+    spec:
+      containers:
+        - name: game-2048
+          image: alexwhen/docker-2048:latest
+          ports:
+            - containerPort: 80
+---
+# Service: stable internal IP for the Deployment.
+# The IngressRoute below sends traffic here.
+apiVersion: v1
+kind: Service
+metadata:
+  name: game-2048-service
+  namespace: game-2048
+spec:
+  selector:
+    app: game-2048
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP

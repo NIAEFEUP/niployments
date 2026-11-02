@@ -1,0 +1,90 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inicio
+  namespace: inicio
+  annotations:
+    keel.sh/policy: "force"
+    keel.sh/match-tag: "true" 
+spec:
+  selector:
+    matchLabels:
+      app: inicio
+  template:
+    metadata:
+      labels:
+        app: inicio
+    spec:
+      containers:
+      - name: inicio
+        image: registry.niaefeup.pt/niaefeup/inicio:main
+        resources:
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+        imagePullPolicy: Always
+      imagePullSecrets:
+        - name: harbor-pull-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inicio-service
+  namespace: inicio
+spec:
+  selector:
+    app: inicio
+  ports:
+  - port: 80
+    targetPort: 3000
+  type: "ClusterIP"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inicio-ws
+  namespace: inicio
+  annotations:
+    keel.sh/policy: "force"
+    keel.sh/match-tag: "true"
+spec:
+  selector:
+    matchLabels:
+      app: inicio-ws
+  template:
+    metadata:
+      labels:
+        app: inicio-ws
+    spec:
+      containers:
+      - name: inicio-ws
+        image: registry.niaefeup.pt/niaefeup/inicio-ws:main
+        resources:
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 1234
+        envFrom:
+          - secretRef:
+              name: inicio-ws-secret
+        imagePullPolicy: Always
+      imagePullSecrets:
+        - name: harbor-pull-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inicio-ws-service
+  namespace: inicio
+spec:
+  selector:
+    app: inicio-ws
+  ports:
+  - port: 80
+    targetPort: 1234
+  type: "ClusterIP"

@@ -1,0 +1,21 @@
+ui:
+  message: Welcome to Niployments!
+  color: '#000000'
+  logo: 'https://avatars.githubusercontent.com/u/3583307?s=280&v=4'
+replicaCount: 3
+service:
+  type: ClusterIP
+  externalPort: 8081
+  httpPort: 8081
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 500m
+    memory: 128Mi
+faults:
+  delay: false
+  error: false
+  unready: false
+  unhealthy: false
