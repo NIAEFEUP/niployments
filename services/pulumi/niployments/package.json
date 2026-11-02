@@ -4,33 +4,35 @@
     "type": "module",
     "private": true,
     "scripts": {
-        "lint": "eslint --max-warnings=0 .",
-        "lint:fix": "eslint --fix .",
-        "prettier": "prettier --check .",
-        "prettier:fix": "prettier --write .",
+        "lint": "oxlint --type-aware --max-warnings=0",
+        "lint:fix": "oxlint --type-aware --fix",
+        "format": "oxfmt --check",
+        "format:fix": "oxfmt",
         "build": "tsc",
         "build:watch": "tsc --watch",
-        "check": "pnpm run lint && pnpm run prettier"
+        "test": "tsc && node --test \"bin/tests/*.test.js\"",
+        "check": "pnpm run lint && pnpm run format"
     },
     "devDependencies": {
-        "@eslint/js": "^9.7.0",
-        "@types/eslint__js": "^8.42.3",
-        "@types/node": "^18.19.39",
-        "eslint": "^9.7.0",
-        "eslint-plugin-only-warn": "^1.1.0",
-        "prettier": "3.3.3",
-        "typescript": "^5.5.3",
-        "typescript-eslint": "8.0.0-alpha.44"
+        "@types/node": "^24.0.0",
+        "oxfmt": "^0.75.0",
+        "oxlint": "^1.90.0",
+        "oxlint-tsgolint": "^7.0.2005",
+        "typescript": "^6.0.3"
     },
     "dependencies": {
-        "@pulumi/crds": "workspace:^",
-        "@pulumi/kubernetes": "^4.14.0",
-        "@pulumi/pulumi": "^3.121.0"
+        "@pulumi/crds": "workspace:*",
+        "@pulumi/kubernetes": "^4.34.2",
+        "@pulumi/pulumi": "^3.273.0"
     },
     "imports": {
-        "#resources/*": "./bin/resources/*",
-        "#services/*": "./bin/services/*",
+        "#config": "./bin/config.js",
+        "#components/*": "./bin/components/*",
+        "#platform/*": "./bin/platform/*",
+        "#databases/*": "./bin/databases/*",
+        "#apps/*": "./bin/apps/*",
+        "#dev/*": "./bin/dev/*",
         "#utils/*": "./bin/utils/*"
     },
-    "packageManager": "pnpm@9.1.0+sha512.67f5879916a9293e5cf059c23853d571beaf4f753c707f40cb22bed5fb1578c6aad3b6c4107ccb3ba0b35be003eb621a16471ac836c87beb53f9d54bb4612724"
+    "packageManager": "pnpm@12.9.0"
 }

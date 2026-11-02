@@ -1,0 +1,22 @@
+# Overrides on top of values.yaml for development
+sentinel:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 50Mi
+replica:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+  persistence:
+    size: 512Mi
+primary:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+  persistence:
+    size: 512Mi
+metrics:
+  enabled: false

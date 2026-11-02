@@ -14,11 +14,15 @@
     "forceConsistentCasingInFileNames": true,
     "rootDir": ".",
     "paths": {
-      "#resources/*": ["./resources/*"],
-      "#services/*": ["./services/*"],
+      "#config": ["./config.ts"],
+      "#components/*": ["./components/*"],
+      "#platform/*": ["./platform/*"],
+      "#databases/*": ["./databases/*"],
+      "#apps/*": ["./apps/*"],
+      "#dev/*": ["./dev/*"],
       "#utils/*": ["./utils/*"]
     }
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules", "bin", "crds"]
+  "exclude": ["node_modules", "bin"]
 }

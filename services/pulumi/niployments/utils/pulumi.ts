@@ -41,7 +41,7 @@ type FlattenArrayIntoObject<T extends readonly pulumi.Inputs[]> =
     ...infer Rest extends readonly pulumi.Inputs[],
   ]
     ? MergeObjects<NonNullable<First>, FlattenArrayIntoObject<Rest>>
-    : /* eslint-disable-next-line @typescript-eslint/no-empty-object-type --
+    : /* oxlint-disable-next-line typescript/no-empty-object-type --
        * T is empty array and flattening it produces an empty object
        */
       {};

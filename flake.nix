@@ -25,6 +25,12 @@
             kubernetes-helm
             kubectl
             k9s
+            nodejs_24
+            pnpm
+            pulumi-bin
+            yq-go
+            jq
+            kube-linter
           ];
         };
       }

@@ -23,8 +23,6 @@ function ensure_yq {
 }
 
 ensure_installed helm
-ensure_installed crd2pulumi
-ensure_installed pnpm
 ensure_yq
 
 function download_crds_from_helm {
@@ -51,7 +49,7 @@ function download_crds_from_helm_template {
     local options=$4
     local dir=$5
 
-    local crds="$(helm template "$name" "$chart_id" --version "$chart_version" --dry-run=server $options | yq '. | select(.kind == "CustomResourceDefinition")')"
+    local crds="$(helm template "$name" "$chart_id" --version "$chart_version" --dry-run=client $options | yq '. | select(.kind == "CustomResourceDefinition")')"
 
     if [ -z "$crds" ]; then
         return
@@ -134,22 +132,8 @@ function download_crds {
     echo "${crds[@]}"
 }
 
-function patch_crds_package() {
-    local crds_package=$1
-    yq -i '.version = "0.0.0"' -oj "$crds_package/package.json"
-    yq -i '.exports.["."] = "./bin/index.js"' -oj "$crds_package/package.json"
-}
-
-function build_crds_package() {
-    local crds_package=$1
-    pnpm install --use-stderr
-    pnpm run -C "$crds_package" build > /dev/null
-}
-
-rm -rf crds/
-
 SPEC_FILE="crds.yaml"
-CRDS_PROJECT_DIR="crds/nodejs/"
+MANIFESTS_DIR="crd-manifests"
 
 # 1. Add helm repositories
 echo
@@ -157,16 +141,12 @@ add_repositories "$SPEC_FILE"
 
 # 2. Download CRDs from sources
 echo
-crd_paths="$(download_crds "$SPEC_FILE" "$(dirname "$CRDS_PROJECT_DIR")/.tmp/")"
+rm -rf "$MANIFESTS_DIR"
+download_crds "$SPEC_FILE" "$MANIFESTS_DIR" > /dev/null
 
-# 3. Generate Pulumi CRDs package
+# 3. Generate the typed SDK (@pulumi/crds) from them
 echo
-crd2pulumi -n ${crd_paths[@]}
-
-# 4. Patch and build Pulumi CRDs package
-echo
-patch_crds_package "$CRDS_PROJECT_DIR"
-build_crds_package "$CRDS_PROJECT_DIR"
+./generate-crds-sdk.sh
 
 echo
-echo "CRDs synced successfully."
+echo "CRDs synced successfully, commit crd-manifests/."

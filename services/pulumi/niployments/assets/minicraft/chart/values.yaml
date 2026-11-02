@@ -1,0 +1,25 @@
+# Default values for minecraft.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+minecraft:
+  name: "minicraft"
+  type: "PAPER"
+  version: "26.1.2"
+  gamemode: "survival"
+  motd: "Bem-vindos ao miNIcraft!"
+  port: 30565
+  onlineMode: false
+  enableWhitelist: true
+  whitelist: Tomili2000,peu,Pinho,Sp1kyBtw,Darguima,pmpy_,skaffoldf
+
+volume:
+  storage: 6Gi
+  storageClassName: longhorn-locality-no-backup
+  mountPath: /data
+
+resources:
+  limits:
+    memory: 4Gi
+  requests:
+    memory: 2Gi

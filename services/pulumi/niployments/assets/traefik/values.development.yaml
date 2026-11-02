@@ -1,0 +1,19 @@
+# Overrides on top of values.yaml for the kind development cluster
+deployment:
+  replicas: 1
+
+ports:
+  web:
+    # no http -> https redirect in development
+    redirectTo: null
+
+service:
+  annotations:
+    "io.cilium/lb-ipam-ips": "172.28.255.205"
+  spec:
+    externalTrafficPolicy: Cluster
+    loadBalancerClass: null
+
+podSecurityContext:
+  runAsGroup: 0
+  runAsUser: 0

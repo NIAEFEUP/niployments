@@ -1,0 +1,11 @@
+[
+  "Namespace:cert-manager",
+  "Release:cert-manager/cert-manager",
+  "Release:kube-system/traefik",
+  "Namespace:website-ae",
+  "Deployment:website-ae/website-ae",
+  "Service:website-ae/website-ae-service",
+  "Certificate:website-ae/website-ae-cert",
+  "IngressRoute:website-ae/website-ae-https",
+  "Cluster:pg/cnpg-cluster"
+]

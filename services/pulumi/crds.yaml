@@ -1,14 +1,10 @@
 # yaml-language-server: $schema=../../schemas/crds.schema.json
+#
+# CRD sources of the typed `@pulumi/crds` extension SDK (sync-crds.sh downloads them into crd-manifests/).
+# Versions here MUST match what runs in the cluster (see niployments/versions.ts).
 repositories:
   - name: jetstack
     url: https://charts.jetstack.io
-  # - name: clustersecret
-  #   url: https://charts.clustersecret.io/
-  # mongodb official charts are not needed while temporary fix is in use
-  # - name: mongodb
-  #   url: https://mongodb.github.io/helm-charts
-  - name: mittwald
-    url: https://helm.mittwald.de
   - name: longhorn
     url: https://charts.longhorn.io
   - name: traefik
@@ -20,36 +16,35 @@ manifests:
     chart: jetstack/cert-manager
     version: v1.14.7
     options: |
-      --values=../cert-manager/values.yaml
+      --values=niployments/assets/cert-manager/values.yaml
       --namespace=cert-manager
-  # cilium - no CRDs
-  # cluster-secret
-  # - type: helm
-  #   chart: clustersecret/cluster-secret
-  # databases/mongodb
-  ## [version for official helm charts below]
-  # - type: template
-  #   chart: mongodb/community-operator
-  #   options: |
-  #     --namespace=mongodb
-  ## [version for temporary fix version below]
+  # cilium: the agent installs its CRDs at runtime, so take them from the source tree
+  - type: curl
+    name: cilium/ciliumbgppeeringpolicies
+    url: https://raw.githubusercontent.com/cilium/cilium/v1.15.3/pkg/k8s/apis/cilium.io/client/crds/v2alpha1/ciliumbgppeeringpolicies.yaml
+  - type: curl
+    name: cilium/ciliumloadbalancerippools
+    url: https://raw.githubusercontent.com/cilium/cilium/v1.15.3/pkg/k8s/apis/cilium.io/client/crds/v2alpha1/ciliumloadbalancerippools.yaml
+  - type: curl
+    name: cilium/ciliuml2announcementpolicies
+    url: https://raw.githubusercontent.com/cilium/cilium/v1.15.3/pkg/k8s/apis/cilium.io/client/crds/v2alpha1/ciliuml2announcementpolicies.yaml
+  # databases/mongodb (temporary fork, see resources/mongodb)
   - type: curl
     name: mongodb/community-operator
     url: https://raw.githubusercontent.com/limwa/mongodb-kubernetes-operator/master/config/crd/bases/mongodbcommunity.mongodb.com_mongodbcommunity.yaml
   # databases/postgresql
   - type: curl
     name: cloudnative-pg/cloudnative-pg
-    url: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.22/releases/cnpg-1.22.2.yaml
-  # image-registry (harbor) - no CRDs
-  # replicator - no CRDs
+    url: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.23/releases/cnpg-1.23.2.yaml
   # storage/longhorn
   - type: template
     chart: longhorn/longhorn
     version: 1.6.1
     options: |
-      --values=../storage/longhorn/prod-values.yaml
-      --namespace=longhorn
+      --values=niployments/assets/longhorn/values.yaml
+      --namespace=longhorn-system
   # traefik
   - type: helm
     chart: traefik/traefik
+    # CRD typing only: chart 25.x also ships the legacy traefik.containo.us CRDs, which duplicate the traefik.io kinds and made SDK generation fail with crd2pulumi (not retried with provider extensions).
     version: 28.3.0

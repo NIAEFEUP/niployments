@@ -1,0 +1,51 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "oxc", "unicorn"],
+  "categories": { "correctness": "error" },
+  "options": { "typeAware": true, "denyWarnings": true },
+  "ignorePatterns": ["node_modules", "bin", "assets"],
+  "rules": {
+    // what typescript-eslint's `recommendedTypeChecked` enabled
+    "typescript/await-thenable": "error",
+    "typescript/ban-ts-comment": "error",
+    "typescript/no-array-delete": "error",
+    "typescript/no-duplicate-type-constituents": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-floating-promises": "error",
+    "typescript/no-for-in-array": "error",
+    "typescript/no-implied-eval": "error",
+    "typescript/no-misused-promises": "error",
+    "typescript/no-redundant-type-constituents": "error",
+    "typescript/no-unnecessary-type-assertion": "error",
+    "typescript/no-unsafe-argument": "error",
+    "typescript/no-unsafe-assignment": "error",
+    "typescript/no-unsafe-call": "error",
+    "typescript/no-unsafe-enum-comparison": "error",
+    "typescript/no-unsafe-member-access": "error",
+    "typescript/no-unsafe-return": "error",
+    "typescript/no-unsafe-unary-minus": "error",
+    "typescript/only-throw-error": "error",
+    "typescript/prefer-promise-reject-errors": "error",
+    "typescript/require-await": "error",
+    "typescript/restrict-plus-operands": "error",
+    "typescript/unbound-method": "error",
+
+    // A pulumi.Output<T> interpolated in a plain template literal prints "[object Object]"
+    // instead of the value: it needs pulumi.interpolate. These two rules (together) catch what
+    // @pulumi/eslint-plugin's no-output-in-template-literal does. That plugin cannot run here:
+    // its rules need a ts.Program through parserServices, which oxlint's JS plugins don't have.
+    "typescript/no-base-to-string": "error",
+    "typescript/restrict-template-expressions": "error"
+  },
+  "overrides": [
+    {
+      // node:test registers tests through promises, and mocks are loosely typed
+      "files": ["tests/**"],
+      "rules": {
+        "typescript/no-floating-promises": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-return": "off"
+      }
+    }
+  ]
+}
