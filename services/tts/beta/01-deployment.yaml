@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: tts-fe
-          image: registry.niaefeup.pt/niaefeup/tts-fe:develop
+          image: registry.niaefeup.pt/niaefeup/tts-fe:beta
           imagePullPolicy: Always
           resources:
             limits:
