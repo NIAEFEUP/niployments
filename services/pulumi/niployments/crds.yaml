@@ -16,7 +16,7 @@ manifests:
     chart: jetstack/cert-manager
     version: v1.14.7
     options: |
-      --values=niployments/assets/cert-manager/values.yaml
+      --values=assets/cert-manager/values.yaml
       --namespace=cert-manager
   # cilium: the agent installs its CRDs at runtime, so take them from the source tree
   - type: curl
@@ -41,7 +41,7 @@ manifests:
     chart: longhorn/longhorn
     version: 1.6.1
     options: |
-      --values=niployments/assets/longhorn/values.yaml
+      --values=assets/longhorn/values.yaml
       --namespace=longhorn-system
   # traefik
   - type: helm

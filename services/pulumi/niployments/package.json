@@ -1,38 +1,43 @@
 {
     "name": "@niaefeup/niployments-pulumi",
-    "main": "bin/index.js",
+    "main": "index.ts",
     "type": "module",
     "private": true,
+    "engines": {
+        "node": ">=24"
+    },
     "scripts": {
         "lint": "oxlint --type-aware --max-warnings=0",
         "lint:fix": "oxlint --type-aware --fix",
         "format": "oxfmt --check",
         "format:fix": "oxfmt",
-        "build": "tsc",
-        "build:watch": "tsc --watch",
-        "test": "tsc && node --test \"bin/tests/*.test.js\"",
+        "typecheck": "tsc --noEmit",
+        "test": "tsc --noEmit && for f in tests/*.test.ts; do node --no-warnings --loader ts-node/esm \"$f\" || exit 1; done",
         "check": "pnpm run lint && pnpm run format"
     },
     "devDependencies": {
+        "@types/mocha": "^5.2.5",
         "@types/node": "^24.0.0",
+        "@types/shell-quote": "^1.6.0",
         "oxfmt": "^0.75.0",
         "oxlint": "^1.90.0",
         "oxlint-tsgolint": "^7.0.2005",
+        "ts-node": "^10.9.2",
         "typescript": "^6.0.3"
     },
     "dependencies": {
-        "@pulumi/crds": "workspace:*",
+        "@pulumi/crds": "file:sdks/crds",
         "@pulumi/kubernetes": "^4.34.2",
         "@pulumi/pulumi": "^3.273.0"
     },
     "imports": {
-        "#config": "./bin/config.js",
-        "#components/*": "./bin/components/*",
-        "#platform/*": "./bin/platform/*",
-        "#databases/*": "./bin/databases/*",
-        "#apps/*": "./bin/apps/*",
-        "#dev/*": "./bin/dev/*",
-        "#utils/*": "./bin/utils/*"
+        "#config": "./config.js",
+        "#components/*": "./components/*",
+        "#platform/*": "./platform/*",
+        "#databases/*": "./databases/*",
+        "#apps/*": "./apps/*",
+        "#dev/*": "./dev/*",
+        "#utils/*": "./utils/*"
     },
     "packageManager": "pnpm@12.9.0"
 }

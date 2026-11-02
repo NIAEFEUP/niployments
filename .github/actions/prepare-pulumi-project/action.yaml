@@ -1,5 +1,5 @@
 name: "Prepare Pulumi project"
-description: "Generates the typed CRD SDK and installs dependencies"
+description: "Installs dependencies and generates the typed CRD SDK with `pulumi install`"
 inputs:
   node-version:
     description: "Node version"
@@ -14,29 +14,25 @@ runs:
   steps:
     - uses: pnpm/action-setup@v4
       with:
-        package_json_file: services/pulumi/package.json
+        package_json_file: services/pulumi/niployments/package.json
 
     - uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
         cache: "pnpm"
-        cache-dependency-path: services/pulumi/pnpm-lock.yaml
+        cache-dependency-path: services/pulumi/niployments/pnpm-lock.yaml
 
     - uses: pulumi/setup-pulumi@v2
       with:
         pulumi-version: ${{ inputs.pulumi-version }}
 
-    # @pulumi/crds is generated from services/pulumi/crd-manifests (a pnpm workspace package)
-    - name: Generate the CRD SDK
+    # Generates @pulumi/crds (sdks/crds) from the `packages:` entry in Pulumi.yaml, then runs
+    # `pnpm install`.
+    - name: Install dependencies
       shell: sh
-      working-directory: services/pulumi
+      working-directory: services/pulumi/niployments
       env:
         PULUMI_SKIP_UPDATE_CHECK: "true"
         # the Kubernetes provider plugin is downloaded from GitHub releases
         GITHUB_TOKEN: ${{ github.token }}
-      run: ./generate-crds-sdk.sh
-
-    - name: Install dependencies
-      shell: sh
-      working-directory: services/pulumi
-      run: pnpm install --frozen-lockfile
+      run: pulumi install

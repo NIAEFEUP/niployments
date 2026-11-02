@@ -24,6 +24,7 @@ niployments/
   apps/             our apps: websites, tts, inicio, plausible, nextcloud, ...
   dev/              onboarding helpers, only deployed in development
   assets/<svc>/     Helm values: values.yaml + optional values.<stack-env>.yaml override
+  crd-manifests/    CRDs the typed `crds` SDK is generated from
   tests/            builds the whole resource graph with Pulumi mocks (no cluster needed)
 ```
 
@@ -31,12 +32,13 @@ niployments/
 
 ```sh
 nix develop          # or direnv allow: node 24, pnpm 12, pulumi, kubectl, helm, kind
-cd services/pulumi
-./generate-crds-sdk.sh  # generates the typed CRD SDK (@pulumi/crds), only needs the pulumi CLI
-pnpm install
-cd niployments
-pnpm run build
+cd services/pulumi/niployments
+pulumi install       # pnpm install + generates the typed CRD SDK (sdks/crds, git-ignored)
+pnpm run test        # type check + resource graph with Pulumi mocks
 ```
+
+The project is self-contained (it is not a pnpm workspace) and runs its TypeScript directly
+(`main: index.ts`, through `ts-node`), so there is no build step.
 
 ### Typed CRDs
 
@@ -44,14 +46,14 @@ pnpm run build
 [Kubernetes provider extension](https://www.pulumi.com/dev/tutorials/typed-customresources-with-provider-extensions/)
 named `crds` (`import * as crds from "@pulumi/crds"`, resource types look like
 `crds:cert-manager.io/v1:Certificate`). The CRDs it is built from are committed in
-[`crd-manifests/`](crd-manifests). The SDK itself is generated into `crds/nodejs` (git-ignored), which is a
-pnpm workspace package that `niployments` depends on with `workspace:*`: run
-`./generate-crds-sdk.sh`, then `pnpm install` (which compiles it).
+[`crd-manifests/`](niployments/crd-manifests), and listed in the `packages:` entry of
+[`Pulumi.yaml`](niployments/Pulumi.yaml). `pulumi install` regenerates the SDK from that entry
+(into `sdks/crds`, which is not committed), so CI and the Pulumi Kubernetes Operator get it for free.
 
-To add or bump a CRD source, edit [`crds.yaml`](crds.yaml) (versions must match what runs in the cluster),
-run `./sync-crds.sh` (needs helm, yq, curl and network access; it also regenerates the SDK) and commit
-`crd-manifests/`. The provider version used for generation is set in `generate-crds-sdk.sh` and must match
-`@pulumi/kubernetes`.
+To add or bump a CRD source, edit [`crds.yaml`](niployments/crds.yaml) (versions must match what runs in
+the cluster), run `./sync-crds.sh` from `niployments/` (needs helm, yq, curl, pulumi and network
+access; it rewrites `crd-manifests/` and the `packages:` entry) and commit both. The provider version
+(`KUBERNETES_PROVIDER_VERSION` in `sync-crds.sh`) must match `@pulumi/kubernetes`.
 
 ### Linting and formatting
 
@@ -77,7 +79,7 @@ them. Read [MIGRATION.md](niployments/MIGRATION.md) first.
 ### Development
 
 ```sh
-dev/setup-kind-cluster.sh           # kind + Cilium
+dev/setup-kind-cluster.sh           # kind + Cilium (from the repository root)
 cd services/pulumi/niployments
 pulumi login --local
 pulumi stack init development       # do not commit the encryptionsalt added to Pulumi.development.yaml

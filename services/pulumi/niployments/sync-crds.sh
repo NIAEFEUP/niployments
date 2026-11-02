@@ -132,6 +132,9 @@ function download_crds {
     echo "${crds[@]}"
 }
 
+# must match the @pulumi/kubernetes SDK (extensions need >= 4.34.0)
+KUBERNETES_PROVIDER_VERSION="4.34.2"
+
 SPEC_FILE="crds.yaml"
 MANIFESTS_DIR="crd-manifests"
 
@@ -144,9 +147,16 @@ echo
 rm -rf "$MANIFESTS_DIR"
 download_crds "$SPEC_FILE" "$MANIFESTS_DIR" > /dev/null
 
-# 3. Generate the typed SDK (@pulumi/crds) from them
+# 3. Record the typed SDK (@pulumi/crds) in Pulumi.yaml and generate it into sdks/crds, as a
+#    Pulumi Kubernetes provider extension. From then on `pulumi install` regenerates it.
+#    https://www.pulumi.com/dev/tutorials/typed-customresources-with-provider-extensions/
 echo
-./generate-crds-sdk.sh
+extension="name=crds version=1.0.0"
+while IFS= read -r manifest; do
+    extension+=" crd-manifest=$manifest"
+done < <(find "$MANIFESTS_DIR" -name '*.yaml' | sort)
+
+pulumi package add "kubernetes@$KUBERNETES_PROVIDER_VERSION" --extension "$extension"
 
 echo
-echo "CRDs synced successfully, commit crd-manifests/."
+echo "CRDs synced successfully, commit crd-manifests/ and Pulumi.yaml."
