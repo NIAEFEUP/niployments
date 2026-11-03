@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neet
+  namespace: neet
+  annotations:
+    keel.sh/policy: "force"
+    keel.sh/match-tag: "true"
+spec:
+  selector:
+    matchLabels:
+      app: neet
+  template:
+    metadata:
+      labels:
+        app: neet
+    spec:
+      containers:
+      - name: neet
+        image: registry.niaefeup.pt/niaefeup/neet:main
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+        envFrom:
+          - secretRef:
+              name: neet-env
+        imagePullPolicy: Always
+      imagePullSecrets:
+        - name: harbor-pull-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: neet-service
+  namespace: neet
+spec:
+  selector:
+    app: neet
+  ports:
+  - port: 80
+    targetPort: 3000
+  type: "ClusterIP"

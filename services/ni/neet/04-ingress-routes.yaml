@@ -1,0 +1,17 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: neet-https
+  namespace: neet
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`neet.niaefeup.pt`)
+      kind: Rule
+      services:
+        - name: neet-service
+          port: 80
+  tls:
+    secretName: neet-cert
