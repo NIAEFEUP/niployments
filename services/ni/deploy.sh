@@ -12,6 +12,7 @@ NI_CERT_CERT=$2
 kubectl apply -f $(dirname $0)/website
 kubectl apply -f $(dirname $0)/nitsig
 kubectl apply -f $(dirname $0)/plausible
+kubectl apply -f $(dirname $0)/neet
 
 if [[ -z "$NI_CERT_KEY" ]]; then
     echo "NI_CERT_KEY not found... not creating certificates"
