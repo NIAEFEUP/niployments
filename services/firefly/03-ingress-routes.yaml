@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`firefly.niaefeup.pt`)
+    - match: Host(`firefly.nifeup.com`)
       kind: Rule
       services:
         - name: firefly-iii

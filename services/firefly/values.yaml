@@ -51,7 +51,7 @@ config:
 
   # -- Directly defined environment variables. Use this for non-secret configuration values.
   env:
-    APP_URL: https://firefly.niaefeup.pt
+    APP_URL: https://firefly.nifeup.com
     DB_HOST: cnpg-cluster-rw.pg.svc.cluster.local
     DB_CONNECTION: pgsql
     DB_PORT: "5432"

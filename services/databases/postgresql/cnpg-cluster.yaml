@@ -63,6 +63,12 @@ spec:
         login: true
         passwordSecret:
           name: inicio-staging-secret
+      - name: firefly
+        ensure: present
+        createdb: false
+        login: true
+        passwordSecret:
+          name: firefly-secret
 
   storage:
     size: 40Gi
