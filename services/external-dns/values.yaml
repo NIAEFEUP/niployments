@@ -18,3 +18,4 @@ extraArgs:
   - --txt-prefix=external-dns-
   - --cloudflare-proxied
   - --domain-filter=niaefeup.pt
+  - --domain-filter=nifeup.com

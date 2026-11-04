@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: firefly-https
+  namespace: firefly
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`firefly.nifeup.com`)
+      kind: Rule
+      services:
+        - name: firefly-iii
+          port: 80
+  tls:
+    secretName: firefly-cert
