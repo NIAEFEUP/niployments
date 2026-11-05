@@ -8,7 +8,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`niaefeup.pt`)
+    - match: Host(`nifeup.com`) || Host(`www.nifeup.com`) || Host(`niaefeup.pt`)
       kind: Rule
       services:
         - name: website-ni-service
