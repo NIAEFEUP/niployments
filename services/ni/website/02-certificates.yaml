@@ -8,8 +8,8 @@ spec:
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
-  commonName: nifeup.pt
+  commonName: nifeup.com
   dnsNames:
-    - nifeup.pt
-    - www.nifeup.pt
+    - nifeup.com
+    - www.nifeup.com
     - niaefeup.pt
