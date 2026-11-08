@@ -4,6 +4,8 @@ kind: IngressRoute
 metadata:
   name: neet-https
   namespace: neet
+  annotations:
+    external-dns.alpha.kubernetes.io/target: niaefeup.pt
 spec:
   entryPoints:
     - websecure
