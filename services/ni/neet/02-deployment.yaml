@@ -16,6 +16,17 @@ spec:
       labels:
         app: neet
     spec:
+      initContainers:
+        - name: migrate
+          image: registry.niaefeup.pt/niaefeup/neet:main
+          command: ["node_modules/.bin/prisma", "db", "migrate"]
+          env:
+            - name: PRISMA_DISABLE_TELEMETRY
+              value: "1"
+          envFrom:
+            - secretRef:
+                name: neet-env
+          imagePullPolicy: Always
       containers:
       - name: neet
         image: registry.niaefeup.pt/niaefeup/neet:main
