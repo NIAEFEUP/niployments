@@ -2,8 +2,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tts-frontend-deployment
-  namespace: tts
+  name: tts-staging-frontend-deployment
+  namespace: tts-staging
   annotations:
     keel.sh/policy: "force"
     keel.sh/match-tag: "true"
@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: tts-fe
-          image: registry.niaefeup.pt/niaefeup/tts-fe:main
+          image: registry.niaefeup.pt/niaefeup/tts-fe:develop
           imagePullPolicy: Always
           resources:
             limits:
@@ -33,8 +33,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: tts-frontend-service
-  namespace: tts
+  name: tts-staging-frontend-service
+  namespace: tts-staging
 spec:
   selector:
     app: tts-frontend
@@ -46,8 +46,8 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tts-backend-deployment
-  namespace: tts
+  name: tts-staging-backend-deployment
+  namespace: tts-staging
   annotations:
     keel.sh/policy: "force"
     keel.sh/match-tag: "true"
@@ -63,7 +63,7 @@ spec:
     spec:
       containers:
         - name: tts-be
-          image: registry.niaefeup.pt/niaefeup/tts-be:main
+          image: registry.niaefeup.pt/niaefeup/tts-be:develop
           imagePullPolicy: Always
           resources:
             limits:
@@ -73,15 +73,15 @@ spec:
             - containerPort: 8000
           envFrom:
             - secretRef:
-                name: <FILL-IN>
+                name: tts-staging-backend-secret
       imagePullSecrets:
         - name: harbor-pull-secret
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: tts-backend-service
-  namespace: tts
+  name: tts-staging-backend-service
+  namespace: tts-staging
 spec:
   selector:
     app: tts-backend

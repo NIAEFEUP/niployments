@@ -73,7 +73,7 @@ spec:
             - containerPort: 8000
           envFrom:
             - secretRef:
-                name: <FILL-IN>
+                name: tts-beta-backend-secret
       imagePullSecrets:
         - name: harbor-pull-secret
 ---
