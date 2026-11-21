@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: neet-cert
+  namespace: neet
+spec:
+  secretName: neet-cert
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: neet.niaefeup.pt
+  dnsNames:
+    - neet.niaefeup.pt
