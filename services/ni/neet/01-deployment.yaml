@@ -23,9 +23,6 @@ spec:
           env:
             - name: PRISMA_DISABLE_TELEMETRY
               value: "1"
-          envFrom:
-            - secretRef:
-                name: neet-env
           imagePullPolicy: Always
       containers:
       - name: neet
@@ -36,9 +33,6 @@ spec:
             cpu: "500m"
         ports:
         - containerPort: 3000
-        envFrom:
-          - secretRef:
-              name: neet-env
         imagePullPolicy: Always
       imagePullSecrets:
         - name: harbor-pull-secret
