@@ -70,7 +70,7 @@ spec:
               memory: "128Mi"
               cpu: "500m"
           ports:
-            - containerPort: 8000
+            - containerPort: 3000
           envFrom:
             - secretRef:
                 name: tts-be-secret
@@ -87,5 +87,5 @@ spec:
     app: tts-backend
   ports:
     - port: 80
-      targetPort: 8000
+      targetPort: 3000
   type: "ClusterIP"
