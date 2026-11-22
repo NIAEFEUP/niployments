@@ -2,8 +2,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tts-staging-frontend-deployment
-  namespace: tts-staging
+  name: tts-beta-frontend-deployment
+  namespace: tts-beta
   annotations:
     keel.sh/policy: "force"
     keel.sh/match-tag: "true"
@@ -33,8 +33,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: tts-staging-frontend-service
-  namespace: tts-staging
+  name: tts-beta-frontend-service
+  namespace: tts-beta
 spec:
   selector:
     app: tts-frontend
@@ -46,8 +46,8 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tts-staging-backend-deployment
-  namespace: tts-staging
+  name: tts-beta-backend-deployment
+  namespace: tts-beta
   annotations:
     keel.sh/policy: "force"
     keel.sh/match-tag: "true"
@@ -73,15 +73,15 @@ spec:
             - containerPort: 8000
           envFrom:
             - secretRef:
-                name: tts-staging-backend-secret
+                name: tts-beta-backend-secret
       imagePullSecrets:
         - name: harbor-pull-secret
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: tts-staging-backend-service
-  namespace: tts-staging
+  name: tts-beta-backend-service
+  namespace: tts-beta
 spec:
   selector:
     app: tts-backend

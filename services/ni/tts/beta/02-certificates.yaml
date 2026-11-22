@@ -1,10 +1,10 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: tts-staging-certificate
-  namespace: tts-staging
+  name: tts-beta-certificate
+  namespace: tts-beta
 spec:
-  secretName: tts-staging-certificate-secret
+  secretName: tts-beta-certificate-secret
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
