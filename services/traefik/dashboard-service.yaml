@@ -1,0 +1,16 @@
+# The chart does not expose port 9000 (dashboard) in its Service; used by services/cloudflared.
+# The selector depends on the Helm release name and namespace (traefik / kube-system).
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-dashboard
+  namespace: kube-system
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: traefik
+    app.kubernetes.io/instance: traefik-kube-system
+  ports:
+    - name: traefik
+      port: 9000
+      targetPort: traefik
