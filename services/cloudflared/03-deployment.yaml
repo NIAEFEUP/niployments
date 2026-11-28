@@ -31,6 +31,12 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 3
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
           securityContext:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
