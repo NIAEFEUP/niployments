@@ -95,6 +95,8 @@ echo "Waiting for traefik deployment..."
 $KUBECTL_EXECUTABLE wait --for=condition=available --timeout=180s \
   deployment/traefik -n kube-system
 
+$KUBECTL_EXECUTABLE apply -f $(dirname $0)/../services/traefik/dashboard-service.yaml
+
 bash $(dirname $0)/../services/cert-manager/deploy-dev.sh
 
 echo "Waiting for cert-manager to be ready..."

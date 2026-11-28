@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+  namespace: cloudflared
+data:
+  config.yaml: |
+    # UUID of tunnel ni-dashboards (public: it is the target of the DNS CNAME)
+    tunnel: d68dba1f-57fc-4963-8cd8-207dcc019a0e
+    credentials-file: /etc/cloudflared/creds/credentials.json
+    metrics: 0.0.0.0:2000
+    # teamName = Zero Trust team name (<team>.cloudflareaccess.com), audTag = AUD of the Access app.
+    # cloudflared rejects requests without a valid Access token, so a hostname missing from the app is never public.
+    ingress:
+      - hostname: longhorn.nifeup.com
+        service: http://longhorn-frontend.longhorn-system.svc.cluster.local:80
+        originRequest:
+          access:
+            required: true
+            teamName: nifeup
+            audTag: [28b9349e36d26e6378e9b1ade18836b699ec80951609eadab25fcb58f35a3f9d]
+      - hostname: traefik.nifeup.com
+        service: http://traefik-dashboard.kube-system.svc.cluster.local:9000
+        originRequest:
+          access:
+            required: true
+            teamName: nifeup
+            audTag: [28b9349e36d26e6378e9b1ade18836b699ec80951609eadab25fcb58f35a3f9d]
+      - service: http_status:404
